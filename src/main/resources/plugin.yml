@@ -1,0 +1,61 @@
+name: ModReq
+version: ${project.version}
+main: uk.co.notnull.modreq.ModReq
+author: Jim (NotKatuen)
+api-version: 1.15
+description: File moderator requests.
+#commands:
+#  modreq:
+#    description: File a ModReq.
+#    permission: modreq.request
+#    aliases: [ticket]
+#  check:
+#    description: Check open/closed ModReq.
+#    permission: modreq.mod
+#  done:
+#    description: Close open ModReq.
+#    permission: modreq.mod
+#  tpid:
+#    description: Teleport to ModReq.
+#    permission: modreq.mod
+#    aliases: [tp-id]
+#  claim:
+#    description: Claim a ModReq.
+#    permission: modreq.mod
+#  unclaim:
+#    description: Unclaim a ModReq.
+#    permission: modreq.mod
+#  reopen:
+#    description: Reopen a ModReq.
+#    permission: modreq.mod
+#  elevate:
+#    description: Elevate a ModReq.
+#    permission: modreq.mod
+#  mrnote:
+#    description: Add or remove a note.
+#    permission: modreq.mod
+#    aliases: [mr-note]
+#  mrreload:
+#    description: Reload config and language file.
+#    permission: modreq.admin
+#    aliases: [mr-reload]
+#permissions:
+#  modreq.request:
+#    description: Access to PlayerCommands.
+#    default: true
+#  modreq.mod:
+#    description: Access to ModCommands.
+#    default: op
+#    children:
+#      modreq.request: true
+#  modreq.mod.overrideclaimed:
+#    description: Access to override (close) claimed ModReqs.
+#    default: op
+#  modreq.admin:
+#    description: Access to all ModReq commands.
+#    default: op
+#    children:
+#      modreq.request: true
+#      modreq.mod: true
+#      modreq.mod.overrideclaimed: true
+
