@@ -12,24 +12,13 @@ public class CmdElevate {
     public CmdElevate() {
     }
 
-    public void elevateModReq(final Player pPlayer, final String[] pArgs) {
+    public void elevateModReq(final Player player, final int id) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
-                boolean var1 = false;
-
-                int id;
-                try {
-                    id = Integer.parseInt(pArgs[0]);
-                } catch (NumberFormatException var8) {
-                    pPlayer.sendMessage(
-                            ModReq.getPlugin().getLanguageFile().getLangString("error.NUMBER-ERROR").replaceAll("%id", pArgs[0]));
-                    return;
-                }
-
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
@@ -48,26 +37,26 @@ public class CmdElevate {
                                 pStatement.setInt(1, id);
                                 pStatement.executeUpdate();
                                 pStatement.close();
-                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.1").replaceAll("%id", "" + id).replaceAll("%mod", pPlayer.getName()));
+                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.1").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
                             } else {
                                 pStatement.close();
                                 pStatement = connection.prepareStatement("UPDATE modreq SET elevated='0' WHERE id=?");
                                 pStatement.setInt(1, id);
                                 pStatement.executeUpdate();
                                 pStatement.close();
-                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.2").replaceAll("%id", "" + id).replaceAll("%mod", pPlayer.getName()));
+                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.2").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
                             }
                         } else {
-                            ModReq.getPlugin().sendMsg(pPlayer, "error.ALREADY-CLOSED");
+                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
                         }
                     } else {
-                        pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
                     }
 
                     connection.close();
                 } catch (SQLException var7) {
                     var7.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }

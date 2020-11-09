@@ -156,7 +156,11 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("page") Integer page
     ) {
-		(new CmdCheck()).checkOpenModreqs(player, new String[]{page != null ? String.valueOf(page) : ""}, page != null);
+		if(page != null) {
+			(new CmdCheck()).checkOpenModreqs(player, page);
+		} else {
+			(new CmdCheck()).checkOpenModreqs(player);
+		}
 	}
 
 	@CommandMethod("mr info <id>")
@@ -166,7 +170,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdCheck()).checkSpecialModreq(player, new String[]{String.valueOf(id)});
+		(new CmdCheck()).checkSpecialModreq(player, id);
 	}
 
 	@CommandMethod("mr search <criteria>")
@@ -176,7 +180,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("criteria") String criteria
     ) {
-		(new CmdCheck()).searchOpenModreqs(player, new String[]{criteria});
+		(new CmdCheck()).searchOpenModreqs(player, criteria);
 	}
 
 	@CommandMethod("mr claim <id>")
@@ -186,7 +190,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim()).claimModReq(player, new String[]{String.valueOf(id)}, true);
+		(new CmdClaim()).claimModReq(player, id, true);
 	}
 
 	@CommandMethod("mr unclaim <id>")
@@ -196,7 +200,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim()).claimModReq(player, new String[]{String.valueOf(id)}, false);
+		(new CmdClaim()).claimModReq(player, id, false);
 	}
 
 	@CommandMethod("mr close <id> <message>")
@@ -207,7 +211,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") String message
     ) {
-		(new CmdDone()).doneModReq(player, new String[]{String.valueOf(id), message});
+		(new CmdDone()).doneModReq(player, id, message);
 	}
 
 	@CommandMethod("mr open <id>")
@@ -217,7 +221,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdReopen()).reopenModReq(player, new String[]{String.valueOf(id)});
+		(new CmdReopen()).reopenModReq(player, id);
 	}
 
 	@CommandMethod("mr elevate <id>")
@@ -227,7 +231,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdElevate()).elevateModReq(player, new String[]{String.valueOf(id)});
+		(new CmdElevate()).elevateModReq(player, id);
 	}
 
 	@CommandMethod("mr tp <id>")
@@ -237,7 +241,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdTpid()).tpToModReq(player, new String[]{String.valueOf(id)});
+		(new CmdTpid()).tpToModReq(player, id);
 	}
 
 	@CommandMethod("mr note add <id> <note>")
@@ -248,7 +252,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("note") String note
     ) {
-		(new CmdNote()).addNote(player, new String[]{String.valueOf(id), note});
+		(new CmdNote()).addNote(player, id, note);
 	}
 
 	@CommandMethod("mr note remove <id> <noteid>")
@@ -260,7 +264,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("noteid") Integer noteId
     ) {
-		(new CmdNote()).removeNote(player, new String[]{String.valueOf(id), String.valueOf(noteId)});
+		(new CmdNote()).removeNote(player, id, noteId);
 	}
 
 	@ProxiedBy("modreq")
@@ -270,7 +274,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("message") String message
     ) {
-		(new CmdModreq()).modreq(player, new String[]{message}, player.getLocation());
+		(new CmdModreq()).modreq(player, message);
 	}
 
 	@CommandMethod("mr me")

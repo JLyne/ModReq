@@ -12,24 +12,13 @@ public class CmdReopen {
     public CmdReopen() {
     }
 
-    public void reopenModReq(final Player pPlayer, final String[] pArgs) {
+    public void reopenModReq(final Player player, final int id) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
-                boolean var1 = false;
-
-                int id;
-                try {
-                    id = Integer.parseInt(pArgs[0]);
-                } catch (NumberFormatException var7) {
-                    pPlayer.sendMessage(
-                            ModReq.getPlugin().getLanguageFile().getLangString("error.NUMBER-ERROR").replaceAll("%id", pArgs[0]));
-                    return;
-                }
-
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
@@ -45,18 +34,18 @@ public class CmdReopen {
                             pStatement.setInt(1, id);
                             pStatement.executeUpdate();
                             pStatement.close();
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.REOPEN").replaceAll("%mod", pPlayer.getName()).replaceAll("%id", "" + id));
+                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.REOPEN").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id));
                         } else {
-                            ModReq.getPlugin().sendMsg(pPlayer, "error.NOT-CLOSED");
+                            ModReq.getPlugin().sendMsg(player, "error.NOT-CLOSED");
                         }
                     } else {
-                        pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
                     }
 
                     connection.close();
                 } catch (SQLException var6) {
                     var6.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }

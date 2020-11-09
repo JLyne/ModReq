@@ -14,26 +14,13 @@ public class CmdTpid {
     public CmdTpid() {
     }
 
-    public void tpToModReq(final Player pPlayer, final String[] pArgs) {
+    public void tpToModReq(final Player player, final int id) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
-                boolean var1 = false;
-
-                int id_;
-                try {
-                    id_ = Integer.parseInt(pArgs[0]);
-                } catch (NumberFormatException var12) {
-                    pPlayer.sendMessage(
-                            ModReq.getPlugin().getLanguageFile().getLangString("error.NUMBER-ERROR").replaceAll("%id", pArgs[0]));
-                    return;
-                }
-
-                int id = id_;
-
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
@@ -50,24 +37,24 @@ public class CmdTpid {
                         pStatement.close();
                         if (done == 0) {
                             Bukkit.getScheduler().runTask(ModReq.getPlugin(), () -> {
-                                if (pPlayer.teleport(new Location(Bukkit.getWorld(world), (double)x, (double)y, (double)z))) {
-                                    pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.TELEPORT").replaceAll("%id", "" + id));
+                                if (player.teleport(new Location(Bukkit.getWorld(world), (double)x, (double)y, (double)z))) {
+                                    player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.TELEPORT").replaceAll("%id", "" + id));
                                 } else {
-                                    ModReq.getPlugin().sendMsg(pPlayer, "error.TELEPORT-ERROR");
+                                    ModReq.getPlugin().sendMsg(player, "error.TELEPORT-ERROR");
                                 }
 
                             });
                         } else {
-                            ModReq.getPlugin().sendMsg(pPlayer, "error.ALREADY-CLOSED");
+                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
                         }
                     } else {
-                        pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
                     }
 
                     connection.close();
                 } catch (SQLException var11) {
                     var11.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }

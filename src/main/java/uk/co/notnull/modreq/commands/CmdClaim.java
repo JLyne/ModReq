@@ -12,24 +12,13 @@ public class CmdClaim {
     public CmdClaim() {
     }
 
-    public void claimModReq(final Player pPlayer, final String[] pArgs, final boolean pClaim) {
+    public void claimModReq(final Player player, final int id, final boolean claim) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
-                boolean var1 = false;
-
-                int id;
-                try {
-                    id = Integer.parseInt(pArgs[0]);
-                } catch (NumberFormatException var7) {
-                    pPlayer.sendMessage(
-                            ModReq.getPlugin().getLanguageFile().getLangString("error.NUMBER-ERROR").replaceAll("%id", pArgs[0]));
-                    return;
-                }
-
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
@@ -42,43 +31,43 @@ public class CmdClaim {
                         sqlres.close();
                         pStatement.close();
                         if (done == 0) {
-                            if (pClaim) {
-                                if (!claimed.equals("") && !pPlayer.hasPermission("modreq.admin") && !pPlayer.hasPermission("modreq.mod.overrideclaimed")) {
-                                    ModReq.getPlugin().sendMsg(pPlayer, "error.ALREADY-CLAIMED");
+                            if (claim) {
+                                if (!claimed.equals("") && !player.hasPermission("modreq.admin") && !player.hasPermission("modreq.mod.overrideclaimed")) {
+                                    ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLAIMED");
                                 } else {
                                     pStatement.close();
                                     pStatement = connection.prepareStatement("UPDATE modreq SET claimed=? WHERE id=?");
-                                    pStatement.setString(1, pPlayer.getUniqueId().toString());
+                                    pStatement.setString(1, player.getUniqueId().toString());
                                     pStatement.setInt(2, id);
                                     pStatement.executeUpdate();
                                     pStatement.close();
-                                    ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.CLAIM").replaceAll("%mod", pPlayer.getName()).replaceAll("%id", "" + id));
+                                    ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.CLAIM").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id));
                                 }
                             } else if (!claimed.equals("")) {
-                                if (!claimed.equals(pPlayer.getUniqueId().toString()) && !pPlayer.hasPermission("modreq.admin") && !pPlayer.hasPermission("modreq.mod.overrideclaimed")) {
-                                    ModReq.getPlugin().sendMsg(pPlayer, "error.OTHER-CLAIMED");
+                                if (!claimed.equals(player.getUniqueId().toString()) && !player.hasPermission("modreq.admin") && !player.hasPermission("modreq.mod.overrideclaimed")) {
+                                    ModReq.getPlugin().sendMsg(player, "error.OTHER-CLAIMED");
                                 } else {
                                     pStatement.close();
                                     pStatement = connection.prepareStatement("UPDATE modreq SET claimed='' WHERE id=?");
                                     pStatement.setInt(1, id);
                                     pStatement.executeUpdate();
                                     pStatement.close();
-                                    ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.UNCLAIM").replaceAll("%mod", pPlayer.getName()).replaceAll("%id", "" + id));
+                                    ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.UNCLAIM").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id));
                                 }
                             } else {
-                                ModReq.getPlugin().sendMsg(pPlayer, "error.NOT-CLAIMED");
+                                ModReq.getPlugin().sendMsg(player, "error.NOT-CLAIMED");
                             }
                         } else {
-                            ModReq.getPlugin().sendMsg(pPlayer, "error.ALREADY-CLOSED");
+                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
                         }
                     } else {
-                        pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
                     }
 
                     connection.close();
                 } catch (SQLException var8) {
                     var8.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }

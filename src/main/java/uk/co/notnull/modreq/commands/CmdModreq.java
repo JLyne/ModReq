@@ -16,21 +16,21 @@ public class CmdModreq {
     public CmdModreq() {
     }
 
-    public void modreq(final Player pPlayer, final String[] pArgs, final Location pLoc) {
+    public void modreq(final Player player, final String message) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE uuid=? AND done='0'");
-                    pStatement.setString(1, pPlayer.getUniqueId().toString());
+                    pStatement.setString(1, player.getUniqueId().toString());
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         sqlres.close();
                         pStatement.close();
                     } else {
@@ -38,31 +38,25 @@ public class CmdModreq {
                         sqlres.close();
                         pStatement.close();
                         if (count >= ModReq.getPlugin().getConfiguration().getMax_open_modreqs()) {
-                            pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.MAX-OPEN-MODREQS").replaceAll("%max", "" + ModReq.getPlugin().getConfiguration().getMax_open_modreqs()));
+                            player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.MAX-OPEN-MODREQS").replaceAll("%max", "" + ModReq.getPlugin().getConfiguration().getMax_open_modreqs()));
                         } else {
-                            String request = "";
-
-                            int id;
-                            for(id = 0; id < pArgs.length; ++id) {
-                                request = request + pArgs[id] + " ";
-                            }
-
+                            Location location = player.getLocation();
                             pStatement = connection.prepareStatement("INSERT INTO modreq (uuid,request,timestamp,world,x,y,z) VALUES (?,?,?,?,?,?,?)");
-                            pStatement.setString(1, pPlayer.getUniqueId().toString());
-                            pStatement.setString(2, request.trim());
+                            pStatement.setString(1, player.getUniqueId().toString());
+                            pStatement.setString(2, message.trim());
                             pStatement.setLong(3, System.currentTimeMillis());
-                            pStatement.setString(4, pLoc.getWorld().getName());
-                            pStatement.setInt(5, pLoc.getBlockX());
-                            pStatement.setInt(6, pLoc.getBlockY());
-                            pStatement.setInt(7, pLoc.getBlockZ());
+                            pStatement.setString(4, location.getWorld().getName());
+                            pStatement.setInt(5, location.getBlockX());
+                            pStatement.setInt(6, location.getBlockY());
+                            pStatement.setInt(7, location.getBlockZ());
                             pStatement.executeUpdate();
                             pStatement.close();
-                            ModReq.getPlugin().sendMsg(pPlayer, "player.REQUEST-FILED");
+                            ModReq.getPlugin().sendMsg(player, "player.REQUEST-FILED");
                             pStatement = connection.prepareStatement("SELECT MAX(id) FROM modreq WHERE uuid=?");
-                            pStatement.setString(1, pPlayer.getUniqueId().toString());
+                            pStatement.setString(1, player.getUniqueId().toString());
                             sqlres = pStatement.executeQuery();
                             if (sqlres.next()) {
-                                id = sqlres.getInt(1);
+                                int id = sqlres.getInt(1);
                                 sqlres.close();
                                 pStatement.close();
                                 ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.NEW-MODREQ").replaceAll("%id", "" + id));
@@ -74,7 +68,7 @@ public class CmdModreq {
                     connection.close();
                 } catch (SQLException var7) {
                     var7.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }
@@ -82,21 +76,21 @@ public class CmdModreq {
         runnable.runTaskAsynchronously(ModReq.getPlugin());
     }
 
-    public void checkPlayerModReqs(final Player pPlayer) {
+    public void checkPlayerModReqs(final Player player) {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
                     Connection connection = ModReq.getPlugin().getSqlHandler().open();
                     if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                         return;
                     }
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT id,request,timestamp,mod_uuid,mod_comment,mod_timestamp,done FROM modreq WHERE uuid=? ORDER BY id DESC");
-                    pStatement.setString(1, pPlayer.getUniqueId().toString());
+                    pStatement.setString(1, player.getUniqueId().toString());
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "player.check.NO-MODREQS");
+                        ModReq.getPlugin().sendMsg(player, "player.check.NO-MODREQS");
                     } else {
                         ArrayList requests = new ArrayList();
 
@@ -112,14 +106,14 @@ public class CmdModreq {
 
                         --end;
                         int count = ModReq.getPlugin().getConfiguration().getShow_last_modreqs();
-                        pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.1").replaceAll("%count", "" + count));
+                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.1").replaceAll("%count", "" + count));
                         boolean first = true;
 
                         for(int i = end; i > -1; --i) {
                             if (first) {
                                 first = false;
                             } else {
-                                pPlayer.sendMessage("");
+                                player.sendMessage("");
                             }
 
                             OfflinePlayer modUser = null;
@@ -136,26 +130,26 @@ public class CmdModreq {
 
                             String timestamp_formatted = ModReq.getPlugin().getFormat().format(((Request)requests.get(i)).getTimestamp());
                             String mod_timestamp_formatted = ModReq.getPlugin().getFormat().format(((Request)requests.get(i)).getMod_timestamp());
-                            pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.2").replaceAll("%status", status).replaceAll("%date", timestamp_formatted).replaceAll("%id", "" + ((Request)requests.get(i)).getId()));
-                            pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.3").replaceAll("%msg", ((Request)requests.get(i)).getRequest()));
+                            player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.2").replaceAll("%status", status).replaceAll("%date", timestamp_formatted).replaceAll("%id", "" + ((Request)requests.get(i)).getId()));
+                            player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.3").replaceAll("%msg", ((Request)requests.get(i)).getRequest()));
                             if (((Request)requests.get(i)).getDone() != 0) {
                                 if (modUser.getName() != null) {
-                                    pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.4").replaceAll("%mod", modUser.getName()).replaceAll("%date", mod_timestamp_formatted));
+                                    player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.4").replaceAll("%mod", modUser.getName()).replaceAll("%date", mod_timestamp_formatted));
                                 } else {
-                                    pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.4").replaceAll("%mod", "unknown").replaceAll("%date", mod_timestamp_formatted));
+                                    player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.4").replaceAll("%mod", "unknown").replaceAll("%date", mod_timestamp_formatted));
                                 }
 
-                                pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.5").replaceAll("%msg", ((Request)requests.get(i)).getMod_comment()));
+                                player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.check.5").replaceAll("%msg", ((Request)requests.get(i)).getMod_comment()));
                             }
                         }
 
-                        ModReq.getPlugin().sendMsg(pPlayer, "player.check.6");
+                        ModReq.getPlugin().sendMsg(player, "player.check.6");
                     }
 
                     connection.close();
                 } catch (SQLException var13) {
                     var13.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
                 }
 
             }
