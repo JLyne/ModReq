@@ -230,7 +230,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdElevate()).elevateModReq(player, id);
+		(new CmdElevate(ModReq.getPlugin())).elevateModReq(player, id);
 	}
 
 	@CommandMethod("mr tp <id>")

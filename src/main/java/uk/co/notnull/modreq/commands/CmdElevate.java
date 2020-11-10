@@ -1,60 +1,43 @@
 package uk.co.notnull.modreq.commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.Request;
 
 public class CmdElevate {
-    public CmdElevate() {
+    private final ModReq plugin;
+
+    public CmdElevate(ModReq plugin) {
+        this.plugin = plugin;
     }
 
     public void elevateModReq(final Player player, final int id) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
-
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT done,elevated FROM modreq WHERE id=?");
-                    pStatement.setInt(1, id);
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (sqlres.next()) {
-                        int done = sqlres.getInt(1);
-                        int elevated = sqlres.getInt(2);
-                        sqlres.close();
-                        pStatement.close();
-                        if (done == 0) {
-                            if (elevated == 0) {
-                                pStatement.close();
-                                pStatement = connection.prepareStatement("UPDATE modreq SET elevated='1' WHERE id=?");
-                                pStatement.setInt(1, id);
-                                pStatement.executeUpdate();
-                                pStatement.close();
-                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.1").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
-                            } else {
-                                pStatement.close();
-                                pStatement = connection.prepareStatement("UPDATE modreq SET elevated='0' WHERE id=?");
-                                pStatement.setInt(1, id);
-                                pStatement.executeUpdate();
-                                pStatement.close();
-                                ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.elevate.2").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
-                            }
-                        } else {
-                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
-                        }
-                    } else {
-                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
-                    }
-                } catch (SQLException var7) {
-                    var7.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                }
-
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
+                player.sendMessage(plugin.getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                return CompletableFuture.completedFuture(null);
             }
-        };
-        runnable.runTaskAsynchronously(ModReq.getPlugin());
+
+            int done = request.getDone();
+            int elevated = request.getElevated();
+
+            if(done == 0) {
+                return plugin.getRequestRegistry().elevate(id, elevated == 0).thenAcceptAsync((Boolean result) -> {
+                    plugin.sendModMsg(plugin.getLanguageFile()
+                                              .getLangString("mod.elevate." + (elevated == 0 ? "1" : "2"))
+                                              .replaceAll("%id", "" + id)
+                                              .replaceAll("%mod", player.getName()));
+                });
+            } else {
+                plugin.sendMsg(player, "error.ALREADY-CLOSED");
+                return CompletableFuture.completedFuture(null);
+            }
+        }).exceptionally(e -> {
+            e.printStackTrace();
+            plugin.sendMsg(player, "error.DATABASE-ERROR");
+            return null;
+        });
     }
 }

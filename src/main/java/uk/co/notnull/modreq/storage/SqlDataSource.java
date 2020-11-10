@@ -139,8 +139,15 @@ public class SqlDataSource implements DataSource {
 		}
 	}
 
-	public boolean elevateRequest(int id) throws SQLException {
-		return true;
+	public boolean elevateRequest(int id, boolean elevated) throws SQLException {
+		Connection connection = plugin.getDataSource().getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET elevated=? WHERE id=?");
+		pStatement.setInt(1, elevated ? 1 : 0);
+		pStatement.setInt(2, id);
+		int result = pStatement.executeUpdate();
+		pStatement.close();
+
+		return result > 1;
 	}
 
 	public boolean reopenRequest(int id) throws SQLException {

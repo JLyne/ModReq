@@ -11,6 +11,6 @@ public interface DataSource {
 	void destroy();
 	boolean requestExists(int id) throws Exception;
 	Request getRequest(int id) throws Exception;
-	boolean elevateRequest(int id) throws Exception;
+	boolean elevateRequest(int id, boolean elevated) throws Exception;
 	boolean reopenRequest(int id) throws Exception;
 }

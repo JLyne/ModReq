@@ -32,8 +32,8 @@ public class RequestRegistry {
 		return makeFuture(() -> plugin.getDataSource().getRequest(id));
 	}
 
-	public CompletableFuture<Boolean> elevate(int id) {
-		return makeFuture(() -> plugin.getDataSource().elevateRequest(id));
+	public CompletableFuture<Boolean> elevate(int id, boolean elevated) {
+		return makeFuture(() -> plugin.getDataSource().elevateRequest(id, elevated));
 	}
 
 	public CompletableFuture<Boolean> reopen(int id) {
