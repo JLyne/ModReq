@@ -16,11 +16,7 @@ public class CmdElevate {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
-                    Connection connection = ModReq.getPlugin().getSqlHandler().open();
-                    if (connection == null) {
-                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                        return;
-                    }
+                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT done,elevated FROM modreq WHERE id=?");
                     pStatement.setInt(1, id);
@@ -52,8 +48,6 @@ public class CmdElevate {
                     } else {
                         player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
                     }
-
-                    connection.close();
                 } catch (SQLException var7) {
                     var7.printStackTrace();
                     ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");

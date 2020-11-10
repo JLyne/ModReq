@@ -13,6 +13,7 @@ public class Configuration {
     private String mysql_database;
     private String mysql_user;
     private String mysql_pass;
+    private String mysql_options;
     private int modreqs_per_page;
     private int show_last_modreqs;
     private int max_open_modreqs;
@@ -47,6 +48,7 @@ public class Configuration {
         this.mysql_database = this.getString("database.mysql.database", "");
         this.mysql_user = this.getString("database.mysql.user", "");
         this.mysql_pass = this.getString("database.mysql.pass", "");
+        this.mysql_options = this.getString("database.mysql.options", "autoreconnect=true&useSSL=false&serverTimezone=UTC");
         this.modreqs_per_page = this.getInt("settings.modreqs-per-page", 5);
         this.show_last_modreqs = this.getInt("settings.show-last-modreqs", 5);
         this.max_open_modreqs = this.getInt("settings.max-open-modreqs", 5);
@@ -100,6 +102,10 @@ public class Configuration {
 
     public String getMySQLDatabase() {
         return this.mysql_database;
+    }
+
+    public String getMySQLOptions() {
+        return this.mysql_options;
     }
 
     public String getMySQLUser() {

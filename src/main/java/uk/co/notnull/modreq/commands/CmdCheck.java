@@ -24,11 +24,7 @@ public class CmdCheck {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
 				try {
-					Connection connection = ModReq.getPlugin().getSqlHandler().open();
-					if (connection == null) {
-						ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-						return;
-					}
+					Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
 					PreparedStatement pStatement;
 					if (player.hasPermission("modreq.admin")) {
@@ -56,7 +52,6 @@ public class CmdCheck {
 													   .getLanguageFile()
 													   .getLangString("error.NUMBER-ERROR")
 													   .replaceAll("%id", String.valueOf(page)));
-							connection.close();
 							return;
 						}
 
@@ -69,7 +64,6 @@ public class CmdCheck {
 
 						if (page > resultPages) {
 							player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.PAGE-ERROR").replaceAll("%page", "" + page));
-							connection.close();
 							return;
 						}
 
@@ -126,7 +120,6 @@ public class CmdCheck {
 						player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.check.4").replaceAll("%page", "" + page).replaceAll("%allpages", "" + resultPages));
 					}
 
-					connection.close();
 				} catch (SQLException var16) {
 					var16.printStackTrace();
 					ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
@@ -141,11 +134,7 @@ public class CmdCheck {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
 				try {
-					Connection connection = ModReq.getPlugin().getSqlHandler().open();
-					if (connection == null) {
-						ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-						return;
-					}
+					Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
 					PreparedStatement pStatement = connection.prepareStatement("SELECT uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE id=?");
 					pStatement.setInt(1, id);
@@ -230,7 +219,6 @@ public class CmdCheck {
 						}
 					}
 
-					connection.close();
 				} catch (SQLException var15) {
 					var15.printStackTrace();
 					ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
@@ -245,11 +233,7 @@ public class CmdCheck {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			public void run() {
 				try {
-					Connection connection = ModReq.getPlugin().getSqlHandler().open();
-					if (connection == null) {
-						ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-						return;
-					}
+					Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
 					PreparedStatement pStatement;
 					if (player.hasPermission("modreq.admin")) {
@@ -325,7 +309,6 @@ public class CmdCheck {
 						player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.check.1").replaceAll("%count", "" + requests.size()));
 					}
 
-					connection.close();
 				} catch (SQLException var12) {
 					var12.printStackTrace();
 					ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");

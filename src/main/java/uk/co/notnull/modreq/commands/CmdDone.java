@@ -18,11 +18,7 @@ public class CmdDone {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
-                    Connection connection = ModReq.getPlugin().getSqlHandler().open();
-                    if (connection == null) {
-                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                        return;
-                    }
+                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT uuid,claimed,mod_uuid FROM modreq WHERE id=?");
                     pStatement.setInt(1, id);
@@ -37,13 +33,11 @@ public class CmdDone {
                         pStatement.close();
                         if (!mod_uuid.equals("")) {
                             ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
-                            connection.close();
                             return;
                         }
 
                         if (!claimed.equals("") && !claimed.equals(player.getUniqueId().toString()) && !player.hasPermission("modreq.mod.admin") && !player.hasPermission("modreq.mod.overrideclaimed")) {
                             ModReq.getPlugin().sendMsg(player, "error.OTHER-CLAIMED");
-                            connection.close();
                             return;
                         }
 
@@ -84,8 +78,6 @@ public class CmdDone {
                             pStatement.close();
                         }
                     }
-
-                    connection.close();
                 } catch (SQLException var12) {
                     var12.printStackTrace();
                     ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");

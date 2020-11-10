@@ -20,11 +20,7 @@ public class CmdModreq {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
-                    Connection connection = ModReq.getPlugin().getSqlHandler().open();
-                    if (connection == null) {
-                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                        return;
-                    }
+                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE uuid=? AND done='0'");
                     pStatement.setString(1, player.getUniqueId().toString());
@@ -64,8 +60,6 @@ public class CmdModreq {
                             }
                         }
                     }
-
-                    connection.close();
                 } catch (SQLException var7) {
                     var7.printStackTrace();
                     ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
@@ -80,11 +74,7 @@ public class CmdModreq {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
-                    Connection connection = ModReq.getPlugin().getSqlHandler().open();
-                    if (connection == null) {
-                        ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                        return;
-                    }
+                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT id,request,timestamp,mod_uuid,mod_comment,mod_timestamp,done FROM modreq WHERE uuid=? ORDER BY id DESC");
                     pStatement.setString(1, player.getUniqueId().toString());
@@ -145,8 +135,6 @@ public class CmdModreq {
 
                         ModReq.getPlugin().sendMsg(player, "player.check.6");
                     }
-
-                    connection.close();
                 } catch (SQLException var13) {
                     var13.printStackTrace();
                     ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");

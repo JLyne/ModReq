@@ -20,11 +20,7 @@ public class PlayerJoin {
         BukkitRunnable runnable = new BukkitRunnable() {
             public void run() {
                 try {
-                    Connection connection = ModReq.getPlugin().getSqlHandler().open();
-                    if (connection == null) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
-                        return;
-                    }
+                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
 
                     PreparedStatement pStatement = connection.prepareStatement("SELECT id,mod_uuid,mod_comment FROM modreq WHERE uuid=? AND done='1'");
                     pStatement.setString(1, pPlayer.getUniqueId().toString());
@@ -87,8 +83,6 @@ public class PlayerJoin {
 
                         sqlres.close();
                     }
-
-                    connection.close();
                 } catch (SQLException var8) {
                     var8.printStackTrace();
                     ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
