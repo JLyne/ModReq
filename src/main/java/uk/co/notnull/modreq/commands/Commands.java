@@ -27,6 +27,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import uk.co.notnull.modreq.ModReq;
 
 public class Commands {
 	private PaperCommandManager<CommandSender> paperCommandManager;
@@ -239,7 +240,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdTpid()).tpToModReq(player, id);
+		(new CmdTpid(ModReq.getPlugin())).tpToModReq(player, id);
 	}
 
 	@CommandMethod("mr note add <id> <note>")
