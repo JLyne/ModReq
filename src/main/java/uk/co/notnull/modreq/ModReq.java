@@ -15,14 +15,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.commands.Commands;
 import uk.co.notnull.modreq.listener.PlayerListener;
 import uk.co.notnull.modreq.storage.DataSource;
-import uk.co.notnull.modreq.storage.MysqlDataSource;
-import uk.co.notnull.modreq.storage.SqliteDataSource;
+import uk.co.notnull.modreq.storage.SqlDataSource;
 
 public final class ModReq extends JavaPlugin {
     private static ModReq plugin;
@@ -30,13 +27,15 @@ public final class ModReq extends JavaPlugin {
     private LanguageFile lang;
     private DataSource dataSource;
     private SimpleDateFormat format;
+    private RequestRegistry requestRegistry;
 
-    public ModReq() {
-    }
+    public ModReq() {}
 
     public void onEnable() {
         plugin = this;
         this.reloadConfiguration();
+
+        this.requestRegistry = new RequestRegistry(this);
 
         new Commands(this);
 
@@ -50,14 +49,14 @@ public final class ModReq extends JavaPlugin {
 //        this.getCommand("elevate").setExecutor(new PlayerCommands());
 //        this.getCommand("mrreload").setExecutor(new PlayerCommands());
 //        this.getCommand("mrnote").setExecutor(new PlayerCommands());
-        PluginManager pm = Bukkit.getPluginManager();
-        pm.registerEvents(new PlayerListener(), this);
+
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+
         if (this.cfg.isMySQL()) {
             this.getLogger().info("Plugin enabled (database: MySQL).");
         } else {
             this.getLogger().info("Plugin enabled (database: SQLite).");
         }
-
     }
 
     public void onDisable() {
@@ -84,6 +83,10 @@ public final class ModReq extends JavaPlugin {
         return this.format;
     }
 
+    public RequestRegistry getRequestRegistry() {
+        return requestRegistry;
+    }
+
     public void reloadConfiguration() {
         this.lang = new LanguageFile();
         Locale locale = Locale.forLanguageTag(this.getLanguageFile().getLangString("general.LANGUAGE-TAG"));
@@ -91,17 +94,13 @@ public final class ModReq extends JavaPlugin {
         this.format = new SimpleDateFormat(this.getLanguageFile().getLangString("general.DATE-FORMAT"), locale);
         this.cfg = cfg;
 
-        if(this.dataSource != null) {
-            this.dataSource.destroy();
-        }
-
-        if(ModReq.this.cfg.isMySQL()) {
-            this.dataSource = new MysqlDataSource(getLogger(), cfg);
-        } else {
-            this.dataSource = new SqliteDataSource(getLogger(), "modreq", "plugins/ModReq");
-        }
-
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            if(this.dataSource != null) {
+                this.dataSource.destroy();
+            }
+
+            this.dataSource = new SqlDataSource(this, cfg);
+
             if(!this.dataSource.init()) {
                 getServer().getPluginManager().disablePlugin(plugin);
             }
