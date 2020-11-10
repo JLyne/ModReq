@@ -38,6 +38,9 @@ public class RequestRegistry {
 		return makeFuture(() -> plugin.getDataSource().elevateRequest(id, elevated));
 	}
 
+	public CompletableFuture<Request> close(Request request, Player mod, String message) {
+		return makeFuture(() ->  plugin.getDataSource().closeRequest(request, mod, message));
+	}
 	public CompletableFuture<Boolean> reopen(int id) {
 		return makeFuture(() -> plugin.getDataSource().reopenRequest(id));
 	}

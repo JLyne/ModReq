@@ -151,6 +151,31 @@ public class SqlDataSource implements DataSource {
 		return result > 1;
 	}
 
+	public Request closeRequest(Request request, Player mod, String message) throws SQLException {
+		long time = System.currentTimeMillis();
+		int status = request.isCreatorOnline() ? 2 : 1;
+		message = message.trim();
+
+		Connection connection = plugin.getDataSource().getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid=?,mod_comment=?,mod_timestamp=?,done=?,elevated='0' WHERE id=?");
+		pStatement.setString(1, mod.getUniqueId().toString());
+		pStatement.setString(2, message);
+		pStatement.setLong(3, time);
+		pStatement.setLong(4, status);
+		pStatement.setInt(5, request.getId());
+		pStatement.executeUpdate();
+
+		pStatement.close();
+		pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE modreq_id=?");
+		pStatement.setInt(1, request.getId());
+		pStatement.executeUpdate();
+		pStatement.close();
+
+		return new Request(request.getId(), request.getCreator(), request.getMessage(),
+						   request.getCreateTime(), request.getLocation(), request.getOwner(),
+						   mod.getUniqueId(), message, new Date(time), status, false);
+	}
+
 	public boolean reopenRequest(int id) throws SQLException {
 		Connection connection = plugin.getDataSource().getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");

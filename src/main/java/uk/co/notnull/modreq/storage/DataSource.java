@@ -16,4 +16,5 @@ public interface DataSource {
 	boolean reopenRequest(int id) throws Exception;
 	boolean claim(int id, Player player) throws Exception;
 	boolean unclaim(int id) throws Exception;
+	Request closeRequest(Request request, Player mod, String message) throws Exception;
 }

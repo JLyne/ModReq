@@ -1,90 +1,61 @@
 package uk.co.notnull.modreq.commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.Request;
 
 public class CmdDone {
-    public CmdDone() {
+    private final ModReq plugin;
+
+    public CmdDone(ModReq plugin) {
+        this.plugin = plugin;
     }
 
     public void doneModReq(final Player player, final int id, String message) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
+                player.sendMessage(plugin.getLanguageFile().getLangString("error.ID-ERROR")
+                                           .replaceAll("%id", "" + id));
+                return CompletableFuture.completedFuture(null);
+            }
 
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT uuid,claimed,mod_uuid FROM modreq WHERE id=?");
-                    pStatement.setInt(1, id);
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (!sqlres.next()) {
-                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
-                    } else {
-                        String uuid = sqlres.getString(1);
-                        String claimed = sqlres.getString(2);
-                        String mod_uuid = sqlres.getString(3);
-                        sqlres.close();
-                        pStatement.close();
-                        if (!mod_uuid.equals("")) {
-                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
-                            return;
-                        }
+            if(request.isClosed()) {
+                plugin.sendMsg(player, "error.ALREADY-CLOSED");
+                return CompletableFuture.completedFuture(null);
+            }
 
-                        if (!claimed.equals("") && !claimed.equals(player.getUniqueId().toString()) && !player.hasPermission("modreq.mod.admin") && !player.hasPermission("modreq.mod.overrideclaimed")) {
-                            ModReq.getPlugin().sendMsg(player, "error.OTHER-CLAIMED");
-                            return;
-                        }
+            boolean canClaimOther = player.hasPermission("modreq.admin")
+                    || player.hasPermission("modreq.mod.overrideclaimed");
 
-                        Player requestSender = Bukkit.getPlayer(UUID.fromString(uuid));
+            if(!request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
+                plugin.sendMsg(player, "error.OTHER-CLAIMED");
+                return CompletableFuture.completedFuture(null);
+            }
 
-                        if (requestSender != null && requestSender.isOnline()) {
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid=?,mod_comment=?,mod_timestamp=?,done='2',elevated='0' WHERE id=?");
-                            pStatement.setString(1, player.getUniqueId().toString());
-                            pStatement.setString(2, message.trim());
-                            pStatement.setLong(3, System.currentTimeMillis());
-                            pStatement.setInt(4, id);
-                            pStatement.executeUpdate();
-                            requestSender.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.DONE").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id));
-                            requestSender.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("general.DONE-MESSAGE").replaceAll("%msg", message));
-                            ModReq.getPlugin().playSound(requestSender);
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.DONE").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("general.DONE-MESSAGE").replaceAll("%msg", message));
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE modreq_id=?");
-                            pStatement.setInt(1, id);
-                            pStatement.executeUpdate();
-                            pStatement.close();
-                        } else {
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid=?,mod_comment=?,mod_timestamp=?,done='1',elevated='0' WHERE id=?");
-                            pStatement.setString(1, player.getUniqueId().toString());
-                            pStatement.setString(2, message.trim());
-                            pStatement.setLong(3, System.currentTimeMillis());
-                            pStatement.setInt(4, id);
-                            pStatement.executeUpdate();
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.DONE").replaceAll("%id", "" + id).replaceAll("%mod", player.getName()));
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("general.DONE-MESSAGE").replaceAll("%msg", message));
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE modreq_id=?");
-                            pStatement.setInt(1, id);
-                            pStatement.executeUpdate();
-                            pStatement.close();
-                        }
-                    }
-                } catch (SQLException var12) {
-                    var12.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+            return plugin.getRequestRegistry().close(request, player, message).thenAcceptAsync((Request result) -> {
+                Player creator = Bukkit.getPlayer(result.getCreator());
+
+                if(creator != null) {
+                    creator.sendMessage(plugin.getLanguageFile().getLangString("player.DONE")
+                                                .replaceAll("%mod", player.getName())
+                                                .replaceAll("%id", "" + id));
+                    creator.sendMessage(plugin.getLanguageFile().getLangString("general.DONE-MESSAGE")
+                                                .replaceAll("%msg", message));
+                    plugin.playSound(creator);
                 }
 
-            }
-        };
-        runnable.runTaskAsynchronously(ModReq.getPlugin());
+                plugin.sendModMsg(plugin.getLanguageFile().getLangString("mod.DONE")
+                                          .replaceAll("%id", "" + id)
+                                          .replaceAll("%mod", player.getName()));
+                plugin.sendModMsg(plugin.getLanguageFile().getLangString("general.DONE-MESSAGE")
+                                          .replaceAll("%msg", message));
+            });
+        }).exceptionally((e) -> {
+            ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+            return null;
+        });
     }
 }

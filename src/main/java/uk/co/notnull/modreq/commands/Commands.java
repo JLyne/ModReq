@@ -210,7 +210,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") String message
     ) {
-		(new CmdDone()).doneModReq(player, id, message);
+		(new CmdDone(ModReq.getPlugin())).doneModReq(player, id, message);
 	}
 
 	@CommandMethod("mr open <id>")
