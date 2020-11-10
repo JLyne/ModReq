@@ -7,10 +7,7 @@ import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class SqlDataSource implements DataSource {
 	private final ModReq plugin;
@@ -18,6 +15,9 @@ public class SqlDataSource implements DataSource {
 	private final HikariConfig config;
 	private HikariDataSource ds;
 	private final Configuration cfg;
+
+	private File sqliteFile = null;
+	private Connection sqliteConnection = null;
 
 	public SqlDataSource(ModReq plugin, Configuration cfg) {
         this.plugin = plugin;
@@ -38,33 +38,37 @@ public class SqlDataSource implements DataSource {
 			config.addDataSourceProperty("prepStmtCacheSize" , "250");
 			config.addDataSourceProperty("prepStmtCacheSqlLimit" , "2048");
 		} else {
-        	 File folder = plugin.getDataFolder();
+        	File folder = plugin.getDataFolder();
 
 			if(!folder.exists()) {
 				folder.mkdir();
 			}
 
-			File sqlFile = new File(folder.getAbsolutePath() + File.separator + "modreq.db");
-
-			config.setPoolName("modreq");
-			config.setDriverClassName("org.sqlite.JDBC");
-			config.setJdbcUrl("jdbc:sqlite:" + sqlFile.getAbsolutePath());
-			config.setConnectionTestQuery("SELECT 1");
-			config.setMaximumPoolSize(5);
-			config.setMinimumIdle(2);
+			this.sqliteFile = new File(folder.getAbsolutePath() + File.separator + "modreq.db");
 		}
     }
 
 	@Override
 	public Connection getConnection() throws SQLException {
-        return ds.getConnection();
+		if(cfg.isMySQL()) {
+        	return ds.getConnection();
+		} else {
+			if(sqliteConnection == null || sqliteConnection.isClosed()) {
+				sqliteConnection = DriverManager.getConnection("jdbc:sqlite:" + this.sqliteFile.getAbsolutePath());
+			}
+
+			return sqliteConnection;
+		}
     }
 
 	@Override
 	public boolean init() {
 		try {
-			ds = new HikariDataSource(config);
-    		Connection connection = ds.getConnection();
+			if(cfg.isMySQL()) {
+				ds = new HikariDataSource(config);
+			}
+
+    		Connection connection = getConnection();
 			PreparedStatement statement;
 
 			if(cfg.isMySQL()) {
@@ -91,7 +95,13 @@ public class SqlDataSource implements DataSource {
 
 	@Override
 	public void destroy() {
-		ds.close();
+		if(cfg.isMySQL()) {
+			ds.close();
+		} else if (sqliteConnection != null) {
+			try {
+				sqliteConnection.close();
+			} catch (SQLException ignored) {}
+		}
 	}
 
 	public boolean requestExists(int id) throws SQLException {
@@ -131,5 +141,16 @@ public class SqlDataSource implements DataSource {
 
 	public boolean elevateRequest(int id) throws SQLException {
 		return true;
+	}
+
+	public boolean reopenRequest(int id) throws SQLException {
+		Connection connection = plugin.getDataSource().getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");
+
+		pStatement.setInt(1, id);
+		int result = pStatement.executeUpdate();
+		pStatement.close();
+
+		return result > 1;
 	}
 }
