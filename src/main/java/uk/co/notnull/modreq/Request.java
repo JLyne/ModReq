@@ -1,6 +1,10 @@
 package uk.co.notnull.modreq;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+
 public class Request {
+    private final Location location;
     private int id;
     private int x;
     private int y;
@@ -31,6 +35,7 @@ public class Request {
         this.mod_timestamp = pMod_timestamp;
         this.done = pDone;
         this.elevated = pElevated;
+        this.location = new Location(Bukkit.getWorld(world), x, y, z);
     }
 
     public int getId() {
@@ -87,6 +92,10 @@ public class Request {
 
     public String getMod_comment() {
         return this.mod_comment;
+    }
+
+    public Location getLocation() {
+        return location;
     }
 }
 
