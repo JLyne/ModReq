@@ -1,5 +1,6 @@
 package uk.co.notnull.modreq.storage;
 
+import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Request;
 
 import java.sql.Connection;
@@ -13,4 +14,6 @@ public interface DataSource {
 	Request getRequest(int id) throws Exception;
 	boolean elevateRequest(int id, boolean elevated) throws Exception;
 	boolean reopenRequest(int id) throws Exception;
+	boolean claim(int id, Player player) throws Exception;
+	boolean unclaim(int id) throws Exception;
 }

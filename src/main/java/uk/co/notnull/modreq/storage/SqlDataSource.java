@@ -2,6 +2,7 @@ package uk.co.notnull.modreq.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Configuration;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
@@ -155,6 +156,31 @@ public class SqlDataSource implements DataSource {
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");
 
 		pStatement.setInt(1, id);
+		int result = pStatement.executeUpdate();
+		pStatement.close();
+
+		return result > 1;
+	}
+
+	public boolean claim(int id, Player player) throws SQLException {
+		Connection connection = plugin.getDataSource().getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed=? WHERE id=?");
+
+		pStatement.setString(1, player.getUniqueId().toString());
+		pStatement.setInt(2, id);
+
+		int result = pStatement.executeUpdate();
+		pStatement.close();
+
+		return result > 1;
+	}
+
+	public boolean unclaim(int id) throws SQLException {
+		Connection connection = plugin.getDataSource().getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='' WHERE id=?");
+
+		pStatement.setInt(1, id);
+
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 

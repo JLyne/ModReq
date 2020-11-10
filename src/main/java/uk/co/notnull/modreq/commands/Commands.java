@@ -189,7 +189,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim()).claimModReq(player, id, true);
+		(new CmdClaim(ModReq.getPlugin())).claimModReq(player, id, true);
 	}
 
 	@CommandMethod("mr unclaim <id>")
@@ -199,7 +199,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim()).claimModReq(player, id, false);
+		(new CmdClaim(ModReq.getPlugin())).claimModReq(player, id, false);
 	}
 
 	@CommandMethod("mr close <id> <message>")
