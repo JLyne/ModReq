@@ -1,50 +1,41 @@
 package uk.co.notnull.modreq.commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.Request;
 
 public class CmdReopen {
-    public CmdReopen() {
+    private final ModReq plugin;
+
+    public CmdReopen(ModReq plugin) {
+        this.plugin = plugin;
     }
 
     public void reopenModReq(final Player player, final int id) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
-
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT done FROM modreq WHERE id=?");
-                    pStatement.setInt(1, id);
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (sqlres.next()) {
-                        int done = sqlres.getInt(1);
-                        sqlres.close();
-                        pStatement.close();
-                        if (done > 0) {
-                            pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");
-                            pStatement.setInt(1, id);
-                            pStatement.executeUpdate();
-                            pStatement.close();
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.REOPEN").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id));
-                        } else {
-                            ModReq.getPlugin().sendMsg(player, "error.NOT-CLOSED");
-                        }
-                    } else {
-                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
-                    }
-                } catch (SQLException var6) {
-                    var6.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
-                }
-
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
+                player.sendMessage(plugin.getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                return CompletableFuture.completedFuture(null);
             }
-        };
-        runnable.runTaskAsynchronously(ModReq.getPlugin());
+
+            if(request.getDone() > 0) {
+                return plugin.getRequestRegistry().reopen(id).thenAcceptAsync((Boolean result) -> {
+                     plugin.sendModMsg(plugin.getLanguageFile().getLangString("mod.REOPEN")
+                                              .replaceAll("%mod", player.getName())
+                                              .replaceAll("%id", "" + id));
+                });
+            } else {
+                plugin.sendMsg(player, "error.NOT-CLOSED");
+            }
+
+            return CompletableFuture.completedFuture(null);
+        }).exceptionally(e -> {
+            e.printStackTrace();
+            plugin.sendMsg(player, "error.DATABASE-ERROR");
+            return null;
+        });
     }
 }
 

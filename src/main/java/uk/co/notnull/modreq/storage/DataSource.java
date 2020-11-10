@@ -12,4 +12,5 @@ public interface DataSource {
 	boolean requestExists(int id) throws Exception;
 	Request getRequest(int id) throws Exception;
 	boolean elevateRequest(int id) throws Exception;
+	boolean reopenRequest(int id) throws Exception;
 }
