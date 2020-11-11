@@ -3,6 +3,7 @@ package uk.co.notnull.modreq.commands;
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.entity.Player;
+import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
 
@@ -16,13 +17,12 @@ public class CmdClaim {
     public void claimModReq(final Player player, final int id, final boolean claim) {
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
             if(request == null) {
-                player.sendMessage(plugin.getLanguageFile().getLangString("error.ID-ERROR")
-                                           .replaceAll("%id", "" + id));
+                Messages.send(player,"error.ID-ERROR",  "%id", String.valueOf(id));
                 return CompletableFuture.completedFuture(null);
             }
 
             if(request.getDone() != 0) {
-                plugin.sendMsg(player, "error.ALREADY-CLOSED");
+                Messages.send(player, "error.ALREADY-CLOSED");
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -31,34 +31,28 @@ public class CmdClaim {
 
             if(claim) {
                 if(!request.getClaimed().isEmpty() && !canClaimOther) {
-                    plugin.sendMsg(player, "error.ALREADY-CLAIMED");
+                    Messages.send(player, "error.ALREADY-CLAIMED");
                     return CompletableFuture.completedFuture(null);
                 }
 
                 return plugin.getRequestRegistry().claim(id, player).thenAcceptAsync((Boolean result) -> {
-                    plugin.sendModMsg(plugin.getLanguageFile()
-                                              .getLangString("mod.CLAIM")
-                                              .replaceAll("%mod", player.getName())
-                                              .replaceAll("%id", "" + id));
+                    Messages.sendToMods("mod.CLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
                 });
             } else if(!request.getClaimed().isEmpty()) {
                 if(!request.getClaimed().equals(player.getUniqueId().toString()) && !canClaimOther) {
-                    plugin.sendMsg(player, "error.OTHER-CLAIMED");
+                    Messages.send(player, "error.OTHER-CLAIMED");
                     return CompletableFuture.completedFuture(null);
                 }
 
                 return plugin.getRequestRegistry().unclaim(id).thenAcceptAsync((Boolean result) -> {
-                    plugin.sendModMsg(plugin.getLanguageFile()
-                                              .getLangString("mod.UNCLAIM")
-                                              .replaceAll("%mod", player.getName())
-                                              .replaceAll("%id", "" + id));
+                    Messages.sendToMods("error.UNCLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
                 });
             } else {
-                plugin.sendMsg(player, "error.NOT-CLAIMED");
+                Messages.send(player, "error.NOT-CLAIMED");
                 return CompletableFuture.completedFuture(null);
             }
         }).exceptionally((e) -> {
-            ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+            Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
     }

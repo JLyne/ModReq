@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Note;
 
@@ -24,13 +25,13 @@ public class CmdNote {
                     pStatement.setInt(1, id);
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
                     } else {
                         int done = sqlres.getInt(1);
                         sqlres.close();
                         pStatement.close();
                         if (done != 0) {
-                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
+                            Messages.send(player, "error.ALREADY-CLOSED");
                         } else {
                             pStatement = connection.prepareStatement("INSERT INTO modreq_notes (modreq_id,uuid,note) VALUES (?,?,?)");
                             pStatement.setInt(1, id);
@@ -38,12 +39,15 @@ public class CmdNote {
                             pStatement.setString(3, message.trim());
                             pStatement.executeUpdate();
                             pStatement.close();
-                            ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.note.ADD").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id).replaceAll("%msg", message));
+                            Messages.sendToMods("mod.note.ADD",
+                                                "%mod", player.getName(),
+                                                "%id", String.valueOf(id),
+                                                "%msg", message);
                         }
                     }
                 } catch (SQLException var9) {
                     var9.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+                    Messages.send(player, "error.DATABASE-ERROR");
                 }
 
             }
@@ -61,19 +65,19 @@ public class CmdNote {
                     pStatement.setInt(1, id);
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("error.ID-ERROR").replaceAll("%id", "" + id));
+                        Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
                     } else {
                         int done = sqlres.getInt(1);
                         sqlres.close();
                         pStatement.close();
                         if (done != 0) {
-                            ModReq.getPlugin().sendMsg(player, "error.ALREADY-CLOSED");
+                            Messages.send(player, "error.ALREADY-CLOSED");
                         } else {
                             pStatement = connection.prepareStatement("SELECT id,uuid,note FROM modreq_notes WHERE modreq_id=? ORDER BY id ASC");
                             pStatement.setInt(1, id);
                             sqlres = pStatement.executeQuery();
                             if (!sqlres.next()) {
-                                ModReq.getPlugin().sendMsg(player, "error.NOTE-DOES-NOT-EXIST");
+                                Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
                             } else {
                                 ArrayList notes = new ArrayList();
 
@@ -91,19 +95,22 @@ public class CmdNote {
                                         pStatement.setInt(1, ((Note)notes.get(noteId)).getId());
                                         pStatement.executeUpdate();
                                         pStatement.close();
-                                        ModReq.getPlugin().sendModMsg(ModReq.getPlugin().getLanguageFile().getLangString("mod.note.REMOVE").replaceAll("%mod", player.getName()).replaceAll("%id", "" + id).replaceAll("%msg", ((Note)notes.get(noteId)).getNote()));
+                                        Messages.sendToMods("mod.note.REMOVE",
+                                                            "%mod", player.getName(),
+                                                            "%id", String.valueOf(id),
+                                                            "%msg", ((Note)notes.get(noteId)).getNote());
                                     } else {
-                                        ModReq.getPlugin().sendMsg(player, "error.NOTE-OTHER");
+                                        Messages.send(player, "error.NOTE-OTHER");
                                     }
                                 } else {
-                                    ModReq.getPlugin().sendMsg(player, "error.NOTE-DOES-NOT-EXIST");
+                                    Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
                                 }
                             }
                         }
                     }
                 } catch (SQLException var9) {
                     var9.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+                    Messages.send(player, "error.DATABASE-ERROR");
                 }
 
             }

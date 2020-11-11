@@ -2,6 +2,7 @@ package uk.co.notnull.modreq.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
 
@@ -14,21 +15,19 @@ public class CmdTpid {
     public void tpToModReq(final Player player, final int id) {
         plugin.getRequestRegistry().get(id).thenAcceptAsync((Request request) -> {
             if(request == null) {
-                player.sendMessage(plugin.getLanguageFile().getLangString("error.ID-ERROR")
-                                           .replaceAll("%id", String.valueOf(id)));
+                Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
                 return;
             }
 
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
-                    player.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.TELEPORT")
-                                               .replaceAll("%id", "" + id));
+                    Messages.send(player, "mod.TELEPORT", "%id", String.valueOf(id));
                 } else {
-                    ModReq.getPlugin().sendMsg(player, "error.TELEPORT-ERROR");
+                    Messages.send(player, "error.TELEPORT-ERROR");
                 }
             });
         }).exceptionally((e) -> {
-            ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+            Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
     }

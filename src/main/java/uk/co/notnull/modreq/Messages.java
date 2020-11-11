@@ -131,7 +131,7 @@ public class Messages {
         }
     }
 
-    public static void send(String key, Player recipient,  String ...replacements) {
+    public static void send(Player recipient, String key, String ...replacements) {
         Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
 
         if(cfg.getString(key) != null) {

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
 
@@ -23,22 +24,20 @@ public class CmdModreq {
     public void modreq(final Player player, final String message) {
         plugin.getRequestRegistry().getOpenCount(player).thenComposeAsync((Integer count) -> {
             if(count >= plugin.getConfiguration().getMax_open_modreqs()) {
-                player.sendMessage(plugin.getLanguageFile()
-                                           .getLangString("error.MAX-OPEN-MODREQS")
-                                           .replaceAll("%max", "" + plugin.getConfiguration()
-                                                   .getMax_open_modreqs()));
+
+                Messages.send(player, "error.MAX-OPEN-MODREQS", "%max",
+                              String.valueOf(plugin.getConfiguration().getMax_open_modreqs()));
 
                 return CompletableFuture.completedFuture(null);
             }
 
             return plugin.getRequestRegistry().create(player, message).thenAcceptAsync((Request request) -> {
-                plugin.sendMsg(player, "player.REQUEST-FILED");
-                plugin.sendModMsg(plugin.getLanguageFile().getLangString("mod.NEW-MODREQ")
-                                          .replaceAll("%id", "" + request.getId()));
+                Messages.send(player, "player.REQUEST-FILED");
+                Messages.sendToMods("mod.NEW-MODREQ", "%id", String.valueOf(request.getId()));
                 plugin.playModSound();
             });
         }).exceptionally((e) -> {
-            plugin.sendMsg(player, "error.DATABASE-ERROR");
+            Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
     }
@@ -110,7 +109,7 @@ public class CmdModreq {
                     }
                 } catch (SQLException var13) {
                     var13.printStackTrace();
-                    ModReq.getPlugin().sendMsg(player, "error.DATABASE-ERROR");
+                    Messages.send(player , "error.DATABASE-ERROR");
                 }
 
             }
