@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.UUID;
 
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
@@ -24,10 +25,11 @@ import uk.co.notnull.modreq.storage.SqlDataSource;
 public final class ModReq extends JavaPlugin {
     private static ModReq plugin;
     private Configuration cfg;
-    private LanguageFile lang;
+    private Messages lang;
     private DataSource dataSource;
     private SimpleDateFormat format;
     private RequestRegistry requestRegistry;
+    private BukkitAudiences bukkitAudiences;
 
     public ModReq() {}
 
@@ -36,6 +38,7 @@ public final class ModReq extends JavaPlugin {
         this.reloadConfiguration();
 
         this.requestRegistry = new RequestRegistry(this);
+        this.bukkitAudiences = BukkitAudiences.create(plugin);
 
         new Commands(this);
 
@@ -71,7 +74,8 @@ public final class ModReq extends JavaPlugin {
         return this.cfg;
     }
 
-    public LanguageFile getLanguageFile() {
+    @Deprecated
+    public Messages getLanguageFile() {
         return this.lang;
     }
 
@@ -87,8 +91,12 @@ public final class ModReq extends JavaPlugin {
         return requestRegistry;
     }
 
+    public BukkitAudiences getBukkitAudiences() {
+        return bukkitAudiences;
+    }
+
     public void reloadConfiguration() {
-        this.lang = new LanguageFile();
+        this.lang = new Messages();
         Locale locale = Locale.forLanguageTag(this.getLanguageFile().getLangString("general.LANGUAGE-TAG"));
         Configuration cfg = new Configuration();
         this.format = new SimpleDateFormat(this.getLanguageFile().getLangString("general.DATE-FORMAT"), locale);
@@ -107,10 +115,12 @@ public final class ModReq extends JavaPlugin {
         });
     }
 
+    @Deprecated
     public void sendMsg(CommandSender sender, String message) {
         sender.sendMessage(this.getLanguageFile().getLangString(message));
     }
 
+    @Deprecated
     public void sendModMsg(String message) {
         Iterator var3 = Bukkit.getOnlinePlayers().iterator();
 
@@ -160,4 +170,6 @@ public final class ModReq extends JavaPlugin {
         UUID uuid = UUID.fromString(uuidString);
         return Bukkit.getOfflinePlayer(uuid);
     }
+
+
 }

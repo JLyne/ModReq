@@ -25,18 +25,16 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import uk.co.notnull.modreq.ModReq;
 
 public class Commands {
 	private PaperCommandManager<CommandSender> paperCommandManager;
-    private BukkitAudiences bukkitAudiences;
     private CommandConfirmationManager<CommandSender> confirmationManager;
     private AnnotationParser<CommandSender> annotationParser;
     private MinecraftHelp<CommandSender> minecraftHelp;
 
-	public Commands(JavaPlugin plugin) {
+	public Commands(ModReq plugin) {
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
                 AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
 
@@ -54,16 +52,11 @@ public class Commands {
         }
 
         //
-        // Create a BukkitAudiences instance (adventure) in order to use the minecraft-extras
-        // help system
-        //
-        this.bukkitAudiences = BukkitAudiences.create(plugin);
-        //
         // Create the Minecraft help menu system
         //
         this.minecraftHelp = new MinecraftHelp<>(
                 /* Help Prefix */ "/mr",
-                /* Audience mapper */ this.bukkitAudiences::sender,
+                /* Audience mapper */ plugin.getBukkitAudiences()::sender,
                 /* Manager */ this.paperCommandManager
         );
         //
@@ -122,7 +115,7 @@ public class Commands {
                                 .append(Component.text("ModReq", NamedTextColor.GOLD))
                                 .append(Component.text("] ", NamedTextColor.DARK_GRAY))
                                 .append(component).build()
-                ).apply(paperCommandManager, bukkitAudiences::sender);
+                ).apply(paperCommandManager, plugin.getBukkitAudiences()::sender);
         //
         // Create the commands
         //
