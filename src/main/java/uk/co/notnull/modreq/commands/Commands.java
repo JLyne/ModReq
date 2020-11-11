@@ -208,7 +208,7 @@ public class Commands {
     private void commandClose(
             final @NonNull Player player,
             final @Argument("id") Integer id,
-            final @Argument("message") String message
+            final @Argument("message") @Greedy String message
     ) {
 		(new CmdDone(ModReq.getPlugin())).doneModReq(player, id, message);
 	}
@@ -243,15 +243,15 @@ public class Commands {
 		(new CmdTpid(ModReq.getPlugin())).tpToModReq(player, id);
 	}
 
-	@CommandMethod("mr note add <id> <note>")
+	@CommandMethod("mr note add <id> <message>")
     @CommandDescription("Add a note to the specified modreq")
 	@CommandPermission("modreq.mod")
     private void commandNoteAdd(
             final @NonNull Player player,
             final @Argument("id") Integer id,
-            final @Argument("note") String note
+            final @Argument("message") @Greedy String message
     ) {
-		(new CmdNote()).addNote(player, id, note);
+		(new CmdNote()).addNote(player, id, message);
 	}
 
 	@CommandMethod("mr note remove <id> <noteid>")
@@ -271,16 +271,30 @@ public class Commands {
     @CommandDescription("Create a modreq")
     private void commandCreate(
             final @NonNull Player player,
-            final @Argument("message") String message
+            final @Argument("message") @Greedy String message
     ) {
 		(new CmdModreq(ModReq.getPlugin())).modreq(player, message);
 	}
 
+	@ProxiedBy("modreq")
 	@CommandMethod("mr me")
     @CommandDescription("View your created modreqs")
     private void commandMe(
             final @NonNull Player player
     ) {
 		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player);
+	}
+
+	@CommandMethod("mr reload")
+    @CommandDescription("Reload the configuration")
+	@CommandPermission("modreq.admin")
+    private void commandReload(final @NonNull CommandSender player) {
+		ModReq.getPlugin().reloadConfiguration();
+
+		if(ModReq.getPlugin().getConfiguration().isMySQL()) {
+			player.sendMessage(ChatColor.WHITE + "Config and language file reloaded (database: MySQL).");
+		} else {
+			player.sendMessage(ChatColor.WHITE + "Config and language file reloaded (database: SQLite).");
+		}
 	}
 }
