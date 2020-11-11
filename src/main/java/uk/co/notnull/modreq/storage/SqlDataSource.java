@@ -2,13 +2,19 @@ package uk.co.notnull.modreq.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Configuration;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.RequestCollection;
 
 import java.io.File;
 import java.sql.*;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SqlDataSource implements DataSource {
 	private final ModReq plugin;
@@ -120,7 +126,7 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public Request getRequest(int id) throws SQLException {
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 
 		PreparedStatement pStatement = connection.prepareStatement("SELECT uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE id = ?");
 		pStatement.setInt(1, id);
@@ -141,7 +147,7 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public boolean elevateRequest(int id, boolean elevated) throws SQLException {
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET elevated=? WHERE id=?");
 		pStatement.setInt(1, elevated ? 1 : 0);
 		pStatement.setInt(2, id);
@@ -156,7 +162,7 @@ public class SqlDataSource implements DataSource {
 		int status = request.isCreatorOnline() ? 2 : 1;
 		message = message.trim();
 
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid=?,mod_comment=?,mod_timestamp=?,done=?,elevated='0' WHERE id=?");
 		pStatement.setString(1, mod.getUniqueId().toString());
 		pStatement.setString(2, message);
@@ -177,7 +183,7 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public boolean reopenRequest(int id) throws SQLException {
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");
 
 		pStatement.setInt(1, id);
@@ -188,7 +194,7 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public boolean claim(int id, Player player) throws SQLException {
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed=? WHERE id=?");
 
 		pStatement.setString(1, player.getUniqueId().toString());
@@ -201,7 +207,7 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public boolean unclaim(int id) throws SQLException {
-		Connection connection = plugin.getDataSource().getConnection();
+		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='' WHERE id=?");
 
 		pStatement.setInt(1, id);
@@ -210,5 +216,144 @@ public class SqlDataSource implements DataSource {
 		pStatement.close();
 
 		return result > 1;
+	}
+
+	public Request createRequest(Player player, String message) throws SQLException {
+		Location location = player.getLocation();
+		Connection connection = getConnection();
+		long time = System.currentTimeMillis();
+		int id;
+
+		message = message.trim();
+
+		PreparedStatement pStatement = connection.prepareStatement("INSERT INTO modreq (uuid,request,timestamp,world,x,y,z) VALUES (?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		pStatement.setString(1, player.getUniqueId().toString());
+		pStatement.setString(2, message);
+		pStatement.setLong(3, time);
+		pStatement.setString(4, location.getWorld().getName());
+		pStatement.setInt(5, location.getBlockX());
+		pStatement.setInt(6, location.getBlockY());
+		pStatement.setInt(7, location.getBlockZ());
+		pStatement.executeUpdate();
+
+		ResultSet rs = pStatement.getGeneratedKeys();
+
+		if(!rs.next()) {
+			throw new SQLException("No row id returned?");
+		}
+
+		id = rs.getInt(1);
+		pStatement.close();
+
+		return new Request(id, player.getUniqueId(), message, new Date(time), location);
+	}
+
+	public int getOpenRequestCount(boolean includeElevated) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement;
+
+		if(includeElevated) {
+			pStatement= connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0'");
+		} else {
+			pStatement= connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0' AND elevated='0'");
+		}
+
+		ResultSet sqlres = pStatement.executeQuery();
+
+		if(!sqlres.next()) {
+			sqlres.close();
+			pStatement.close();
+			throw new SQLException("Invalid response");
+		}
+
+		int count = sqlres.getInt(1);
+		sqlres.close();
+		pStatement.close();
+
+		return count;
+	}
+
+	public int getOpenRequestCount(Player player) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE uuid=? AND done='0'");
+		pStatement.setString(1, player.getUniqueId().toString());
+		ResultSet sqlres = pStatement.executeQuery();
+
+		if (!sqlres.next()) {
+			sqlres.close();
+			pStatement.close();
+			throw new SQLException("Invalid response");
+		}
+
+		int count = sqlres.getInt(1);
+		sqlres.close();
+		pStatement.close();
+
+		return count;
+	}
+
+	public RequestCollection getUnseenClosedRequests(Player player) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("SELECT id,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done=1 AND uuid=?");
+		pStatement.setString(1, player.getUniqueId().toString());
+		ResultSet sqlres = pStatement.executeQuery();
+
+		RequestCollection requests = new RequestCollection();
+
+		while(!sqlres.isAfterLast()) {
+			World world = Bukkit.getWorld(sqlres.getString(4));
+			Date createdDate = new Date(sqlres.getLong(3));
+			Date closedDate = sqlres.getLong(11) != 0 ? new Date(sqlres.getLong(11)) : null;
+			Location location = new Location(world, sqlres.getInt(5), sqlres.getInt(6), sqlres.getInt(7));
+
+			UUID owner = sqlres.getString(8).isEmpty() ? null : UUID.fromString(sqlres.getString(8));
+			UUID responder = sqlres.getString(9).isEmpty() ? null : UUID.fromString(sqlres.getString(9));
+
+			requests.add(new Request(sqlres.getInt(1), player.getUniqueId(),
+									 sqlres.getString(2), createdDate, location,
+									 owner, responder, sqlres.getString(10), closedDate,
+									 sqlres.getInt(12), sqlres.getBoolean(13)
+			));
+
+			sqlres.next();
+		}
+
+		sqlres.close();
+		pStatement.close();
+
+		return requests;
+	}
+
+	public RequestCollection markRequestsAsSeen(RequestCollection requests) throws SQLException {
+		if(requests.isEmpty()) {
+			return requests;
+		}
+
+		Connection connection = getConnection();
+
+		StringBuilder builder = new StringBuilder("UPDATE modreq SET done='2' WHERE id IN (");
+
+		for(int i = 0 ; i < requests.size(); i++) {
+			builder.append("?,");
+		}
+
+		String sql = builder.deleteCharAt(builder.length() -1).append(")").toString();
+		PreparedStatement pStatement = connection.prepareStatement(sql);
+
+		int i = 1;
+		for(Request request: requests) {
+			pStatement.setInt(i++, request.getId());
+		}
+
+		pStatement.executeUpdate();
+		pStatement.close();
+
+		requests = requests.stream().map(request -> {
+			return new Request(request.getId(), request.getCreator(), request.getMessage(),
+						   request.getCreateTime(), request.getLocation(), request.getOwner(),
+						   request.getResponder(), request.getResponse(), request.getCloseTime(), request.getDone(), request.isElevated());
+		}).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
+
+		return requests;
 	}
 }

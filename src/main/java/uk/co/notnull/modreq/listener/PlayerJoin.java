@@ -1,95 +1,66 @@
 package uk.co.notnull.modreq.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.ModReq;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
+import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.RequestCollection;
 
 public class PlayerJoin {
-    public PlayerJoin() {
+    private final ModReq plugin;
+
+    public PlayerJoin(ModReq plugin) {
+        this.plugin = plugin;
     }
 
-    public void onPlayerJoin(final Player pPlayer) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
+    public void onPlayerJoin(final Player player) {
+        Bukkit.getScheduler().runTaskLater(plugin, () -> this.joinChecks(player), 100L);
+    }
 
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT id,mod_uuid,mod_comment FROM modreq WHERE uuid=? AND done='1'");
-                    pStatement.setString(1, pPlayer.getUniqueId().toString());
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (sqlres.next()) {
-                        ModReq.getPlugin().sendMsg(pPlayer, "general.ON-JOIN-HEADER");
-                        boolean first = true;
-                        ArrayList ids = new ArrayList();
+    public void joinChecks(Player player) {
+        plugin.getRequestRegistry().getUnseenClosed(player, true).thenAcceptAsync((RequestCollection requests) -> {
+            if(requests.isEmpty()) {
+                return;
+            }
 
-                        while(!sqlres.isAfterLast()) {
-                            if (first) {
-                                first = false;
-                            } else {
-                                pPlayer.sendMessage("");
-                            }
+            plugin.sendMsg(player, "general.ON-JOIN-HEADER");
 
-                            OfflinePlayer mod = ModReq.getPlugin().getOfflinePlayer(sqlres.getString(2));
-                            if (mod != null) {
-                                pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.DONE").replaceAll("%mod", mod.getName()).replaceAll("%id", "" + sqlres.getInt(1)));
-                            } else {
-                                pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("player.DONE").replaceAll("%mod", "unknown").replaceAll("%id", "" + sqlres.getInt(1)));
-                            }
+            for(Request request: requests) {
+                OfflinePlayer mod = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
+                String modName = mod != null & mod.getName() != null ? mod.getName() : "unknown";
 
-                            pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("general.DONE-MESSAGE").replaceAll("%msg", sqlres.getString(3)));
-                            ids.add(sqlres.getInt(1));
-                            sqlres.next();
-                        }
+                player.sendMessage(plugin.getLanguageFile().getLangString("player.DONE")
+                                            .replaceAll("%mod", modName)
+                                            .replaceAll("%id", "" + request.getId()));
 
-                        pStatement.close();
-                        Iterator var7 = ids.iterator();
+                player.sendMessage(plugin.getLanguageFile().getLangString("general.DONE-MESSAGE")
+                                            .replaceAll("%msg", request.getResponse()));
+                player.sendMessage("");
+            }
 
-                        while(var7.hasNext()) {
-                            int i = (Integer)var7.next();
-                            pStatement = connection.prepareStatement("UPDATE modreq SET done='2' WHERE id=?");
-                            pStatement.setInt(1, i);
-                            pStatement.executeUpdate();
-                            pStatement.close();
-                        }
+            plugin.sendMsg(player, "general.HELP-LIST-MODREQS");
+            plugin.playSound(player);
+        }).exceptionally(e -> {
+            e.printStackTrace();
+            plugin.sendMsg(player, "error.DATABASE-ERROR");
+            return null;
+        });
 
-                        ModReq.getPlugin().sendMsg(pPlayer, "general.HELP-LIST-MODREQS");
-                        ModReq.getPlugin().playSound(pPlayer);
-                    }
-
-                    sqlres.close();
-                    pStatement.close();
-                    if (pPlayer.hasPermission("modreq.mod") || pPlayer.hasPermission("modreq.admin")) {
-                        if (pPlayer.hasPermission("modreq.admin")) {
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0'");
-                        } else {
-                            pStatement.close();
-                            pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0' AND elevated='0'");
-                        }
-
-                        sqlres = pStatement.executeQuery();
-                        if (sqlres.next() && sqlres.getInt(1) > 0) {
-                            pPlayer.sendMessage(ModReq.getPlugin().getLanguageFile().getLangString("mod.MODREQS-OPEN").replaceAll("%count", "" + sqlres.getInt(1)));
-                            ModReq.getPlugin().playSound(pPlayer);
-                        }
-
-                        sqlres.close();
-                    }
-                } catch (SQLException var8) {
-                    var8.printStackTrace();
-                    ModReq.getPlugin().sendMsg(pPlayer, "error.DATABASE-ERROR");
+        if(player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin")) {
+            plugin.getRequestRegistry().getOpenCount(player.hasPermission("modreq.admin")).thenAcceptAsync((Integer count) -> {
+                if(count == 0) {
+                    return;
                 }
 
-            }
-        };
-        runnable.runTaskLaterAsynchronously(ModReq.getPlugin(), 100L);
+                player.sendMessage(plugin.getLanguageFile().getLangString("mod.MODREQS-OPEN")
+                                           .replaceAll("%count", String.valueOf(count)));
+                plugin.playSound(player);
+            }).exceptionally(e -> {
+                e.printStackTrace();
+                plugin.sendMsg(player, "error.DATABASE-ERROR");
+                return null;
+            });
+        }
     }
 }

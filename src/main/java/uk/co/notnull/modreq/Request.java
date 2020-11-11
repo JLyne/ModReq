@@ -20,6 +20,20 @@ public class Request {
     private final UUID responder;
     private final String response;
 
+    public Request(int id, UUID creator, String message, Date createTime, Location location) {
+        this.id = id;
+        this.creator = creator;
+        this.message = message;
+        this.createTime = createTime;
+        this.owner = null;
+        this.responder = null;
+        this.response = null;
+        this.closeTime = null;
+        this.done = 0;
+        this.elevated = false;
+        this.location = location;
+    }
+
     public Request(int id, UUID creator, String message, Date createTime, Location location, UUID owner, UUID responder, String response, Date closeTime, int pDone, boolean elevated) {
         this.id = id;
         this.creator = creator;

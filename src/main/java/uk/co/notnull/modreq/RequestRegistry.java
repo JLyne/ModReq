@@ -52,4 +52,28 @@ public class RequestRegistry {
 	public CompletableFuture<Boolean> unclaim(int id) {
 		return makeFuture(() -> plugin.getDataSource().unclaim(id));
 	}
+
+	public CompletableFuture<Request> create(Player player, String message) {
+		return makeFuture(() -> plugin.getDataSource().createRequest(player, message));
+	}
+
+	public CompletableFuture<Integer> getOpenCount(boolean includeElevated) {
+		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(includeElevated));
+	}
+
+	public CompletableFuture<Integer> getOpenCount(Player player) {
+		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(player));
+	}
+
+	public CompletableFuture<RequestCollection> getUnseenClosed(Player player, boolean markSeen) {
+		return makeFuture(() -> {
+			RequestCollection requests = plugin.getDataSource().getUnseenClosedRequests(player);
+
+			if(markSeen) {
+				return plugin.getDataSource().markRequestsAsSeen(requests);
+			}
+
+			return requests;
+		});
+	}
 }

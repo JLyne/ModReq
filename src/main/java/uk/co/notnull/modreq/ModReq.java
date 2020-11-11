@@ -155,6 +155,7 @@ public final class ModReq extends JavaPlugin {
 
     }
 
+    @Deprecated
     public OfflinePlayer getOfflinePlayer(String uuidString) {
         UUID uuid = UUID.fromString(uuidString);
         return Bukkit.getOfflinePlayer(uuid);

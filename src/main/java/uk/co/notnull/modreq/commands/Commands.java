@@ -273,7 +273,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("message") String message
     ) {
-		(new CmdModreq()).modreq(player, message);
+		(new CmdModreq(ModReq.getPlugin())).modreq(player, message);
 	}
 
 	@CommandMethod("mr me")
@@ -281,6 +281,6 @@ public class Commands {
     private void commandMe(
             final @NonNull Player player
     ) {
-		(new CmdModreq()).checkPlayerModReqs(player);
+		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player);
 	}
 }
