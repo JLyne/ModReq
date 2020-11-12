@@ -46,10 +46,16 @@ public class Request {
         this.message = pRequest;
         this.createTime = new Date(pTimestamp);
         this.owner = pClaimed.isEmpty() ? null : UUID.fromString(pClaimed);
-        this.response = new Response(pMod_uuid.isEmpty() ? null : UUID.fromString(pMod_uuid),
-                                     pMod_comment,
-                                     pMod_timestamp == 0 ? null : new Date(pMod_timestamp),
-                                     pDone == 2);
+
+        if(!pMod_uuid.isEmpty()) {
+            this.response = new Response(pMod_uuid.isEmpty() ? null : UUID.fromString(pMod_uuid),
+                                         pMod_comment,
+                                         pMod_timestamp == 0 ? null : new Date(pMod_timestamp),
+                                         pDone == 2);
+        } else {
+            this.response = null;
+        }
+
         this.elevated = pElevated == 1;
         this.location = new Location(Bukkit.getWorld(world), x, y, z);
     }
@@ -73,6 +79,7 @@ public class Request {
         return hasResponse() ? response.getResponder().toString() : "";
     }
 
+    @Deprecated
     public int getDone() {
         return hasResponse() ? (response.isSeen() ? 2 : 1) : 0;
     }
