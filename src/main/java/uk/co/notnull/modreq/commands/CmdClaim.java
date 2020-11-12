@@ -45,7 +45,7 @@ public class CmdClaim {
                 }
 
                 return plugin.getRequestRegistry().unclaim(request).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("error.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
+                    Messages.sendToMods("mod.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
                 });
             } else {
                 Messages.send(player, "error.NOT-CLAIMED");

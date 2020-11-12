@@ -23,7 +23,7 @@ public class CmdReopen {
 
             if(request.getDone() > 0) {
                 return plugin.getRequestRegistry().reopen(request).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("error.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
+                    Messages.sendToMods("mod.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
                 });
             } else {
                 Messages.send(player,"error.NOT-CLOSED");
