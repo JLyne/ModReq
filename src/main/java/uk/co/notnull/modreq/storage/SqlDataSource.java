@@ -248,6 +248,41 @@ public class SqlDataSource implements DataSource {
 		return new Request(id, player.getUniqueId(), message, new Date(time), location);
 	}
 
+	public RequestCollection getOpenRequests(Player player) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement;
+
+		pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND uuid=?");
+		pStatement.setString(1, player.getUniqueId().toString());
+
+		ResultSet sqlres = pStatement.executeQuery();
+		RequestCollection requests = createCollection(sqlres);
+
+		sqlres.close();
+		pStatement.close();
+
+		return requests;
+	}
+
+	public RequestCollection getOpenRequests(boolean includeElevated) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement;
+
+		if(includeElevated) {
+			pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'");
+		} else {
+			pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND elevated='0'");
+		}
+
+		ResultSet sqlres = pStatement.executeQuery();
+		RequestCollection requests = createCollection(sqlres);
+
+		sqlres.close();
+		pStatement.close();
+
+		return requests;
+	}
+
 	public int getOpenRequestCount(boolean includeElevated) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement;
@@ -298,25 +333,7 @@ public class SqlDataSource implements DataSource {
 		pStatement.setString(1, player.getUniqueId().toString());
 		ResultSet sqlres = pStatement.executeQuery();
 
-		RequestCollection requests = new RequestCollection();
-
-		while(!sqlres.isAfterLast()) {
-			World world = Bukkit.getWorld(sqlres.getString(4));
-			Date createdDate = new Date(sqlres.getLong(3));
-			Date closedDate = sqlres.getLong(11) != 0 ? new Date(sqlres.getLong(11)) : null;
-			Location location = new Location(world, sqlres.getInt(5), sqlres.getInt(6), sqlres.getInt(7));
-
-			UUID owner = sqlres.getString(8).isEmpty() ? null : UUID.fromString(sqlres.getString(8));
-			UUID responder = sqlres.getString(9).isEmpty() ? null : UUID.fromString(sqlres.getString(9));
-
-			requests.add(new Request(sqlres.getInt(1), player.getUniqueId(),
-									 sqlres.getString(2), createdDate, location,
-									 owner, responder, sqlres.getString(10), closedDate,
-									 sqlres.getInt(12), sqlres.getBoolean(13)
-			));
-
-			sqlres.next();
-		}
+		RequestCollection requests = createCollection(sqlres);
 
 		sqlres.close();
 		pStatement.close();
@@ -355,5 +372,29 @@ public class SqlDataSource implements DataSource {
 		}).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
 
 		return requests;
+	}
+
+	private RequestCollection createCollection(ResultSet resultSet) throws SQLException {
+		RequestCollection results = new RequestCollection();
+
+		while(!resultSet.isAfterLast()) {
+			World world = Bukkit.getWorld(resultSet.getString(5));
+			Date createdDate = new Date(resultSet.getLong(4));
+			Date closedDate = resultSet.getLong(12) != 0 ? new Date(resultSet.getLong(12)) : null;
+			Location location = new Location(world, resultSet.getInt(6), resultSet.getInt(7), resultSet.getInt(8));
+
+			UUID owner = resultSet.getString(8).isEmpty() ? null : UUID.fromString(resultSet.getString(9));
+			UUID responder = resultSet.getString(9).isEmpty() ? null : UUID.fromString(resultSet.getString(10));
+
+			results.add(new Request(resultSet.getInt(1), UUID.fromString(resultSet.getString(2)),
+									 resultSet.getString(3), createdDate, location,
+									 owner, responder, resultSet.getString(11), closedDate,
+									 resultSet.getInt(13), resultSet.getBoolean(14)
+			));
+
+			resultSet.next();
+		}
+
+		return results;
 	}
 }

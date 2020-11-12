@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import de.themoep.minedown.adventure.MineDown;
+import de.themoep.minedown.adventure.Replacer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -59,6 +60,9 @@ public class Messages {
         setDefaultString("general.HELP-LIST-MODREQS", "&b-=-=- List your last ModReqs: /modreq -=-=-");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy 'at' HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
+        setDefaultString("general.ONLINE-PLAYER", "&a%player");
+        setDefaultString("general.OFFLINE-PLAYER", "&c%player");
+        setDefaultString("general.UNKNOWN-PLAYER", "&cUnknown");
         setDefaultString("player.REQUEST-FILED", "&aYour ModReq has been sent to the staff members. Please be patient.");
         setDefaultString("player.DONE", "&2%mod &ahas closed your ModReq (%id).");
         setDefaultString("player.check.1", "&b-=-=- Last %count ModReq(s) -=-=-");
@@ -104,16 +108,29 @@ public class Messages {
         }
     }
 
-    public static Component get(String pEntry, String ...replacements) {
+    public static Component get(String key, String ...replacements) {
         if(cfg == null) {
             load();
         }
 
-        if(cfg.getString(pEntry) != null) {
-            return new MineDown(cfg.getString(pEntry)).replace(replacements).toComponent();
+        if(cfg.getString(key) != null) {
+            return new MineDown(cfg.getString(key)).replace(replacements).toComponent();
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + pEntry);
+            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
             return Component.empty();
+        }
+    }
+
+    public static String getString(String key, String ...replacements) {
+        if(cfg == null) {
+            load();
+        }
+
+        if(cfg.getString(key) != null) {
+            return new Replacer().replace(replacements).replaceIn(cfg.getString(key));
+        } else {
+            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+            return "";
         }
     }
 

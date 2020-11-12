@@ -12,6 +12,8 @@ public interface DataSource {
 	boolean init();
 	void destroy();
 	boolean requestExists(int id) throws Exception;
+	RequestCollection getOpenRequests(boolean includeElevated) throws Exception;
+	RequestCollection getOpenRequests(Player player) throws Exception;
 	Request getRequest(int id) throws Exception;
 	boolean elevateRequest(int id, boolean elevated) throws Exception;
 	boolean reopenRequest(int id) throws Exception;

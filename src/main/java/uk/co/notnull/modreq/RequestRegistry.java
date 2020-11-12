@@ -57,6 +57,14 @@ public class RequestRegistry {
 		return makeFuture(() -> plugin.getDataSource().createRequest(player, message));
 	}
 
+	public CompletableFuture<RequestCollection> getOpen(boolean includeElevated) {
+		return makeFuture(() -> plugin.getDataSource().getOpenRequests(includeElevated));
+	}
+
+	public CompletableFuture<RequestCollection> getOpen(Player player) {
+		return makeFuture(() -> plugin.getDataSource().getOpenRequests(player));
+	}
+
 	public CompletableFuture<Integer> getOpenCount(boolean includeElevated) {
 		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(includeElevated));
 	}

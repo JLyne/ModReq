@@ -167,6 +167,8 @@ public class Request {
 
     public boolean isClosed() { return this.done > 0; }
 
+    public boolean isClaimed() { return owner != null; }
+
     public boolean isClaimedBy(UUID uuid) { return uuid.equals(owner); }
 
     public boolean isCreatorOnline() {
