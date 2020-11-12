@@ -114,7 +114,9 @@ public class Messages {
         }
 
         if(cfg.getString(key) != null) {
-            return new MineDown(cfg.getString(key)).replace(replacements).toComponent();
+            return new MineDown(cfg.getString(key))
+                    .placeholderPrefix("%").placeholderSuffix("")
+                    .replace(replacements).toComponent();
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
             return Component.empty();
@@ -127,7 +129,8 @@ public class Messages {
         }
 
         if(cfg.getString(key) != null) {
-            return new Replacer().replace(replacements).replaceIn(cfg.getString(key));
+            return new Replacer().placeholderPrefix("%").placeholderSuffix("")
+                    .replace(replacements).replaceIn(cfg.getString(key));
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
             return "";
@@ -152,7 +155,9 @@ public class Messages {
         Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
 
         if(cfg.getString(key) != null) {
-            audience.sendMessage(new MineDown(cfg.getString(key)).replace(replacements).toComponent());
+            audience.sendMessage(new MineDown(cfg.getString(key))
+                                         .placeholderPrefix("%").placeholderSuffix("")
+                                         .replace(replacements).toComponent());
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
         }
@@ -162,7 +167,9 @@ public class Messages {
         Component message;
 
         if(cfg.getString(key) != null) {
-            message = new MineDown(cfg.getString(key)).replace(replacements).toComponent();
+            message = new MineDown(cfg.getString(key))
+                    .placeholderPrefix("%").placeholderSuffix("")
+                    .replace(replacements).toComponent();
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
             return;

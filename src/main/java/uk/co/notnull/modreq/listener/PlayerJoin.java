@@ -31,8 +31,8 @@ public class PlayerJoin {
                 OfflinePlayer mod = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
                 String modName = mod != null && mod.getName() != null ? mod.getName() : "unknown";
 
-                Messages.send(player, "player.DONE","%mod", modName, "%id", String.valueOf(request.getId()));
-                Messages.send(player, "general.DONE-MESSAGE", "%msg", request.getResponseMessage());
+                Messages.send(player, "player.DONE","mod", modName, "id", String.valueOf(request.getId()));
+                Messages.send(player, "general.DONE-MESSAGE", "msg", request.getResponseMessage());
             }
 
             Messages.send(player, "general.HELP-LIST-MODREQS");
@@ -49,7 +49,7 @@ public class PlayerJoin {
                     return;
                 }
 
-                Messages.send(player, "mod.MODREQS-OPEN", "%count", String.valueOf(count));
+                Messages.send(player, "mod.MODREQS-OPEN", "count", String.valueOf(count));
                 plugin.playSound(player);
             }).exceptionally(e -> {
                 e.printStackTrace();

@@ -25,7 +25,7 @@ public class CmdModreq {
         plugin.getRequestRegistry().getOpenCount(player).thenComposeAsync((Integer count) -> {
             if(count >= plugin.getConfiguration().getMax_open_modreqs()) {
 
-                Messages.send(player, "error.MAX-OPEN-MODREQS", "%max",
+                Messages.send(player, "error.MAX-OPEN-MODREQS", "max",
                               String.valueOf(plugin.getConfiguration().getMax_open_modreqs()));
 
                 return CompletableFuture.completedFuture(null);
@@ -33,7 +33,7 @@ public class CmdModreq {
 
             return plugin.getRequestRegistry().create(player, message).thenAcceptAsync((Request request) -> {
                 Messages.send(player, "player.REQUEST-FILED");
-                Messages.sendToMods("mod.NEW-MODREQ", "%id", String.valueOf(request.getId()));
+                Messages.sendToMods("mod.NEW-MODREQ", "id", String.valueOf(request.getId()));
                 plugin.playModSound();
             });
         }).exceptionally((e) -> {

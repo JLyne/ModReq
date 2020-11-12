@@ -18,7 +18,7 @@ public class CmdDone {
     public void doneModReq(final Player player, final int id, String message) {
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
             if(request == null) {
-                Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
+                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -39,13 +39,13 @@ public class CmdDone {
                 Player creator = Bukkit.getPlayer(result.getCreator());
 
                 if(creator != null) {
-                    Messages.send(creator, "player.DONE", "%mod", player.getName(), "%id", String.valueOf(id));
-                    Messages.send(creator, "general.DONE-MESSAGE", "%msg", message);
+                    Messages.send(creator, "player.DONE", "mod", player.getName(), "id", String.valueOf(id));
+                    Messages.send(creator, "general.DONE-MESSAGE", "msg", message);
                     plugin.playSound(creator);
                 }
 
-                Messages.sendToMods("player.DONE","%mod", player.getName(), "%id", String.valueOf(id));
-                Messages.sendToMods("general.DONE-MESSAGE","%msg", message);
+                Messages.sendToMods("player.DONE","mod", player.getName(), "id", String.valueOf(id));
+                Messages.sendToMods("general.DONE-MESSAGE","msg", message);
             });
         }).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");

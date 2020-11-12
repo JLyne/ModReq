@@ -17,7 +17,7 @@ public class CmdClaim {
     public void claimModReq(final Player player, final int id, final boolean claim) {
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
             if(request == null) {
-                Messages.send(player,"error.ID-ERROR",  "%id", String.valueOf(id));
+                Messages.send(player,"error.ID-ERROR",  "id", String.valueOf(id));
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -36,7 +36,7 @@ public class CmdClaim {
                 }
 
                 return plugin.getRequestRegistry().claim(request, player).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("mod.CLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
+                    Messages.sendToMods("mod.CLAIM", "mod", player.getName(), "id", String.valueOf(id));
                 });
             } else if(!request.getClaimed().isEmpty()) {
                 if(!request.getClaimed().equals(player.getUniqueId().toString()) && !canClaimOther) {
@@ -45,7 +45,7 @@ public class CmdClaim {
                 }
 
                 return plugin.getRequestRegistry().unclaim(request).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("error.UNCLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
+                    Messages.sendToMods("error.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
                 });
             } else {
                 Messages.send(player, "error.NOT-CLAIMED");

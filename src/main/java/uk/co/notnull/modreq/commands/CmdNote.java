@@ -25,7 +25,7 @@ public class CmdNote {
                     pStatement.setInt(1, id);
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
+                        Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                     } else {
                         int done = sqlres.getInt(1);
                         sqlres.close();
@@ -40,9 +40,9 @@ public class CmdNote {
                             pStatement.executeUpdate();
                             pStatement.close();
                             Messages.sendToMods("mod.note.ADD",
-                                                "%mod", player.getName(),
-                                                "%id", String.valueOf(id),
-                                                "%msg", message);
+                                                "mod", player.getName(),
+                                                "id", String.valueOf(id),
+                                                "msg", message);
                         }
                     }
                 } catch (SQLException var9) {
@@ -65,7 +65,7 @@ public class CmdNote {
                     pStatement.setInt(1, id);
                     ResultSet sqlres = pStatement.executeQuery();
                     if (!sqlres.next()) {
-                        Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
+                        Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                     } else {
                         int done = sqlres.getInt(1);
                         sqlres.close();
@@ -96,9 +96,9 @@ public class CmdNote {
                                         pStatement.executeUpdate();
                                         pStatement.close();
                                         Messages.sendToMods("mod.note.REMOVE",
-                                                            "%mod", player.getName(),
-                                                            "%id", String.valueOf(id),
-                                                            "%msg", ((Note)notes.get(noteId)).getNote());
+                                                            "mod", player.getName(),
+                                                            "id", String.valueOf(id),
+                                                            "msg", ((Note)notes.get(noteId)).getNote());
                                     } else {
                                         Messages.send(player, "error.NOTE-OTHER");
                                     }

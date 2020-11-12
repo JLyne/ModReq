@@ -15,13 +15,13 @@ public class CmdTpid {
     public void tpToModReq(final Player player, final int id) {
         plugin.getRequestRegistry().get(id).thenAcceptAsync((Request request) -> {
             if(request == null) {
-                Messages.send(player, "error.ID-ERROR", "%id", String.valueOf(id));
+                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 return;
             }
 
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
-                    Messages.send(player, "mod.TELEPORT", "%id", String.valueOf(id));
+                    Messages.send(player, "mod.TELEPORT", "id", String.valueOf(id));
                 } else {
                     Messages.send(player, "error.TELEPORT-ERROR");
                 }
