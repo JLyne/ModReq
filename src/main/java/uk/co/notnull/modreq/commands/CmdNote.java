@@ -1,121 +1,81 @@
 package uk.co.notnull.modreq.commands;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Note;
+import uk.co.notnull.modreq.Request;
 
 public class CmdNote {
-    public CmdNote() {
+    private final ModReq plugin;
+
+    public CmdNote(ModReq plugin) {
+        this.plugin = plugin;
     }
 
     public void addNote(final Player player, final int id, final String message) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
+                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
+                return CompletableFuture.completedFuture(null);
+            }
 
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT done FROM modreq WHERE id=?");
-                    pStatement.setInt(1, id);
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (!sqlres.next()) {
-                        Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
-                    } else {
-                        int done = sqlres.getInt(1);
-                        sqlres.close();
-                        pStatement.close();
-                        if (done != 0) {
-                            Messages.send(player, "error.ALREADY-CLOSED");
-                        } else {
-                            pStatement = connection.prepareStatement("INSERT INTO modreq_notes (modreq_id,uuid,note) VALUES (?,?,?)");
-                            pStatement.setInt(1, id);
-                            pStatement.setString(2, player.getUniqueId().toString());
-                            pStatement.setString(3, message.trim());
-                            pStatement.executeUpdate();
-                            pStatement.close();
-                            Messages.sendToMods("mod.note.ADD",
+            if(request.isClosed()) {
+                Messages.send(player, "error.ALREADY-CLOSED");
+                return CompletableFuture.completedFuture(null);
+            }
+
+            return plugin.getRequestRegistry().addNote(request, player, message).thenAcceptAsync((Note note) -> {
+                Messages.sendToMods("mod.note.ADD",
                                                 "mod", player.getName(),
                                                 "id", String.valueOf(id),
                                                 "msg", message);
-                        }
-                    }
-                } catch (SQLException var9) {
-                    var9.printStackTrace();
-                    Messages.send(player, "error.DATABASE-ERROR");
-                }
-
-            }
-        };
-        runnable.runTaskAsynchronously(ModReq.getPlugin());
+            });
+        }).exceptionally((e) -> {
+            Messages.send(player, "error.DATABASE-ERROR");
+            return null;
+        });
     }
 
     public void removeNote(final Player player, final int id, final int noteId) {
-        BukkitRunnable runnable = new BukkitRunnable() {
-            public void run() {
-                try {
-                    Connection connection = ModReq.getPlugin().getDataSource().getConnection();
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
+                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
+                return CompletableFuture.completedFuture(null);
+            }
 
-                    PreparedStatement pStatement = connection.prepareStatement("SELECT done FROM modreq WHERE id=?");
-                    pStatement.setInt(1, id);
-                    ResultSet sqlres = pStatement.executeQuery();
-                    if (!sqlres.next()) {
-                        Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
-                    } else {
-                        int done = sqlres.getInt(1);
-                        sqlres.close();
-                        pStatement.close();
-                        if (done != 0) {
-                            Messages.send(player, "error.ALREADY-CLOSED");
-                        } else {
-                            pStatement = connection.prepareStatement("SELECT id,uuid,note FROM modreq_notes WHERE modreq_id=? ORDER BY id ASC");
-                            pStatement.setInt(1, id);
-                            sqlres = pStatement.executeQuery();
-                            if (!sqlres.next()) {
-                                Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
-                            } else {
-                                ArrayList notes = new ArrayList();
+            if(request.isClosed()) {
+                Messages.send(player, "error.ALREADY-CLOSED");
+                return CompletableFuture.completedFuture(null);
+            }
 
-                                while(!sqlres.isAfterLast()) {
-                                    notes.add(new Note(sqlres.getInt(1), id, sqlres.getString(2), sqlres.getString(3)));
-                                    sqlres.next();
-                                }
+             return plugin.getRequestRegistry().getNotes(request).thenComposeAsync((List<Note> notes) -> {
+                Note note = notes.get(noteId);
 
-                                sqlres.close();
-                                pStatement.close();
-                                if (noteId < notes.size() && noteId > -1) {
-                                    if (((Note)notes.get(noteId)).getUuid().equals(player.getUniqueId().toString())) {
-                                        pStatement.close();
-                                        pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE id=?");
-                                        pStatement.setInt(1, ((Note)notes.get(noteId)).getId());
-                                        pStatement.executeUpdate();
-                                        pStatement.close();
-                                        Messages.sendToMods("mod.note.REMOVE",
-                                                            "mod", player.getName(),
-                                                            "id", String.valueOf(id),
-                                                            "msg", ((Note)notes.get(noteId)).getNote());
-                                    } else {
-                                        Messages.send(player, "error.NOTE-OTHER");
-                                    }
-                                } else {
-                                    Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
-                                }
-                            }
-                        }
-                    }
-                } catch (SQLException var9) {
-                    var9.printStackTrace();
-                    Messages.send(player, "error.DATABASE-ERROR");
+                if(note == null) {
+                    Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
+                    return CompletableFuture.completedFuture(null);
                 }
 
-            }
-        };
-        runnable.runTaskAsynchronously(ModReq.getPlugin());
+                if(!note.getCreator().equals(player.getUniqueId()) && !player.hasPermission("modreq.admin")) {
+                    Messages.send(player, "error.NOTE-OTHER");
+                    return CompletableFuture.completedFuture(null);
+                }
+
+                return plugin.getRequestRegistry().removeNote(note).thenAcceptAsync((Boolean result) -> {
+                    Messages.sendToMods("mod.note.REMOVE",
+                                        "mod", player.getName(),
+                                        "id", String.valueOf(id),
+                                        "msg", note.getMessage());
+                });
+             });
+        }).exceptionally((e) -> {
+            Messages.send(player, "error.DATABASE-ERROR");
+            return null;
+        });
     }
 }
 

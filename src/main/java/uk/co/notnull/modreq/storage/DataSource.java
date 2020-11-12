@@ -1,11 +1,13 @@
 package uk.co.notnull.modreq.storage;
 
 import org.bukkit.entity.Player;
+import uk.co.notnull.modreq.Note;
 import uk.co.notnull.modreq.Request;
 import uk.co.notnull.modreq.RequestCollection;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface DataSource {
 	Connection getConnection() throws SQLException;
@@ -29,4 +31,7 @@ public interface DataSource {
 	int getOpenRequestCount(Player player) throws Exception;
 	RequestCollection getUnseenClosedRequests(Player player) throws Exception;
 	RequestCollection markRequestsAsSeen(RequestCollection ids) throws Exception;
+	Note addNoteToRequest(Request request, Player player, String note) throws Exception;
+	boolean removeNote(Note note) throws Exception;
+	List<Note> getNotesForRequest(Request request) throws Exception;
 }

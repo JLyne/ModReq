@@ -2,6 +2,7 @@ package uk.co.notnull.modreq;
 
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -161,6 +162,38 @@ public class RequestRegistry {
 	 */
 	public CompletableFuture<Integer> getOpenCount(Player player) {
 		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(player));
+	}
+
+	/**
+	 * Retrieves the notes added to the given request
+	 * @param request The request to retrieve the notes for
+	 * @return Future completed with a collection of notes if successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<List<Note>> getNotes(Request request) {
+		return makeFuture(() -> plugin.getDataSource().getNotesForRequest(request));
+	}
+
+	/**
+	 * Adds a note by the given player, to the given request
+	 * @param request The request to add the note to
+	 * @param player The player to create the note for
+	 * @param note The note
+	 * @return Future completed with the created note if successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<Note> addNote(Request request, Player player, String note) {
+		return makeFuture(() -> plugin.getDataSource().addNoteToRequest(request, player, note));
+	}
+
+	/**
+	 * Removes the given note from storage
+	 * @param note The note to remove
+	 * @return Future completed a boolean indicating whether the removal was successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<Boolean> removeNote(Note note) {
+		return makeFuture(() -> plugin.getDataSource().removeNote(note));
 	}
 
 	/**

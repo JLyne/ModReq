@@ -244,7 +244,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") @Greedy String message
     ) {
-		(new CmdNote()).addNote(player, id, message);
+		(new CmdNote(ModReq.getPlugin())).addNote(player, id, message);
 	}
 
 	@CommandMethod("mr note remove <id> <noteid>")
@@ -256,7 +256,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("noteid") Integer noteId
     ) {
-		(new CmdNote()).removeNote(player, id, noteId);
+		(new CmdNote(ModReq.getPlugin())).removeNote(player, id, noteId);
 	}
 
 	@ProxiedBy("modreq")

@@ -6,14 +6,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import uk.co.notnull.modreq.Configuration;
-import uk.co.notnull.modreq.ModReq;
-import uk.co.notnull.modreq.Request;
-import uk.co.notnull.modreq.Response;
-import uk.co.notnull.modreq.RequestCollection;
+import uk.co.notnull.modreq.*;
 
 import java.io.File;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class SqlDataSource implements DataSource {
@@ -415,6 +413,61 @@ public class SqlDataSource implements DataSource {
 		}).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
 
 		return requests;
+	}
+
+	public List<Note> getNotesForRequest(Request request) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,note FROM modreq_notes WHERE modreq_id=? ORDER BY id ASC");
+		pStatement.setInt(1, request.getId());
+		ResultSet sqlres = pStatement.executeQuery();
+
+		List<Note> results = new ArrayList<>();
+
+		while(!sqlres.isAfterLast()) {
+			UUID creator = UUID.fromString(sqlres.getString(2));
+
+			results.add(new Note(sqlres.getInt(1), request.getId(), creator, sqlres.getString(3)));
+			sqlres.next();
+		}
+
+		sqlres.close();
+		pStatement.close();
+
+		return results;
+	}
+
+	public Note addNoteToRequest(Request request, Player player, String message) throws SQLException {
+		Connection connection = getConnection();
+		message = message.trim();
+
+		PreparedStatement pStatement = connection.prepareStatement("INSERT INTO modreq_notes (modreq_id,uuid,note) VALUES (?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		pStatement.setInt(1, request.getId());
+		pStatement.setString(2, player.getUniqueId().toString());
+		pStatement.setString(3, message);
+		pStatement.executeUpdate();
+		pStatement.close();
+
+		ResultSet rs = pStatement.getGeneratedKeys();
+
+		if(!rs.next()) {
+			throw new SQLException("No row id returned?");
+		}
+
+		int id = rs.getInt(1);
+		pStatement.close();
+
+		return new Note(id, request.getId(), player.getUniqueId(), message);
+	}
+
+	public boolean removeNote(Note note) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE id=?");
+
+		pStatement.setInt(1, note.getId());
+		int result = pStatement.executeUpdate();
+		pStatement.close();
+
+		return result > 0;
 	}
 
 	private RequestCollection createCollection(ResultSet resultSet) throws SQLException {
