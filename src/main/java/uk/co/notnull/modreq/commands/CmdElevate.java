@@ -21,12 +21,9 @@ public class CmdElevate {
                 return CompletableFuture.completedFuture(null);
             }
 
-            int done = request.getDone();
-            int elevated = request.getElevated();
-
-            if(done == 0) {
-                return plugin.getRequestRegistry().elevate(request, elevated == 0).thenAcceptAsync((Request result) -> {
-                    String message = "mod.elevate." + (elevated == 0 ? "1" : "2");
+            if(!request.isClosed()) {
+                return plugin.getRequestRegistry().elevate(request, !request.isElevated()).thenAcceptAsync((Request result) -> {
+                    String message = "mod.elevate." + (request.isElevated() ? "1" : "2");
                     Messages.sendToMods(message, "mod", player.getName(), "id", String.valueOf(id));
                 });
             } else {

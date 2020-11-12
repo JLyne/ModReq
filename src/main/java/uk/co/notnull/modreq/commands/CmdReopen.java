@@ -21,7 +21,7 @@ public class CmdReopen {
                 return CompletableFuture.completedFuture(null);
             }
 
-            if(request.getDone() > 0) {
+            if(request.isClosed()) {
                 return plugin.getRequestRegistry().reopen(request).thenAcceptAsync((Request result) -> {
                     Messages.sendToMods("mod.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
                 });

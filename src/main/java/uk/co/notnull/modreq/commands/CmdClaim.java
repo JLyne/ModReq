@@ -21,7 +21,7 @@ public class CmdClaim {
                 return CompletableFuture.completedFuture(null);
             }
 
-            if(request.getDone() != 0) {
+            if(request.isClosed()) {
                 Messages.send(player, "error.ALREADY-CLOSED");
                 return CompletableFuture.completedFuture(null);
             }
@@ -30,7 +30,7 @@ public class CmdClaim {
                     || player.hasPermission("modreq.mod.overrideclaimed");
 
             if(claim) {
-                if(!request.getClaimed().isEmpty() && !canClaimOther) {
+                if(request.isClaimed() && !canClaimOther) {
                     Messages.send(player, "error.ALREADY-CLAIMED");
                     return CompletableFuture.completedFuture(null);
                 }
@@ -38,8 +38,8 @@ public class CmdClaim {
                 return plugin.getRequestRegistry().claim(request, player).thenAcceptAsync((Request result) -> {
                     Messages.sendToMods("mod.CLAIM", "mod", player.getName(), "id", String.valueOf(id));
                 });
-            } else if(!request.getClaimed().isEmpty()) {
-                if(!request.getClaimed().equals(player.getUniqueId().toString()) && !canClaimOther) {
+            } else if(request.isClaimed()) {
+                if(!request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
                     Messages.send(player, "error.OTHER-CLAIMED");
                     return CompletableFuture.completedFuture(null);
                 }
