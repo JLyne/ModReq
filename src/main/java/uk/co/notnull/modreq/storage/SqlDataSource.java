@@ -146,15 +146,20 @@ public class SqlDataSource implements DataSource {
 		}
 	}
 
-	public boolean elevateRequest(int id, boolean elevated) throws SQLException {
+	public Request elevateRequest(Request request, boolean elevated) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET elevated=? WHERE id=?");
 		pStatement.setInt(1, elevated ? 1 : 0);
-		pStatement.setInt(2, id);
+		pStatement.setInt(2, request.getId());
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 
-		return result > 1;
+		if(result != 1) {
+			throw new SQLException("Row update failed");
+		}
+
+		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
+							   request.getLocation(), request.getOwner(), true, request.getResponse());
 	}
 
 	public Request closeRequest(Request request, Player mod, String message) throws SQLException {
@@ -182,40 +187,55 @@ public class SqlDataSource implements DataSource {
 						   request.getCreateTime(), request.getLocation(), request.getOwner(), false, response);
 	}
 
-	public boolean reopenRequest(int id) throws SQLException {
+	public Request reopenRequest(Request request) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',mod_uuid='',mod_comment='',mod_timestamp='0',done='0',elevated='0' WHERE id=?");
 
-		pStatement.setInt(1, id);
+		pStatement.setInt(1, request.getId());
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 
-		return result > 1;
+		if(result != 1) {
+			throw new SQLException("Row update failed");
+		}
+
+		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
+							   request.getLocation());
 	}
 
-	public boolean claim(int id, Player player) throws SQLException {
+	public Request claim(Request request, Player player) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed=? WHERE id=?");
 
 		pStatement.setString(1, player.getUniqueId().toString());
-		pStatement.setInt(2, id);
+		pStatement.setInt(2, request.getId());
 
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 
-		return result > 1;
+		if(result != 1) {
+			throw new SQLException("Row update failed");
+		}
+
+		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
+							   request.getLocation(), player.getUniqueId(), request.isElevated(), request.getResponse());
 	}
 
-	public boolean unclaim(int id) throws SQLException {
+	public Request unclaim(Request request) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='' WHERE id=?");
 
-		pStatement.setInt(1, id);
+		pStatement.setInt(1, request.getId());
 
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 
-		return result > 1;
+		if(result != 1) {
+			throw new SQLException("Row update failed");
+		}
+
+		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
+							   request.getLocation(), null, request.isElevated(), request.getResponse());
 	}
 
 	public Request createRequest(Player player, String message) throws SQLException {
@@ -264,15 +284,39 @@ public class SqlDataSource implements DataSource {
 		return requests;
 	}
 
-	public RequestCollection getOpenRequests(boolean includeElevated) throws SQLException {
+	public RequestCollection getAllOpenRequests(boolean includeElevated) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement;
+		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'";
 
-		if(includeElevated) {
-			pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'");
-		} else {
-			pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND elevated='0'");
+		if(!includeElevated) {
+			sql += " AND elevated = '0'";
 		}
+
+		pStatement = connection.prepareStatement(sql);
+
+		ResultSet sqlres = pStatement.executeQuery();
+		RequestCollection requests = createCollection(sqlres);
+
+		sqlres.close();
+		pStatement.close();
+
+		return requests;
+	}
+
+	public RequestCollection getOpenRequests(int page, boolean includeElevated) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement pStatement;
+		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'";
+
+		if(!includeElevated) {
+			sql += " AND elevated = '0'";
+		}
+
+		sql += " LIMIT ?,?";
+		pStatement = connection.prepareStatement(sql);
+		pStatement.setInt(1, page * cfg.getModreqs_per_page());
+		pStatement.setInt(2, cfg.getModreqs_per_page());
 
 		ResultSet sqlres = pStatement.executeQuery();
 		RequestCollection requests = createCollection(sqlres);

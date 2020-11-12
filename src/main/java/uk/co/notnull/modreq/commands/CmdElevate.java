@@ -25,7 +25,7 @@ public class CmdElevate {
             int elevated = request.getElevated();
 
             if(done == 0) {
-                return plugin.getRequestRegistry().elevate(id, elevated == 0).thenAcceptAsync((Boolean result) -> {
+                return plugin.getRequestRegistry().elevate(request, elevated == 0).thenAcceptAsync((Request result) -> {
                     String message = "mod.elevate." + (elevated == 0 ? "1" : "2");
                     Messages.sendToMods(message, "%mod", player.getName(), "%id", String.valueOf(id));
                 });

@@ -11,14 +11,18 @@ public interface DataSource {
 	Connection getConnection() throws SQLException;
 	boolean init();
 	void destroy();
+
+
 	boolean requestExists(int id) throws Exception;
-	RequestCollection getOpenRequests(boolean includeElevated) throws Exception;
+
+	RequestCollection getAllOpenRequests(boolean includeElevated) throws Exception;
+	RequestCollection getOpenRequests(int page, boolean includeElevated) throws Exception;
 	RequestCollection getOpenRequests(Player player) throws Exception;
 	Request getRequest(int id) throws Exception;
-	boolean elevateRequest(int id, boolean elevated) throws Exception;
-	boolean reopenRequest(int id) throws Exception;
-	boolean claim(int id, Player player) throws Exception;
-	boolean unclaim(int id) throws Exception;
+	Request elevateRequest(Request request, boolean elevated) throws Exception;
+	Request reopenRequest(Request request) throws Exception;
+	Request claim(Request request, Player player) throws Exception;
+	Request unclaim(Request request) throws Exception;
 	Request closeRequest(Request request, Player mod, String message) throws Exception;
 	Request createRequest(Player player, String message) throws Exception;
 	int getOpenRequestCount(boolean includeElevated) throws Exception;

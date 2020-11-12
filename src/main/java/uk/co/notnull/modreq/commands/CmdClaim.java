@@ -35,7 +35,7 @@ public class CmdClaim {
                     return CompletableFuture.completedFuture(null);
                 }
 
-                return plugin.getRequestRegistry().claim(id, player).thenAcceptAsync((Boolean result) -> {
+                return plugin.getRequestRegistry().claim(request, player).thenAcceptAsync((Request result) -> {
                     Messages.sendToMods("mod.CLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
                 });
             } else if(!request.getClaimed().isEmpty()) {
@@ -44,7 +44,7 @@ public class CmdClaim {
                     return CompletableFuture.completedFuture(null);
                 }
 
-                return plugin.getRequestRegistry().unclaim(id).thenAcceptAsync((Boolean result) -> {
+                return plugin.getRequestRegistry().unclaim(request).thenAcceptAsync((Request result) -> {
                     Messages.sendToMods("error.UNCLAIM", "%mod", player.getName(), "%id", String.valueOf(id));
                 });
             } else {
