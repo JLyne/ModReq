@@ -429,8 +429,13 @@ public class SqlDataSource implements DataSource {
 			UUID owner = resultSet.getString(8).isEmpty() ? null : UUID.fromString(resultSet.getString(9));
 			UUID responder = resultSet.getString(9).isEmpty() ? null : UUID.fromString(resultSet.getString(10));
 
-			Response response = new Response(responder, resultSet.getString(11), closedDate,
+			Response response = null;
+
+			if(responder != null) {
+				 response = new Response(responder, resultSet.getString(11), closedDate,
 									 resultSet.getInt(13) == 2);
+			}
+
 			results.add(new Request(resultSet.getInt(1), UUID.fromString(resultSet.getString(2)),
 									 resultSet.getString(3), createdDate, location,
 									 owner, resultSet.getBoolean(14), response
