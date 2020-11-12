@@ -9,12 +9,12 @@ import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Configuration;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.Response;
 import uk.co.notnull.modreq.RequestCollection;
 
 import java.io.File;
 import java.sql.*;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class SqlDataSource implements DataSource {
 	private final ModReq plugin;
@@ -177,9 +177,9 @@ public class SqlDataSource implements DataSource {
 		pStatement.executeUpdate();
 		pStatement.close();
 
+		Response response = new Response(mod.getUniqueId(), message, new Date(time), request.isCreatorOnline());
 		return new Request(request.getId(), request.getCreator(), request.getMessage(),
-						   request.getCreateTime(), request.getLocation(), request.getOwner(),
-						   mod.getUniqueId(), message, new Date(time), status, false);
+						   request.getCreateTime(), request.getLocation(), request.getOwner(), false, response);
 	}
 
 	public boolean reopenRequest(int id) throws SQLException {
@@ -366,9 +366,8 @@ public class SqlDataSource implements DataSource {
 		pStatement.close();
 
 		requests = requests.stream().map(request -> {
-			return new Request(request.getId(), request.getCreator(), request.getMessage(),
-						   request.getCreateTime(), request.getLocation(), request.getOwner(),
-						   request.getResponder(), request.getResponse(), request.getCloseTime(), request.getDone(), request.isElevated());
+			return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
+							   request.getLocation(), request.getOwner(), request.isElevated(), request.getResponse());
 		}).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
 
 		return requests;
@@ -386,10 +385,11 @@ public class SqlDataSource implements DataSource {
 			UUID owner = resultSet.getString(8).isEmpty() ? null : UUID.fromString(resultSet.getString(9));
 			UUID responder = resultSet.getString(9).isEmpty() ? null : UUID.fromString(resultSet.getString(10));
 
+			Response response = new Response(responder, resultSet.getString(11), closedDate,
+									 resultSet.getInt(13) == 2);
 			results.add(new Request(resultSet.getInt(1), UUID.fromString(resultSet.getString(2)),
 									 resultSet.getString(3), createdDate, location,
-									 owner, responder, resultSet.getString(11), closedDate,
-									 resultSet.getInt(13), resultSet.getBoolean(14)
+									 owner, resultSet.getBoolean(14), response
 			));
 
 			resultSet.next();

@@ -10,15 +10,12 @@ import java.util.UUID;
 public class Request {
     private final Location location;
     private final int id;
-    private final int done;
     private final boolean elevated;
     private final Date createTime;
-    private final Date closeTime;
     private final UUID creator;
     private final String message;
     private final UUID owner;
-    private final UUID responder;
-    private final String response;
+    public final Response response;
 
     public Request(int id, UUID creator, String message, Date createTime, Location location) {
         this.id = id;
@@ -26,24 +23,18 @@ public class Request {
         this.message = message;
         this.createTime = createTime;
         this.owner = null;
-        this.responder = null;
         this.response = null;
-        this.closeTime = null;
-        this.done = 0;
         this.elevated = false;
         this.location = location;
     }
 
-    public Request(int id, UUID creator, String message, Date createTime, Location location, UUID owner, UUID responder, String response, Date closeTime, int pDone, boolean elevated) {
+    public Request(int id, UUID creator, String message, Date createTime, Location location, UUID owner, boolean elevated, Response response) {
         this.id = id;
         this.creator = creator;
         this.message = message;
         this.createTime = createTime;
         this.owner = owner;
-        this.responder = responder;
         this.response = response;
-        this.closeTime = closeTime;
-        this.done = pDone;
         this.elevated = elevated;
         this.location = location;
     }
@@ -55,10 +46,10 @@ public class Request {
         this.message = pRequest;
         this.createTime = new Date(pTimestamp);
         this.owner = pClaimed.isEmpty() ? null : UUID.fromString(pClaimed);
-        this.responder = pMod_uuid.isEmpty() ? null : UUID.fromString(pMod_uuid);
-        this.response = pMod_comment;
-        this.closeTime = pMod_timestamp == 0 ? null : new Date(pMod_timestamp);
-        this.done = pDone;
+        this.response = new Response(pMod_uuid.isEmpty() ? null : UUID.fromString(pMod_uuid),
+                                     pMod_comment,
+                                     pMod_timestamp == 0 ? null : new Date(pMod_timestamp),
+                                     pDone == 2);
         this.elevated = pElevated == 1;
         this.location = new Location(Bukkit.getWorld(world), x, y, z);
     }
@@ -79,11 +70,11 @@ public class Request {
 
     @Deprecated
     public String getMod_uuid() {
-        return this.responder != null ? this.responder.toString() : "";
+        return hasResponse() ? response.getResponder().toString() : "";
     }
 
     public int getDone() {
-        return this.done;
+        return hasResponse() ? (response.isSeen() ? 2 : 1) : 0;
     }
 
     @Deprecated
@@ -118,7 +109,7 @@ public class Request {
 
     @Deprecated
     public long getMod_timestamp() {
-        return this.closeTime != null ? this.closeTime.getTime() : 0;
+        return hasResponse() ? this.response.getTime().getTime() : 0;
     }
 
     @Deprecated
@@ -128,7 +119,7 @@ public class Request {
 
     @Deprecated
     public String getMod_comment() {
-        return this.response;
+        return hasResponse() ? response.getMessage() : "";
     }
 
     public String getMessage() {
@@ -144,7 +135,7 @@ public class Request {
     }
 
     public Date getCloseTime() {
-        return closeTime;
+        return hasResponse() ? response.getTime() : null;
     }
 
     public UUID getCreator() {
@@ -155,17 +146,25 @@ public class Request {
         return owner;
     }
 
-    public UUID getResponder() {
-        return responder;
+    public boolean hasResponse() {
+        return response != null;
     }
 
-    public String getResponse() {
+    public UUID getResponder() {
+        return hasResponse() ? response.getResponder() : null;
+    }
+
+    public String getResponseMessage() {
+        return hasResponse() ? response.getMessage() : null;
+    }
+
+    public Response getResponse() {
         return response;
     }
 
     public boolean isElevated() { return this.elevated; }
 
-    public boolean isClosed() { return this.done > 0; }
+    public boolean isClosed() { return hasResponse(); }
 
     public boolean isClaimed() { return owner != null; }
 

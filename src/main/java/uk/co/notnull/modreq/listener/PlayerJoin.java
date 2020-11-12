@@ -32,7 +32,7 @@ public class PlayerJoin {
                 String modName = mod != null && mod.getName() != null ? mod.getName() : "unknown";
 
                 Messages.send(player, "player.DONE","%mod", modName, "%id", String.valueOf(request.getId()));
-                Messages.send(player, "general.DONE-MESSAGE", "%msg", request.getResponse());
+                Messages.send(player, "general.DONE-MESSAGE", "%msg", request.getResponseMessage());
             }
 
             Messages.send(player, "general.HELP-LIST-MODREQS");
