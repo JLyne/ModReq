@@ -33,15 +33,9 @@ public class RequestCollection extends ArrayList<Request> {
 
 			//TODO: Notes
 
-//			pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq_notes WHERE modreq_id=?");
-//			pStatement.setInt(1, ((Request)requests.get(i)).getId());
-//			sqlres = pStatement.executeQuery();
-//			if (sqlres != null && sqlres.next() && sqlres.getInt(1) > 0) {
-//				status = status + " " + ModReq.getPlugin().getLanguageFile().getLangString("general.NOTES");
-//			}
-//
-//			sqlres.close();
-//			pStatement.close();
+			if(request.hasNotes()) {
+				status = status + " " + Messages.getString("general.NOTES");
+			}
 
 			String username;
 			if (creator.getName() != null) {

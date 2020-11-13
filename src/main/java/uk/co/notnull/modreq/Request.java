@@ -173,6 +173,10 @@ public class Request {
         return response;
     }
 
+    public boolean hasNotes() {
+        return !notes.isEmpty();
+    }
+
     public List<Note> getNotes() {
         return new ArrayList<>(notes);
     }
