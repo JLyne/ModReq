@@ -313,7 +313,7 @@ public class SqlDataSource implements DataSource {
 
 		sql += " LIMIT ?,?";
 		pStatement = connection.prepareStatement(sql);
-		pStatement.setInt(1, page * cfg.getModreqs_per_page());
+		pStatement.setInt(1, (page - 1) * cfg.getModreqs_per_page());
 		pStatement.setInt(2, cfg.getModreqs_per_page());
 
 		ResultSet sqlres = pStatement.executeQuery();
@@ -479,8 +479,20 @@ public class SqlDataSource implements DataSource {
 			Date closedDate = resultSet.getLong(12) != 0 ? new Date(resultSet.getLong(12)) : null;
 			Location location = new Location(world, resultSet.getInt(6), resultSet.getInt(7), resultSet.getInt(8));
 
-			UUID owner = resultSet.getString(8).isEmpty() ? null : UUID.fromString(resultSet.getString(9));
-			UUID responder = resultSet.getString(9).isEmpty() ? null : UUID.fromString(resultSet.getString(10));
+			UUID owner = null;
+			UUID responder = null;
+
+			try {
+				if(!resultSet.getString(9).isEmpty()) {
+					owner = UUID.fromString(resultSet.getString(9));
+				}
+			} catch(IllegalArgumentException ignored) {}
+
+			try {
+				if(!resultSet.getString(10).isEmpty()) {
+					responder = UUID.fromString(resultSet.getString(10));
+				}
+			} catch(IllegalArgumentException ignored) {}
 
 			Response response = null;
 

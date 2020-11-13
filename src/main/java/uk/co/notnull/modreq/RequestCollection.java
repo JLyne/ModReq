@@ -57,31 +57,38 @@ public class RequestCollection extends ArrayList<Request> {
 			String timestamp = ModReq.getPlugin().getFormat().format(request.getCreateTime());
 
 			if(context != null && context.hasPermission("modreq.mod") && context.hasPermission("modreq.admin")) {
-				result.append(Messages.get("mod.check.2",
+				result = result.append(Messages.get("mod.check.2",
 										   "id", String.valueOf(request.getId()),
-										   "%status", status, "date", timestamp, "player", username));
-				result.append(Messages.get("mod.check.3", "msg", request.getMessage()));
+										   "status", status, "date", timestamp, "player", username));
+				result = result.append(Component.newline());
+				result = result.append(Messages.get("mod.check.3", "msg", request.getMessage()));
 			} else {
-				result.append(Messages.get("player.check.2",
+				result = result.append(Messages.get("player.check.2",
 										   "id", String.valueOf(request.getId()),
 										   "status", status, "date", timestamp));
-				result.append(Messages.get("player.check.3", "msg", request.getMessage()));
+				result = result.append(Component.newline());
+				result = result.append(Messages.get("player.check.3", "msg", request.getMessage()));
 
 				if(request.isClosed()) {
 					String closeTimestamp = ModReq.getPlugin().getFormat().format(request.getCloseTime());
 
+					result = result.append(Component.newline());
+
 					if(responder != null && responder.getName() != null) {
-						result.append(Messages.get("player.check.4", "mod", responder.getName(),
+						result = result.append(Messages.get("player.check.4", "mod", responder.getName(),
 												   "date", closeTimestamp));
 					} else {
-						result.append(Messages.get("player.check.4",
+						result = result.append(Messages.get("player.check.4",
 												   "mod", Messages.getString("general.UNKNOWN-PLAYER"),
 												   "date", closeTimestamp));
 					}
 
-					result.append(Messages.get("player.check.5", "msg", request.getMessage()));
+					result = result.append(Component.newline());
+					result = result.append(Messages.get("player.check.5", "msg", request.getMessage()));
 				}
 			}
+
+			result = result.append(Component.newline());
 		}
 
 		return result;

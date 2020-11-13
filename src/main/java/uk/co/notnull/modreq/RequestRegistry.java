@@ -34,6 +34,10 @@ public class RequestRegistry {
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
 	public CompletableFuture<Boolean> exists(int id) {
+		if(id < 1) {
+			throw new IllegalArgumentException("ID cannot be less than 1");
+		}
+
 		return makeFuture(() -> plugin.getDataSource().requestExists(id));
 	}
 
@@ -44,6 +48,10 @@ public class RequestRegistry {
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
 	public CompletableFuture<Request> get(int id) {
+		if(id < 1) {
+			throw new IllegalArgumentException("ID cannot be less than 1");
+		}
+
 		return makeFuture(() -> plugin.getDataSource().getRequest(id));
 	}
 
@@ -131,6 +139,10 @@ public class RequestRegistry {
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
 	public CompletableFuture<RequestCollection> getOpen(int page, boolean includeElevated) {
+		if(page < 1) {
+			throw new IllegalArgumentException("Page cannot be less than 1");
+		}
+
 		return makeFuture(() -> plugin.getDataSource().getOpenRequests(page, includeElevated));
 	}
 
