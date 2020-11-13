@@ -19,7 +19,6 @@ import cloud.commandframework.paper.PaperCommandManager;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
@@ -149,9 +148,9 @@ public class Commands {
             final @Argument("page") Integer page
     ) {
 		if(page != null) {
-			(new CmdCheck()).checkOpenModreqs(player, page);
+			(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player, page);
 		} else {
-			(new CmdCheck()).checkOpenModreqs(player);
+			(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player);
 		}
 	}
 
@@ -162,7 +161,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdCheck()).checkSpecialModreq(player, id);
+		(new CmdCheck(ModReq.getPlugin())).checkSpecialModreq(player, id);
 	}
 
 	@CommandMethod("mr search <criteria>")
@@ -172,7 +171,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("criteria") String criteria
     ) {
-		(new CmdCheck()).searchOpenModreqs(player, criteria);
+		(new CmdCheck(ModReq.getPlugin())).searchOpenModreqs(player, criteria);
 	}
 
 	@CommandMethod("mr claim <id>")
