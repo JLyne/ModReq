@@ -619,6 +619,10 @@ public class SqlDataSource implements DataSource {
 		List<Integer> ids = new ArrayList<>();
 		RequestCollection results = new RequestCollection();
 
+		if(resultSet.isAfterLast()) {
+			return results;
+		}
+
 		while(!resultSet.isAfterLast()) {
 			int id = resultSet.getInt(1);
 			ids.add(id);
