@@ -108,6 +108,11 @@ public class Messages {
         }
     }
 
+    /**
+     * Returns the specified language string, parsed into a component
+     * @param key The key for the language string
+     * @param replacements A list of placeholders and their replacements
+     */
     public static Component get(String key, String ...replacements) {
         if(cfg == null) {
             load();
@@ -123,6 +128,11 @@ public class Messages {
         }
     }
 
+    /**
+     * Returns the specified language string
+     * @param key The key for the language string
+     * @param replacements A list of placeholders and their replacements
+     */
     public static String getString(String key, String ...replacements) {
         if(cfg == null) {
             load();
@@ -151,6 +161,12 @@ public class Messages {
         }
     }
 
+    /**
+     * Send a language string to the specified player
+     * @param recipient The player to send the message to
+     * @param key The key for the language string to send
+     * @param replacements A list of placeholders and their replacements
+     */
     public static void send(Player recipient, String key, String ...replacements) {
         Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
 
@@ -163,6 +179,22 @@ public class Messages {
         }
     }
 
+    /**
+     * Send a previously created component to the specified player
+     * @param recipient The player to send the message to
+     * @param message The component message to send
+     */
+    public static void send(Player recipient, Component message) {
+        Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
+
+        audience.sendMessage(message);
+    }
+
+    /**
+     * Send a language string to all online players with mod permissions
+     * @param key The key for the language string to send
+     * @param replacements A list of placeholders and their replacements
+     */
     public static void sendToMods(String key, String ...replacements) {
         Component message;
 
