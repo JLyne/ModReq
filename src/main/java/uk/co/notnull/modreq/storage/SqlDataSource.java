@@ -557,15 +557,15 @@ public class SqlDataSource implements DataSource {
 		ResultSet sqlres = pStatement.executeQuery();
 
 		while(!sqlres.isAfterLast()) {
-			UUID creator = UUID.fromString(sqlres.getString(2));
 			int requestId = sqlres.getInt(2);
+			UUID creator = UUID.fromString(sqlres.getString(3));
 
 			if(!results.containsKey(requestId)) {
 				results.put(requestId, new ArrayList<>());
 			}
 
 			results.get(requestId).add(
-					new Note(sqlres.getInt(1), requestId, creator, sqlres.getString(3)));
+					new Note(sqlres.getInt(1), requestId, creator, sqlres.getString(4)));
 			sqlres.next();
 		}
 
