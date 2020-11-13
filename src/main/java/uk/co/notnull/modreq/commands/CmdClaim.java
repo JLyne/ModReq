@@ -1,6 +1,7 @@
 package uk.co.notnull.modreq.commands;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
@@ -15,15 +16,19 @@ public class CmdClaim {
     }
 
     public void claimModReq(final Player player, final int id, final boolean claim) {
+        CompletableFuture<Void> shortcut = new CompletableFuture<>();
+
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
             if(request == null) {
                 Messages.send(player,"error.ID-ERROR",  "id", String.valueOf(id));
-                return CompletableFuture.completedFuture(null);
+                shortcut.complete(null);
+				return new CompletableFuture<>();
             }
 
             if(request.isClosed()) {
                 Messages.send(player, "error.ALREADY-CLOSED");
-                return CompletableFuture.completedFuture(null);
+                shortcut.complete(null);
+				return new CompletableFuture<>();
             }
 
             boolean canClaimOther = player.hasPermission("modreq.admin")
@@ -32,26 +37,31 @@ public class CmdClaim {
             if(claim) {
                 if(request.isClaimed() && !canClaimOther) {
                     Messages.send(player, "error.ALREADY-CLAIMED");
-                    return CompletableFuture.completedFuture(null);
+                    shortcut.complete(null);
+				    return new CompletableFuture<>();
                 }
 
-                return plugin.getRequestRegistry().claim(request, player).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("mod.CLAIM", "mod", player.getName(), "id", String.valueOf(id));
-                });
+                return plugin.getRequestRegistry().claim(request, player);
             } else if(request.isClaimed()) {
                 if(!request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
                     Messages.send(player, "error.OTHER-CLAIMED");
-                    return CompletableFuture.completedFuture(null);
+                    shortcut.complete(null);
+				    return new CompletableFuture<>();
                 }
 
-                return plugin.getRequestRegistry().unclaim(request).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("mod.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
-                });
+                return plugin.getRequestRegistry().unclaim(request);
             } else {
                 Messages.send(player, "error.NOT-CLAIMED");
-                return CompletableFuture.completedFuture(null);
+                shortcut.complete(null);
+				return new CompletableFuture<>();
             }
-        }).exceptionally((e) -> {
+        }).thenAcceptAsync((Request result) -> {
+            if(result.isClaimed()) {
+                Messages.sendToMods("mod.CLAIM", "mod", player.getName(), "id", String.valueOf(id));
+            } else {
+                Messages.sendToMods("mod.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
+            }
+        }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });

@@ -1,6 +1,7 @@
 package uk.co.notnull.modreq.commands;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
@@ -15,22 +16,24 @@ public class CmdReopen {
     }
 
     public void reopenModReq(final Player player, final int id) {
+        CompletableFuture<Void> shortcut = new CompletableFuture<>();
+
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
-            if(request == null) {
-                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
-                return CompletableFuture.completedFuture(null);
+            if(request != null && request.isClosed()) {
+                return plugin.getRequestRegistry().reopen(request);
             }
 
-            if(request.isClosed()) {
-                return plugin.getRequestRegistry().reopen(request).thenAcceptAsync((Request result) -> {
-                    Messages.sendToMods("mod.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
-                });
+            if(request == null) {
+                Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
             } else {
                 Messages.send(player,"error.NOT-CLOSED");
             }
 
-            return CompletableFuture.completedFuture(null);
-        }).exceptionally(e -> {
+            shortcut.complete(null);
+            return new CompletableFuture<>();
+        }).thenAcceptAsync((Request result) -> {
+            Messages.sendToMods("mod.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
+        }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");
             return null;

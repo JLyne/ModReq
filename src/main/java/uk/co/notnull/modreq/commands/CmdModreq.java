@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -22,21 +23,24 @@ public class CmdModreq {
     }
 
     public void modreq(final Player player, final String message) {
+        CompletableFuture<Void> shortcut = new CompletableFuture<>();
+
         plugin.getRequestRegistry().getOpenCount(player).thenComposeAsync((Integer count) -> {
             if(count >= plugin.getConfiguration().getMax_open_modreqs()) {
 
                 Messages.send(player, "error.MAX-OPEN-MODREQS", "max",
                               String.valueOf(plugin.getConfiguration().getMax_open_modreqs()));
 
-                return CompletableFuture.completedFuture(null);
+                shortcut.complete(null);
+                return new CompletableFuture<>();
             }
 
-            return plugin.getRequestRegistry().create(player, message).thenAcceptAsync((Request request) -> {
-                Messages.send(player, "player.REQUEST-FILED");
-                Messages.sendToMods("mod.NEW-MODREQ", "id", String.valueOf(request.getId()));
-                plugin.playModSound();
-            });
-        }).exceptionally((e) -> {
+            return plugin.getRequestRegistry().create(player, message);
+        }).thenAcceptAsync((Request request) -> {
+            Messages.send(player, "player.REQUEST-FILED");
+            Messages.sendToMods("mod.NEW-MODREQ", "id", String.valueOf(request.getId()));
+            plugin.playModSound();
+        }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
