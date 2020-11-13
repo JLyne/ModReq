@@ -9,9 +9,18 @@ import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
 
 import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.DriverManager;
+
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SqlDataSource implements DataSource {
@@ -126,18 +135,15 @@ public class SqlDataSource implements DataSource {
 	public Request getRequest(int id) throws SQLException {
 		Connection connection = getConnection();
 
-		PreparedStatement pStatement = connection.prepareStatement("SELECT uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE id = ?");
+		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE id = ?");
 		pStatement.setInt(1, id);
 		ResultSet sqlres = pStatement.executeQuery();
 
 		if(!sqlres.next()) {
 			return null;
 		} else {
-			Request request = new Request(id, sqlres.getString(1), sqlres.getString(2), sqlres.getLong(3),
-										  sqlres.getString(4), sqlres.getInt(5), sqlres.getInt(6),
-										  sqlres.getInt(7), sqlres.getString(8), sqlres.getString(9),
-										  sqlres.getString(10), sqlres.getLong(11), sqlres.getInt(12),
-										  sqlres.getInt(13));
+			Request request = buildRequest(sqlres).notes(getNotes(id)).build();
+
 			sqlres.close();
 			pStatement.close();
 			return request;
@@ -156,8 +162,17 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
-							   request.getLocation(), request.getOwner(), true, request.getResponse());
+		return Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.claimedBy(request.getOwner())
+				.elevated(true)
+				.response(request.getResponse())
+				.notes(request.getNotes())
+				.build();
 	}
 
 	public Request closeRequest(Request request, Player mod, String message) throws SQLException {
@@ -181,8 +196,18 @@ public class SqlDataSource implements DataSource {
 		pStatement.close();
 
 		Response response = new Response(mod.getUniqueId(), message, new Date(time), request.isCreatorOnline());
-		return new Request(request.getId(), request.getCreator(), request.getMessage(),
-						   request.getCreateTime(), request.getLocation(), request.getOwner(), false, response);
+
+		return Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.claimedBy(request.getOwner())
+				.elevated(false)
+				.response(response)
+				.notes(request.getNotes())
+				.build();
 	}
 
 	public Request reopenRequest(Request request) throws SQLException {
@@ -197,8 +222,14 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
-							   request.getLocation());
+		return Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.notes(request.getNotes())
+				.build();
 	}
 
 	public Request claim(Request request, Player player) throws SQLException {
@@ -215,8 +246,17 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
-							   request.getLocation(), player.getUniqueId(), request.isElevated(), request.getResponse());
+		return Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.claimedBy(player.getUniqueId())
+				.elevated(request.isElevated())
+				.response(request.getResponse())
+				.notes(request.getNotes())
+				.build();
 	}
 
 	public Request unclaim(Request request) throws SQLException {
@@ -232,8 +272,16 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
-							   request.getLocation(), null, request.isElevated(), request.getResponse());
+		return Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.elevated(request.isElevated())
+				.response(request.getResponse())
+				.notes(request.getNotes())
+				.build();
 	}
 
 	public Request createRequest(Player player, String message) throws SQLException {
@@ -263,7 +311,13 @@ public class SqlDataSource implements DataSource {
 		id = rs.getInt(1);
 		pStatement.close();
 
-		return new Request(id, player.getUniqueId(), message, new Date(time), location);
+		return Request.builder()
+				.id(id)
+				.creator(player.getUniqueId())
+				.message(message)
+				.createdAt(new Date(time))
+				.location(location)
+				.build();
 	}
 
 	public RequestCollection getOpenRequests(Player player) throws SQLException {
@@ -274,7 +328,7 @@ public class SqlDataSource implements DataSource {
 		pStatement.setString(1, player.getUniqueId().toString());
 
 		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createCollection(sqlres);
+		RequestCollection requests = createRequestCollection(sqlres);
 
 		sqlres.close();
 		pStatement.close();
@@ -294,7 +348,7 @@ public class SqlDataSource implements DataSource {
 		pStatement = connection.prepareStatement(sql);
 
 		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createCollection(sqlres);
+		RequestCollection requests = createRequestCollection(sqlres);
 
 		sqlres.close();
 		pStatement.close();
@@ -317,7 +371,7 @@ public class SqlDataSource implements DataSource {
 		pStatement.setInt(2, cfg.getModreqs_per_page());
 
 		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createCollection(sqlres);
+		RequestCollection requests = createRequestCollection(sqlres);
 
 		sqlres.close();
 		pStatement.close();
@@ -371,11 +425,11 @@ public class SqlDataSource implements DataSource {
 
 	public RequestCollection getUnseenClosedRequests(Player player) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("SELECT id,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done=1 AND uuid=?");
+		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done=1 AND uuid=?");
 		pStatement.setString(1, player.getUniqueId().toString());
 		ResultSet sqlres = pStatement.executeQuery();
 
-		RequestCollection requests = createCollection(sqlres);
+		RequestCollection requests = createRequestCollection(sqlres);
 
 		sqlres.close();
 		pStatement.close();
@@ -407,10 +461,18 @@ public class SqlDataSource implements DataSource {
 		pStatement.executeUpdate();
 		pStatement.close();
 
-		requests = requests.stream().map(request -> {
-			return new Request(request.getId(), request.getCreator(), request.getMessage(), request.getCreateTime(),
-							   request.getLocation(), request.getOwner(), request.isElevated(), request.getResponse());
-		}).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
+		requests = requests.stream().map(request -> Request.builder()
+				.id(request.getId())
+				.creator(request.getCreator())
+				.message(request.getMessage())
+				.createdAt(request.getCreateTime())
+				.location(request.getLocation())
+				.claimedBy(request.getOwner())
+				.elevated(request.isElevated())
+				.response(request.getResponse())
+				.notes(request.getNotes())
+				.build()
+		).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
 
 		return requests;
 	}
@@ -470,11 +532,51 @@ public class SqlDataSource implements DataSource {
 		return result > 0;
 	}
 
-	private RequestCollection createCollection(ResultSet resultSet) throws SQLException {
-		RequestCollection results = new RequestCollection();
+	private List<Note> getNotes(int id) throws SQLException {
+		return getNotes(List.of(id)).get(id);
+	}
 
-		while(!resultSet.isAfterLast()) {
-			World world = Bukkit.getWorld(resultSet.getString(5));
+	private Map<Integer, List<Note>> getNotes(List<Integer> ids) throws SQLException {
+		Connection connection = getConnection();
+		StringBuilder builder = new StringBuilder("SELECT id,modreq_id,uuid,note FROM modreq_notes WHERE modreq_id IN (");
+		Map<Integer, List<Note>> results = new HashMap<>();
+
+		for(int id: ids) {
+			results.put(id, new ArrayList<>());
+			builder.append("?,");
+		}
+
+		String sql = builder.deleteCharAt(builder.length() -1).append(")").toString();
+		PreparedStatement pStatement = connection.prepareStatement(sql);
+
+		int i = 1;
+		for(Integer id: ids) {
+			pStatement.setInt(i++, id);
+		}
+
+		ResultSet sqlres = pStatement.executeQuery();
+
+		while(!sqlres.isAfterLast()) {
+			UUID creator = UUID.fromString(sqlres.getString(2));
+			int requestId = sqlres.getInt(2);
+
+			if(!results.containsKey(requestId)) {
+				results.put(requestId, new ArrayList<>());
+			}
+
+			results.get(requestId).add(
+					new Note(sqlres.getInt(1), requestId, creator, sqlres.getString(3)));
+			sqlres.next();
+		}
+
+		sqlres.close();
+		pStatement.close();
+
+		return results;
+	}
+
+	private RequestBuilder.BuildStep buildRequest(ResultSet resultSet) throws SQLException {
+		World world = Bukkit.getWorld(resultSet.getString(5));
 			Date createdDate = new Date(resultSet.getLong(4));
 			Date closedDate = resultSet.getLong(12) != 0 ? new Date(resultSet.getLong(12)) : null;
 			Location location = new Location(world, resultSet.getInt(6), resultSet.getInt(7), resultSet.getInt(8));
@@ -501,12 +603,37 @@ public class SqlDataSource implements DataSource {
 									 resultSet.getInt(13) == 2);
 			}
 
-			results.add(new Request(resultSet.getInt(1), UUID.fromString(resultSet.getString(2)),
-									 resultSet.getString(3), createdDate, location,
-									 owner, resultSet.getBoolean(14), response
-			));
+			return Request.builder()
+				 .id(resultSet.getInt(1))
+				 .creator(UUID.fromString(resultSet.getString(2)))
+				 .message(resultSet.getString(3))
+				 .createdAt(createdDate)
+				 .location(location)
+				 .claimedBy(owner)
+				 .elevated(resultSet.getBoolean(14))
+				 .response(response);
+	}
 
+	private RequestCollection createRequestCollection(ResultSet resultSet) throws SQLException {
+		Map<Integer, RequestBuilder.BuildStep> requests = new HashMap<>();
+		List<Integer> ids = new ArrayList<>();
+		RequestCollection results = new RequestCollection();
+
+		while(!resultSet.isAfterLast()) {
+			int id = resultSet.getInt(1);
+			ids.add(id);
+			requests.put(id, buildRequest(resultSet));
 			resultSet.next();
+		}
+
+		Map<Integer, List<Note>> notes = getNotes(ids);
+
+		for(int id: ids) {
+			if(notes.containsKey(id)) {
+				results.add(requests.get(id).notes(notes.get(id)).build());
+			} else {
+				results.add(requests.get(id).build());
+			}
 		}
 
 		return results;

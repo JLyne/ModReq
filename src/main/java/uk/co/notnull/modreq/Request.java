@@ -4,8 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Collections;
 
 public class Request {
     private final Location location;
@@ -15,20 +19,14 @@ public class Request {
     private final UUID creator;
     private final String message;
     private final UUID owner;
-    public final Response response;
+    private final Response response;
+    private final List<Note> notes;
 
-    public Request(int id, UUID creator, String message, Date createTime, Location location) {
-        this.id = id;
-        this.creator = creator;
-        this.message = message;
-        this.createTime = createTime;
-        this.owner = null;
-        this.response = null;
-        this.elevated = false;
-        this.location = location;
-    }
-
-    public Request(int id, UUID creator, String message, Date createTime, Location location, UUID owner, boolean elevated, Response response) {
+    Request(int id, UUID creator, String message, Date createTime, Location location, UUID owner, boolean elevated, Response response, List<Note> notes) {
+        Objects.requireNonNull(creator);
+        Objects.requireNonNull(message);
+        Objects.requireNonNull(createTime);
+        Objects.requireNonNull(location);
         this.id = id;
         this.creator = creator;
         this.message = message;
@@ -37,6 +35,7 @@ public class Request {
         this.response = response;
         this.elevated = elevated;
         this.location = location;
+        this.notes = notes;
     }
 
     @Deprecated
@@ -58,6 +57,11 @@ public class Request {
 
         this.elevated = pElevated == 1;
         this.location = new Location(Bukkit.getWorld(world), x, y, z);
+        this.notes = Collections.emptyList();
+    }
+
+    public static RequestBuilder.IDStep builder() {
+        return RequestBuilder.builder();
     }
 
     public int getId() {
@@ -167,6 +171,10 @@ public class Request {
 
     public Response getResponse() {
         return response;
+    }
+
+    public List<Note> getNotes() {
+        return new ArrayList<>(notes);
     }
 
     public boolean isElevated() { return this.elevated; }
