@@ -169,7 +169,7 @@ public class SqlDataSource implements DataSource {
 				.createdAt(request.getCreateTime())
 				.location(request.getLocation())
 				.claimedBy(request.getOwner())
-				.elevated(true)
+				.elevated(elevated)
 				.response(request.getResponse())
 				.notes(request.getNotes())
 				.build();
