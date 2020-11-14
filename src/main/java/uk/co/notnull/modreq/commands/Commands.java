@@ -264,7 +264,14 @@ public class Commands {
 		(new CmdModreq(ModReq.getPlugin())).modreq(player, message);
 	}
 
-	@ProxiedBy("modreq")
+	@CommandMethod("modreq")
+    @CommandDescription("View your created modreqs")
+    private void commandMe(
+            final @NonNull Player player
+    ) {
+		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player, 1);
+	}
+
 	@CommandMethod("mr me [page]")
     @CommandDescription("View your created modreqs")
     private void commandMe(
