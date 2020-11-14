@@ -97,9 +97,10 @@ public final class ModReq extends JavaPlugin {
 
     public void reloadConfiguration() {
         this.lang = new Messages();
-        Locale locale = Locale.forLanguageTag(this.getLanguageFile().getLangString("general.LANGUAGE-TAG"));
+        Messages.reload();
+        Locale locale = Locale.forLanguageTag(Messages.getString("general.LANGUAGE-TAG"));
         Configuration cfg = new Configuration();
-        this.format = new SimpleDateFormat(this.getLanguageFile().getLangString("general.DATE-FORMAT"), locale);
+        this.format = new SimpleDateFormat(Messages.getString("general.DATE-FORMAT"), locale);
         this.cfg = cfg;
 
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {

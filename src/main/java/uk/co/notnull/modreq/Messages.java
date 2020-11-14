@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import de.themoep.minedown.adventure.MineDown;
 import de.themoep.minedown.adventure.Replacer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -18,7 +17,7 @@ public class Messages {
     private static File file;
     private static YamlConfiguration cfg;
 
-    private static void load() {
+    public static void reload() {
         File folder = new File("plugins/ModReq");
         if (!folder.exists()) {
             folder.mkdir();
@@ -55,8 +54,8 @@ public class Messages {
         setDefaultString("general.OPEN", "&aOPEN");
         setDefaultString("general.CLOSED", "&cCLOSED");
         setDefaultString("general.CLAIMED", "&eCLAIMED (%mod)");
-        setDefaultString("general.ELEVATED", "&b[ADMIN]");
-        setDefaultString("general.NOTES", "&4[NOTES]");
+        setDefaultString("general.ELEVATED", " &b[ADMIN]");
+        setDefaultString("general.NOTES", " &4[NOTES]");
         setDefaultString("general.DONE-MESSAGE", "&7Message: %msg");
         setDefaultString("general.ON-JOIN-HEADER", "&b-=-=- -=-=-");
         setDefaultString("general.HELP-LIST-MODREQS", "&b-=-=- List your last ModReqs: /modreq -=-=-");
@@ -67,13 +66,11 @@ public class Messages {
         setDefaultString("general.UNKNOWN-PLAYER", "&cUnknown");
         setDefaultString("player.REQUEST-FILED", "&aYour ModReq has been sent to the staff members. Please be patient.");
         setDefaultString("player.DONE", "&2%mod &ahas closed your ModReq (%id).");
-        setDefaultString("player.check.1", "&b-=-=- Last %count ModReq(s) -=-=-");
-        setDefaultString("player.check.2", "&6%id [&a%status&6] %date");
-        setDefaultString("player.check.3", "&7Message: %msg");
-        setDefaultString("player.check.4", "&6Answered by &a%mod &6on &a%date&6.");
-        setDefaultString("player.check.5", "&7Message: %msg");
-        setDefaultString("player.check.6", "&b -=-=- New ModReq: /modreq <request> -=-=-");
-        setDefaultString("player.check.NO-MODREQS", "&bYou did not file a ModReq yet. New ModReq: /modreq <request>");
+        setDefaultString("player.list.HEADER", "&b-=-=- Last %count ModReq(s) -=-=-");
+        setDefaultString("player.list.ITEM-REQUEST", "&6%id [&a%status&6] %date\n&7Message: %message");
+        setDefaultString("player.list.ITEM-RESPONSE", "&6Answered by &a%responder &6on &a%close_time&6.\n&7Message: %response");
+        setDefaultString("player.list.FOOTER", "&b -=-=- New ModReq: /modreq <request> -=-=-");
+        setDefaultString("player.list.NO-RESULTS", "&bYou did not file a ModReq yet. New ModReq: /modreq <request>");
         setDefaultString("mod.NEW-MODREQ", "&4&l[MODREQ] &aNew ModReq. Write &2/check %id &ato get more information.");
         setDefaultString("mod.MODREQS-OPEN", "&2%count &aModReq(s) open. Write &2/check &ato get more information.");
         setDefaultString("mod.TELEPORT", "&aTeleported to &2%id&a.");
@@ -83,17 +80,14 @@ public class Messages {
         setDefaultString("mod.elevate.2", "&aADMIN-flag has been removed from ModReq &2%id &aby &2%mod&a.");
         setDefaultString("mod.DONE", "&aModReq &2%id &ahas been closed by &2%mod&a.");
         setDefaultString("mod.REOPEN", "&aModReq &2%id &ahas been reopened by &2%mod&a.");
-        setDefaultString("mod.check.special.1", "&bModReq %id - %status");
-        setDefaultString("mod.check.special.2", "&eFiled by &a%player &eon &a%date &eat &a%world &e(&a%x %y %z&e).");
-        setDefaultString("mod.check.special.3", "&7Message: %msg");
-        setDefaultString("mod.check.special.4", "&eAnswered by &a%mod &eon &a%date&e.");
-        setDefaultString("mod.check.special.5", "&7Message: %msg");
-        setDefaultString("mod.check.special.6", "&4[%id] &7%mod - %msg");
-        setDefaultString("mod.check.1", "&b-=-=- %count ModReq(s) -=-=-");
-        setDefaultString("mod.check.2", "&6%id &6[&a%status&6] %date &a%player");
-        setDefaultString("mod.check.3", "&7Message: %msg");
-        setDefaultString("mod.check.4", "&b-=-=- Page %page of %allpages -=-=-");
-        setDefaultString("mod.check.NO-MODREQS", "&aNo modreqs open.");
+        setDefaultString("mod.info.REQUEST", "&bModReq %id - %status\n&eFiled by &a%player &eon &a%date &eat &a%world &e(&a%x %y %z&e).\n&7Message: %msg");
+        setDefaultString("mod.info.RESPONSE", "&eAnswered by &a%mod &eon &a%date&e.\n&7Message: %msg");
+        setDefaultString("mod.info.NOTE", "&4[%id] &7%mod - %msg");
+        setDefaultString("mod.info.ACTIONS", "");
+        setDefaultString("mod.list.HEADER", "&b-=-=- %count ModReq(s) -=-=-");
+        setDefaultString("mod.list.ITEM", "&6%id [&a%status%elevated%notes&6] %date &a%creator\n&7Message: %message");
+        setDefaultString("mod.list.FOOTER", "&b-=-=- Page %page of %allpages -=-=-");
+        setDefaultString("mod.list.NO-RESULTS", "&aNo modreqs open.");
         setDefaultString("mod.note.ADD", "&2%mod &aadded a note to ModReq &2%id&a: &7%msg");
         setDefaultString("mod.note.REMOVE", "&2%mod &aremoved the following note from ModReq &2%id&a: &7%msg");
 
@@ -117,7 +111,7 @@ public class Messages {
      */
     public static Component get(String key, String ...replacements) {
         if(cfg == null) {
-            load();
+            reload();
         }
 
         if(cfg.getString(key) != null) {
@@ -157,7 +151,7 @@ public class Messages {
      */
     public static String getString(String key, String ...replacements) {
         if(cfg == null) {
-            load();
+            reload();
         }
 
         if(cfg.getString(key) != null) {
@@ -172,7 +166,7 @@ public class Messages {
     @Deprecated
     public static String getLangString(String pEntry) {
         if(cfg == null) {
-            load();
+            reload();
         }
 
         if (cfg.getString(pEntry) != null) {
