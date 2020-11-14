@@ -2,16 +2,44 @@ package uk.co.notnull.modreq;
 
 import de.themoep.minedown.adventure.MineDownParser;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class RequestCollection extends ArrayList<Request> {
+	private final boolean paginated;
+	private final int offset;
+	private final int total;
+
+	RequestCollection(List<Request> requests) {
+		super(requests);
+		this.paginated = false;
+		this.offset = 0;
+		this.total = requests.size();
+	}
+
+	RequestCollection(List<Request> requests, int offset, int total) {
+		super(requests);
+		this.paginated = true;
+		this.offset = offset;
+		this.total = total;
+	}
+
+	public static RequestCollectionBuilder builder() {
+		return new RequestCollectionBuilder();
+	}
+
+	public RequestCollectionBuilder toBuilder() {
+		RequestCollectionBuilder builder = new RequestCollectionBuilder().requests(new ArrayList<>(this));
+
+		if(this.isPaginated()) {
+			return builder.paginated(offset, total);
+		}
+
+		return builder;
+	}
 
 	public Component toComponent(Player context) {
 		Component result = Component.empty();
@@ -78,5 +106,30 @@ public class RequestCollection extends ArrayList<Request> {
 		}
 
 		return result;
+	}
+
+	public boolean isPaginated() {
+		return paginated;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	public int getTotal() {
+		return total;
+	}
+
+	public int getPage() {
+		return paginated ? (offset / ModReq.getPlugin().getConfiguration().getModreqs_per_page()) : 1;
+	}
+
+	public int getTotalPages() {
+		int perPage = ModReq.getPlugin().getConfiguration().getModreqs_per_page();
+		return paginated ? total / perPage + ((total % perPage == 0) ? 0 : 1) : 1;
+	}
+
+	public boolean isAfterLastPage() {
+		return paginated && offset >= total;
 	}
 }

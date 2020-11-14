@@ -171,7 +171,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("criteria") String criteria
     ) {
-		(new CmdCheck(ModReq.getPlugin())).searchOpenModreqs(player, criteria);
+		(new CmdCheck(ModReq.getPlugin())).searchModreqs(player, criteria);
 	}
 
 	@CommandMethod("mr claim <id>")

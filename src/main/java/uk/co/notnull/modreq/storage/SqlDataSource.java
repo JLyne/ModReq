@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class SqlDataSource implements DataSource {
 	private final ModReq plugin;
@@ -320,22 +321,6 @@ public class SqlDataSource implements DataSource {
 				.build();
 	}
 
-	public RequestCollection getOpenRequests(Player player) throws SQLException {
-		Connection connection = getConnection();
-		PreparedStatement pStatement;
-
-		pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND uuid=?");
-		pStatement.setString(1, player.getUniqueId().toString());
-
-		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createRequestCollection(sqlres);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
-	}
-
 	public RequestCollection getAllOpenRequests(boolean includeElevated) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement;
@@ -356,9 +341,11 @@ public class SqlDataSource implements DataSource {
 		return requests;
 	}
 
-	public RequestCollection getOpenRequests(int page, boolean includeElevated) throws SQLException {
+	public RequestCollection getOpenRequests(boolean includeElevated, int page) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement;
+
+		int offset = (page - 1) * cfg.getModreqs_per_page();
 		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'";
 
 		if(!includeElevated) {
@@ -366,12 +353,43 @@ public class SqlDataSource implements DataSource {
 		}
 
 		sql += " LIMIT ?,?";
+
+		int count = getOpenRequestCount(includeElevated);
+
+		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
+			return RequestCollection.builder().paginated(offset, count).build();
+		}
+
 		pStatement = connection.prepareStatement(sql);
-		pStatement.setInt(1, (page - 1) * cfg.getModreqs_per_page());
+		pStatement.setInt(1, offset);
 		pStatement.setInt(2, cfg.getModreqs_per_page());
 
 		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createRequestCollection(sqlres);
+		RequestCollection requests = createPaginatedRequestCollection(sqlres, offset, count);
+
+		sqlres.close();
+		pStatement.close();
+
+		return requests;
+	}
+
+	public RequestCollection getOpenRequests(Player player, int page) throws SQLException {
+		Connection connection = getConnection();
+
+		int offset = (page - 1) * cfg.getModreqs_per_page();
+		int count = getOpenRequestCount(player);
+
+		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
+			return RequestCollection.builder().paginated(offset, count).build();
+		}
+
+		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND uuid=? LIMIT ?,?");
+		pStatement.setString(1, player.getUniqueId().toString());
+		pStatement.setInt(2, (page - 1) * cfg.getModreqs_per_page());
+		pStatement.setInt(3, cfg.getModreqs_per_page());
+
+		ResultSet sqlres = pStatement.executeQuery();
+		RequestCollection requests = createPaginatedRequestCollection(sqlres, page, count);
 
 		sqlres.close();
 		pStatement.close();
@@ -389,16 +407,7 @@ public class SqlDataSource implements DataSource {
 			pStatement= connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0' AND elevated='0'");
 		}
 
-		ResultSet sqlres = pStatement.executeQuery();
-
-		if(!sqlres.next()) {
-			sqlres.close();
-			pStatement.close();
-			throw new SQLException("Invalid response");
-		}
-
-		int count = sqlres.getInt(1);
-		sqlres.close();
+		int count = getCount(pStatement);
 		pStatement.close();
 
 		return count;
@@ -408,16 +417,8 @@ public class SqlDataSource implements DataSource {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE uuid=? AND done='0'");
 		pStatement.setString(1, player.getUniqueId().toString());
-		ResultSet sqlres = pStatement.executeQuery();
 
-		if (!sqlres.next()) {
-			sqlres.close();
-			pStatement.close();
-			throw new SQLException("Invalid response");
-		}
-
-		int count = sqlres.getInt(1);
-		sqlres.close();
+		int count = getCount(pStatement);
 		pStatement.close();
 
 		return count;
@@ -461,7 +462,8 @@ public class SqlDataSource implements DataSource {
 		pStatement.executeUpdate();
 		pStatement.close();
 
-		requests = requests.stream().map(request -> Request.builder()
+		//FIXME: There must be a better way
+		List<Request> results = requests.stream().map(request -> Request.builder()
 				.id(request.getId())
 				.creator(request.getCreator())
 				.message(request.getMessage())
@@ -472,7 +474,36 @@ public class SqlDataSource implements DataSource {
 				.response(request.getResponse())
 				.notes(request.getNotes())
 				.build()
-		).collect(RequestCollection::new, RequestCollection::add, RequestCollection::addAll);
+		).collect(Collectors.toList());
+
+		return requests.toBuilder().requests(results).build();
+	}
+
+	public RequestCollection searchRequests(String search, int page) throws SQLException {
+		Connection connection = getConnection();
+
+		int offset = cfg.getModreqs_per_page() * page;
+		String countSql = "SELECT COUNT(*) FROM modreq WHERE request LIKE ?";
+		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE request LIKE ? ORDER BY done DESC, timestamp DESC LIMIT ?,?";
+
+		PreparedStatement pStatement = connection.prepareStatement(countSql);
+		pStatement.setString(1, "%" + search +"%"); //TODO: Full text search?
+
+		int count = getCount(pStatement);
+		pStatement.close();
+
+		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
+			return RequestCollection.builder().paginated(offset, count).build();
+		}
+
+		pStatement = connection.prepareStatement(sql);
+		pStatement.setString(1, "%" + search +"%"); //TODO: Full text search?
+
+		ResultSet sqlres = pStatement.executeQuery();
+		RequestCollection requests = createPaginatedRequestCollection(sqlres, page, count);
+
+		sqlres.close();
+		pStatement.close();
 
 		return requests;
 	}
@@ -534,6 +565,21 @@ public class SqlDataSource implements DataSource {
 
 	private List<Note> getNotes(int id) throws SQLException {
 		return getNotes(List.of(id)).get(id);
+	}
+
+	private int getCount(PreparedStatement statement) throws SQLException {
+		ResultSet sqlres = statement.executeQuery();
+
+		if(!sqlres.next()) {
+			sqlres.close();
+			statement.close();
+			throw new SQLException("Invalid response");
+		}
+
+		int count = sqlres.getInt(1);
+		sqlres.close();
+
+		return count;
 	}
 
 	private Map<Integer, List<Note>> getNotes(List<Integer> ids) throws SQLException {
@@ -614,14 +660,22 @@ public class SqlDataSource implements DataSource {
 				 .response(response);
 	}
 
+	private RequestCollection createPaginatedRequestCollection(ResultSet resultSet, int offset, int total) throws SQLException {
+		return populateRequestCollection(RequestCollection.builder().paginated(offset, total), resultSet);
+	}
+
 	private RequestCollection createRequestCollection(ResultSet resultSet) throws SQLException {
-		Map<Integer, RequestBuilder.BuildStep> requests = new HashMap<>();
+		return populateRequestCollection(RequestCollection.builder(), resultSet);
+	}
+
+	private RequestCollection populateRequestCollection(RequestCollectionBuilder collection, ResultSet resultSet) throws SQLException {
 		List<Integer> ids = new ArrayList<>();
-		RequestCollection results = new RequestCollection();
 
 		if(resultSet.isAfterLast()) {
-			return results;
+			return collection.build();
 		}
+
+		Map<Integer, RequestBuilder.BuildStep> requests = new HashMap<>();
 
 		while(!resultSet.isAfterLast()) {
 			int id = resultSet.getInt(1);
@@ -634,12 +688,12 @@ public class SqlDataSource implements DataSource {
 
 		for(int id: ids) {
 			if(notes.containsKey(id)) {
-				results.add(requests.get(id).notes(notes.get(id)).build());
+				collection.addRequest(requests.get(id).notes(notes.get(id)).build());
 			} else {
-				results.add(requests.get(id).build());
+				collection.addRequest(requests.get(id).build());
 			}
 		}
 
-		return results;
+		return collection.build();
 	}
 }

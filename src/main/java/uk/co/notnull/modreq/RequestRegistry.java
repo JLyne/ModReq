@@ -131,8 +131,10 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Returns a collection containing the given page open requests, optionally including elevated requests
+	 * Returns a collection containing a page of open requests, optionally including elevated requests
 	 * The results to include will be determined by the page provided, and the configuration option for requests per page
+	 * @param page The page of results to return. An empty collection with isAfterLastPage() == true
+	 *             will be returned if this page doesn't exist.
 	 * @param includeElevated Whether to include elevated requests
 	 * @return Future completed with a collection of results if successful. The collection may be empty if there aren't
 	 *         sufficient open requests to reach the requested page.
@@ -143,17 +145,29 @@ public class RequestRegistry {
 			throw new IllegalArgumentException("Page cannot be less than 1");
 		}
 
-		return makeFuture(() -> plugin.getDataSource().getOpenRequests(page, includeElevated));
+		return makeFuture(() -> plugin.getDataSource().getOpenRequests(includeElevated, page));
 	}
 
 	/**
-	 * Returns a collection containing all open requests created by the given player.
+	 * Returns a collection containing the a page of open requests created by the given player.
 	 * @param player The player to retrieve the created requests for
 	 * @return Future completed with a collection of results if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getOpen(Player player) {
-		return makeFuture(() -> plugin.getDataSource().getOpenRequests(player));
+	public CompletableFuture<RequestCollection> getOpen(Player player, int page) {
+		return makeFuture(() -> plugin.getDataSource().getOpenRequests(player, page));
+	}
+
+	/**
+	 * Returns a collection containing all the requests with the specified text in the request message
+	 * @param search The tect to search for
+	 * @param page The page of results to return. An empty collection with isAfterLastPage() == true
+	 *             will be returned if this page doesn't exist.
+	 * @return Future completed with a collection of results if successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<RequestCollection> search(String search, int page) {
+		return makeFuture(() -> plugin.getDataSource().searchRequests(search, page));
 	}
 
 	/**

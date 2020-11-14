@@ -18,8 +18,9 @@ public interface DataSource {
 	boolean requestExists(int id) throws Exception;
 
 	RequestCollection getAllOpenRequests(boolean includeElevated) throws Exception;
-	RequestCollection getOpenRequests(int page, boolean includeElevated) throws Exception;
-	RequestCollection getOpenRequests(Player player) throws Exception;
+	RequestCollection getOpenRequests(boolean includeElevated, int page) throws Exception;
+	RequestCollection getOpenRequests(Player player, int page) throws Exception;
+	RequestCollection searchRequests(String search, int page) throws Exception;
 	Request getRequest(int id) throws Exception;
 	Request elevateRequest(Request request, boolean elevated) throws Exception;
 	Request reopenRequest(Request request) throws Exception;
