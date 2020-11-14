@@ -498,6 +498,8 @@ public class SqlDataSource implements DataSource {
 
 		pStatement = connection.prepareStatement(sql);
 		pStatement.setString(1, "%" + search +"%"); //TODO: Full text search?
+		pStatement.setInt(2, (page - 1) * cfg.getModreqs_per_page()); //TODO: Full text search?
+		pStatement.setInt(3, cfg.getModreqs_per_page()); //TODO: Full text search?
 
 		ResultSet sqlres = pStatement.executeQuery();
 		RequestCollection requests = createPaginatedRequestCollection(sqlres, page, count);
