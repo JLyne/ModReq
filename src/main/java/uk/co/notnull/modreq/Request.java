@@ -1,15 +1,13 @@
 package uk.co.notnull.modreq;
 
+import de.themoep.minedown.adventure.MineDownParser;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.Objects;
-import java.util.UUID;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Collections;
+import java.util.*;
 
 public class Request {
     private final Location location;
@@ -192,6 +190,144 @@ public class Request {
     public boolean isCreatorOnline() {
         Player player = Bukkit.getPlayer(creator);
         return player != null && player.isOnline();
+    }
+
+    public Component toComponent(Player context) {
+        Component result = Component.empty();
+
+        OfflinePlayer creator = Bukkit.getOfflinePlayer(getCreator());
+        OfflinePlayer owner = isClaimed() ? Bukkit.getOfflinePlayer(getOwner()) : null;
+        OfflinePlayer responder = getResponder() != null ? Bukkit.getOfflinePlayer(getResponder()) : null;
+        Map<String, Component> replacements = new HashMap<>();
+
+        String status;
+
+        if(isClosed()) {
+            status = Messages.getString("general.CLOSED");
+        } else if(!isClaimed()) {
+            status = Messages.getString("general.OPEN");
+        } else if(owner != null) {
+            status = owner.getName();
+        } else {
+            status = "unknown";
+        }
+
+        String username;
+        if (creator.getName() != null) {
+            if (creator.isOnline()) {
+                username = Messages.getString("general.ONLINE-PLAYER","player", creator.getName());
+            } else {
+                username = Messages.getString("general.OFFLINE-PLAYER", "player", creator.getName());
+            }
+        } else {
+            username = Messages.getString("general.UNKNOWN-PLAYER");
+        }
+
+        Component location = Messages.get("mod.info.LOCATION",
+                                          "id",  String.valueOf(id),
+                                          "world", getLocation().getWorld().getName(),
+                                          "x", String.valueOf(getLocation().getBlockX()),
+                                          "y", String.valueOf(getLocation().getBlockX()),
+                                          "z", String.valueOf(getLocation().getBlockX()));
+
+        replacements.put("id", Component.text(getId()));
+        replacements.put("status", new MineDownParser().parse(status).build());
+        replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
+        replacements.put("notes", hasNotes() ? Messages.get("general.NOTES") : Component.empty());
+        replacements.put("note_count", Component.text(getNotes().size()));
+        replacements.put("creator", new MineDownParser().parse(username).build());
+        replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(getCreateTime())));
+        replacements.put("message", Component.text(getMessage()));
+        replacements.put("location", location);
+        replacements.put("world", Component.text(getLocation().getWorld().getName()));
+        replacements.put("x", Component.text(getLocation().getBlockX()));
+        replacements.put("y", Component.text(getLocation().getBlockY()));
+        replacements.put("z", Component.text(getLocation().getBlockZ()));
+
+        if(context != null && (context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin"))) {
+            result = result.append(Messages.get("mod.info.REQUEST", replacements));
+        } else {
+            result = result.append(Messages.get("player.info.REQUEST", replacements));
+        }
+
+        if(isClosed()) {
+            replacements.put("response_date", Component.text(ModReq.getPlugin().getFormat().format(getCloseTime())));
+            replacements.put("response", Component.text(getResponseMessage()));
+
+            result = result.append(Component.newline());
+
+            if(responder != null && responder.getName() != null) {
+                replacements.put("responder", Component.text(responder.getName()));
+            } else {
+                replacements.put("responder", Messages.get("general.UNKNOWN-PLAYER"));
+            }
+
+            result = result.append(Component.newline());
+            result = result.append(Messages.get("mod.info.RESPONSE", replacements));
+        }
+
+        for(Note note: notes) {
+            OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(getCreator());
+            String creatorName;
+
+            if (noteCreator.getName() != null) {
+                creatorName = noteCreator.getName();
+            } else {
+                creatorName = Messages.getString("general.UNKNOWN-PLAYER");
+            }
+
+            result = result.append(Component.newline());
+            result = result.append(Messages.get("mod.info.NOTE",
+                                                "id", String.valueOf(note.getId()),
+                                                "creator", creatorName,
+                                                "message", note.getMessage()));
+        }
+
+        result = result.append(getActions(context));
+
+        return result;
+    }
+
+    private Component getActions(Player context) {
+        Component actions = Component.newline();
+
+        if(context != null && !context.hasPermission("modreq.mod") && !context.hasPermission("modreq.admin")) {
+            return Component.empty();
+        }
+
+        if (isClosed()) {
+            actions = actions.append(Messages.get("mod.action.OPEN", "id", String.valueOf(id)));
+            actions = actions.append(Component.space());
+        } else {
+            actions = actions.append(Messages.get("mod.action.CLOSE", "id", String.valueOf(id)));
+            actions = actions.append(Component.space());
+        }
+
+        actions = actions.append(Messages.get("mod.action.TELEPORT", "id", String.valueOf(id)));
+
+        if (!isClosed()) {
+            actions = actions.append(Component.space());
+
+            if (isClaimedBy(context.getUniqueId())) {
+                actions = actions.append(Messages.get("mod.action.UNCLAIM", "id", String.valueOf(id)));
+                actions = actions.append(Component.space());
+            } else if (!isClaimed()) {
+                actions = actions.append(Messages.get("mod.action.CLAIM", "id", String.valueOf(id)));
+                actions = actions.append(Component.space());
+            }
+
+            if (isElevated()) {
+                actions = actions.append(Messages.get("mod.action.UNELEVATE", "id", String.valueOf(id)));
+                actions = actions.append(Component.space());
+            } else {
+                actions = actions.append(Messages.get("mod.action.ELEVATE", "id", String.valueOf(id)));
+                actions = actions.append(Component.space());
+            }
+
+            actions = actions.append(Messages.get("mod.action.NOTE", "id", String.valueOf(id)));
+        }
+
+        return actions;
     }
 }
 
