@@ -1,11 +1,15 @@
 package uk.co.notnull.modreq;
 
+import de.themoep.minedown.adventure.MineDownParser;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestCollection extends ArrayList<Request> {
 
@@ -16,6 +20,7 @@ public class RequestCollection extends ArrayList<Request> {
 			OfflinePlayer creator = Bukkit.getOfflinePlayer(request.getCreator());
 			OfflinePlayer owner = request.isClaimed() ? Bukkit.getOfflinePlayer(request.getOwner()) : null;
 			OfflinePlayer responder = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
+			Map<String, Component> replacements = new HashMap<>();
 
 			String status;
 
@@ -25,16 +30,6 @@ public class RequestCollection extends ArrayList<Request> {
 				status = owner.getName();
 			} else {
 				status = "unknown";
-			}
-
-			if(request.isElevated()) {
-				status += Messages.getString("general.ELEVATED");
-			}
-
-			//TODO: Notes
-
-			if(request.hasNotes()) {
-				status = status + " " + Messages.getString("general.NOTES");
 			}
 
 			String username;
@@ -48,37 +43,34 @@ public class RequestCollection extends ArrayList<Request> {
 				username = Messages.getString("general.UNKNOWN-PLAYER");
 			}
 
-			String timestamp = ModReq.getPlugin().getFormat().format(request.getCreateTime());
+			replacements.put("id", Component.text(request.getId()));
+			replacements.put("status", new MineDownParser().parse(status).build());
+			replacements.put("elevated", request.isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
+			replacements.put("notes", request.hasNotes() ? Messages.get("general.NOTES") : Component.empty());
+			replacements.put("note_count", Component.text(request.getNotes().size()));
+			replacements.put("creator", new MineDownParser().parse(username).build());
+			replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(request.getCreateTime())));
+			replacements.put("message", Component.text(request.getMessage()));
 
 			if(context != null && context.hasPermission("modreq.mod") && context.hasPermission("modreq.admin")) {
-				result = result.append(Messages.get("mod.check.2",
-										   "id", String.valueOf(request.getId()),
-										   "status", status, "date", timestamp, "player", username));
-				result = result.append(Component.newline());
-				result = result.append(Messages.get("mod.check.3", "msg", request.getMessage()));
+				result = result.append(Messages.get("mod.list.ITEM", replacements));
 			} else {
-				result = result.append(Messages.get("player.check.2",
-										   "id", String.valueOf(request.getId()),
-										   "status", status, "date", timestamp));
-				result = result.append(Component.newline());
-				result = result.append(Messages.get("player.check.3", "msg", request.getMessage()));
+				result = result.append(Messages.get("player.list.ITEM-REQUEST", replacements));
 
 				if(request.isClosed()) {
-					String closeTimestamp = ModReq.getPlugin().getFormat().format(request.getCloseTime());
+					replacements.put("close_time", Component.text(ModReq.getPlugin().getFormat().format(request.getCloseTime())));
+					replacements.put("response", Component.text(request.getResponseMessage()));
 
 					result = result.append(Component.newline());
 
 					if(responder != null && responder.getName() != null) {
-						result = result.append(Messages.get("player.check.4", "mod", responder.getName(),
-												   "date", closeTimestamp));
+						replacements.put("responder", Component.text(responder.getName()));
 					} else {
-						result = result.append(Messages.get("player.check.4",
-												   "mod", Messages.getString("general.UNKNOWN-PLAYER"),
-												   "date", closeTimestamp));
+						replacements.put("responder", Messages.get("general.UNKNOWN-PLAYER"));
 					}
 
 					result = result.append(Component.newline());
-					result = result.append(Messages.get("player.check.5", "msg", request.getMessage()));
+					result = result.append(Messages.get("player.list.ITEM-RESPONSE", replacements));
 				}
 			}
 

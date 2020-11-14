@@ -2,6 +2,7 @@ package uk.co.notnull.modreq;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import de.themoep.minedown.adventure.MineDown;
 import de.themoep.minedown.adventure.Replacer;
@@ -11,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import uk.co.notnull.modreq.util.MineDown;
 
 public class Messages {
     private static File file;
@@ -116,6 +118,26 @@ public class Messages {
     public static Component get(String key, String ...replacements) {
         if(cfg == null) {
             load();
+        }
+
+        if(cfg.getString(key) != null) {
+            return new MineDown(cfg.getString(key))
+                    .placeholderPrefix("%").placeholderSuffix("")
+                    .replace(replacements).toComponent();
+        } else {
+            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+            return Component.empty();
+        }
+    }
+
+    /**
+     * Returns the specified language string, parsed into a component
+     * @param key The key for the language string
+     * @param replacements A list of placeholders and their replacements
+     */
+    public static Component get(String key, Map<String, ?> replacements) {
+        if(cfg == null) {
+            reload();
         }
 
         if(cfg.getString(key) != null) {

@@ -53,9 +53,9 @@ public class CmdCheck {
 
 			return plugin.getRequestRegistry().getOpen(page, includeElevated);
 		}).thenAcceptAsync(requests -> {
-			Messages.send(player, "mod.check.1", "count", String.valueOf(requests.size()));
+			Messages.send(player, "mod.list.HEADER", "count", String.valueOf(requests.size()));
 			Messages.send(player, requests.toComponent(player));
-			Messages.send(player, "mod.check.4",
+			Messages.send(player, "mod.list.FOOTER",
 					  "page", String.valueOf(page),
 					  "allpages", String.valueOf(resultPages.get()));
 		}).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
