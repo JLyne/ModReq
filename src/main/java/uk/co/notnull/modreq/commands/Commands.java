@@ -147,11 +147,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("page") Integer page
     ) {
-		if(page != null) {
-			(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player, page);
-		} else {
-			(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player);
-		}
+		(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player, page != null ? page : 1);
 	}
 
 	@CommandMethod("mr info <id>")
@@ -269,12 +265,13 @@ public class Commands {
 	}
 
 	@ProxiedBy("modreq")
-	@CommandMethod("mr me")
+	@CommandMethod("mr me [page]")
     @CommandDescription("View your created modreqs")
     private void commandMe(
-            final @NonNull Player player
+            final @NonNull Player player,
+            final @Argument("page") Integer page
     ) {
-		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player);
+		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player, page != null ? page : 1);
 	}
 
 	@CommandMethod("mr reload")
