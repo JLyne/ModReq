@@ -46,13 +46,17 @@ public class CmdDone {
             Player creator = Bukkit.getPlayer(result.getCreator());
 
             if(creator != null) {
-                Messages.send(creator, "player.DONE", "mod", player.getName(), "id", String.valueOf(id));
-                Messages.send(creator, "general.DONE-MESSAGE", "msg", message);
+                Messages.send(creator, "player.notification.CLOSED",
+                              "actor", player.getName(),
+                              "id", String.valueOf(id),
+                              "message", message);
                 plugin.playSound(creator);
             }
 
-            Messages.sendToMods("player.DONE","mod", player.getName(), "id", String.valueOf(id));
-            Messages.sendToMods("general.DONE-MESSAGE","msg", message);
+            Messages.sendToMods("player.notification.CLOSED",
+                                "actor", player.getName(),
+                                "id", String.valueOf(id),
+                                "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;

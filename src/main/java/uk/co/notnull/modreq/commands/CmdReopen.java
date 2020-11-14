@@ -32,7 +32,7 @@ public class CmdReopen {
             shortcut.complete(null);
             return new CompletableFuture<>();
         }).thenAcceptAsync((Request result) -> {
-            Messages.sendToMods("mod.REOPEN", "mod", player.getName(), "id", String.valueOf(id));
+            Messages.sendToMods("mod.notification.REOPENED", "actor", player.getName(), "id", String.valueOf(id));
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");

@@ -39,7 +39,7 @@ public class Messages {
         cfg = YamlConfiguration.loadConfiguration(file);
 
         setDefaultString("error.DATABASE-ERROR", "&cError while connecting to database. Please contact an administrator.");
-        setDefaultString("error.ID-ERROR", "&cError: ModReq with ID %id does not exist.");
+        setDefaultString("error.ID-ERROR", "&cError: ModReq #%id does not exist.");
         setDefaultString("error.NUMBER-ERROR", "&cError: %id is not a number/ID/page.");
         setDefaultString("error.NOT-CLOSED", "&cModReq is not closed.");
         setDefaultString("error.ALREADY-CLOSED", "&cModReq already closed.");
@@ -51,12 +51,13 @@ public class Messages {
         setDefaultString("error.NOTE-DOES-NOT-EXIST", "&cError: This note id does not exist.");
         setDefaultString("error.NOTE-OTHER", "&cError: You did not write this note.");
         setDefaultString("error.MAX-OPEN-MODREQS", "&cYou cannot open more than &4%max &cModReq(s) at the same time.");
+
         setDefaultString("general.OPEN", "&aOPEN");
         setDefaultString("general.CLOSED", "&cCLOSED");
-        setDefaultString("general.CLAIMED", "&eCLAIMED (%mod)");
-        setDefaultString("general.ELEVATED", " &b[ADMIN]");
-        setDefaultString("general.NOTES", " &4[NOTES]");
-        setDefaultString("general.DONE-MESSAGE", "&7Message: %msg");
+        setDefaultString("general.CLAIMED", "&eCLAIMED (%actor)");
+        setDefaultString("general.ELEVATED", " &b\\[ADMIN\\]");
+        setDefaultString("general.NOTES", " &4\\[NOTES\\]");
+        setDefaultString("general.DONE-MESSAGE", "&7Message: %message");
         setDefaultString("general.ON-JOIN-HEADER", "&b-=-=- -=-=-");
         setDefaultString("general.HELP-LIST-MODREQS", "&b-=-=- List your last ModReqs: /modreq -=-=-");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy 'at' HH:mm:ss");
@@ -64,41 +65,45 @@ public class Messages {
         setDefaultString("general.ONLINE-PLAYER", "&a%player");
         setDefaultString("general.OFFLINE-PLAYER", "&c%player");
         setDefaultString("general.UNKNOWN-PLAYER", "&cUnknown");
-        setDefaultString("player.REQUEST-FILED", "&aYour ModReq has been sent to the staff members. Please be patient.");
-        setDefaultString("player.DONE", "&2%mod &ahas closed your ModReq (%id).");
+
+        setDefaultString("player.notification.CLOSED", "&2%actor &ahas closed your ModReq (%id).\n&7Message: %message");
+        setDefaultString("player.notification.CREATED", "&aYour ModReq has been sent to the staff members. Please be patient.");
+
         setDefaultString("player.list.HEADER", "&b-=-=- Last %count ModReq(s) -=-=-");
-        setDefaultString("player.list.ITEM-REQUEST", "&6%id [&a%status&6] %date\n&7Message: %message");
+        setDefaultString("player.list.ITEM-REQUEST", "&6%id \\[&a%status&6\\] %date\n&7Message: %message");
         setDefaultString("player.list.ITEM-RESPONSE", "&6Answered by &a%responder &6on &a%close_time&6.\n&7Message: %response");
         setDefaultString("player.list.FOOTER", "&b -=-=- New ModReq: /modreq <request> -=-=-");
-        setDefaultString("player.list.NO-RESULTS", "&bYou did not file a ModReq yet. New ModReq: /modreq <request>");
-        setDefaultString("mod.NEW-MODREQ", "&4&l[MODREQ] &aNew ModReq. Write &2/check %id &ato get more information.");
-        setDefaultString("mod.MODREQS-OPEN", "&2%count &aModReq(s) open. Write &2/check &ato get more information.");
-        setDefaultString("mod.TELEPORT", "&aTeleported to &2%id&a.");
-        setDefaultString("mod.CLAIM", "&aModReq &2%id &ahas been claimed by &2%mod&a.");
-        setDefaultString("mod.UNCLAIM", "&aModReq &2%id &ahas been unclaimed by &2%mod&a.");
-        setDefaultString("mod.elevate.1", "&aModReq &2%id &ahas been flagged for ADMIN by &2%mod&a.");
-        setDefaultString("mod.elevate.2", "&aADMIN-flag has been removed from ModReq &2%id &aby &2%mod&a.");
-        setDefaultString("mod.DONE", "&aModReq &2%id &ahas been closed by &2%mod&a.");
-        setDefaultString("mod.REOPEN", "&aModReq &2%id &ahas been reopened by &2%mod&a.");
+        setDefaultString("player.list.NO-RESULTS", "&bYou have no open ModReqs. New ModReq: /modreq <request>");
+
+        setDefaultString("mod.notification.CREATED", "&4&l[MODREQ] &aNew ModReq. Write &2/check %id &ato get more information.");
+        setDefaultString("mod.notification.CLAIMED", "&aModReq &2#%id &ahas been claimed by &2%actor&a.");
+        setDefaultString("mod.notification.UNCLAIMED", "&aModReq &2#%id &ahas been un-claimed by &2%actor&a.");
+        setDefaultString("mod.notification.ELEVATED", "&aModReq &2#%id &ahas been flagged for admin attention by &2%actor&a.");
+        setDefaultString("mod.notification.UNELEVATED", "&aAdmin flag has been removed from ModReq &2#%id &aby &2%actor&a.");
+        setDefaultString("mod.notification.CLOSED", "&aModReq &2#%id &ahas been closed by &2%actor&a.");
+        setDefaultString("mod.notification.REOPENED", "&aModReq &2#%id &ahas been re-opened by &2%actor&a.");
+        setDefaultString("mod.notification.TELEPORTED", "&aTeleported to &2#%id&a.");
+        setDefaultString("mod.notification.NOTE-ADDED", "&2%actor &aadded a note to ModReq &2#%id&a:\n&7%message");
+        setDefaultString("mod.notification.NOTE-REMOVED", "&2%actor &aremoved a note from ModReq &2#%id&a:\n&7%message");
+
         setDefaultString("mod.info.REQUEST", "&e[ModReq %id - %status](aqua)\nFiled by [%creator](green) on %date at [%location](green).\n[Message: %message](gray)");
         setDefaultString("mod.info.RESPONSE", "[Answered by](yellow) [%responder](green) [on](yellow) [%response_date](green)\n[Message: %response](gray)");
         setDefaultString("mod.info.LOCATION", "[%world (%x %y %z)](show_text=Click to teleport run_command=/mr tp %id)");
-        setDefaultString("mod.info.NOTE", "&4[%id] &7%mod - %msg");
-        setDefaultString("mod.list.HEADER", "&b-=-=- %count ModReq(s) -=-=-");
-        setDefaultString("mod.list.ITEM", "&6%id [&a%status%elevated%notes&6] %date &a%creator\n&7Message: %message");
-        setDefaultString("mod.list.FOOTER", "&b-=-=- Page %page of %allpages -=-=-");
-        setDefaultString("mod.list.NO-RESULTS", "&aNo modreqs open.");
-        setDefaultString("mod.note.ADD", "&2%mod &aadded a note to ModReq &2%id&a: &7%msg");
-        setDefaultString("mod.note.REMOVE", "&2%mod &aremoved the following note from ModReq &2%id&a: &7%msg");
+        setDefaultString("mod.info.NOTE", "&4\\[%id\\] &7%actor - %message");
 
-        setDefaultString("mod.action.CLOSE","[Close](suggest_command=/mr close %id show_text=Close this ModReq)");
-        setDefaultString("mod.action.OPEN","[Re-open](suggest_command=/mr open %id show_text=Re-open this ModReq)");
-        setDefaultString("mod.action.TELEPORT","[Teleport](run_command=/mr tp %id show_text=Teleport to where this ModReq was created)");
-        setDefaultString("mod.action.CLAIM","[Claim](run_command=/mr claim %id show_text=Claim this ModReq to indicate it is being worked on)");
-        setDefaultString("mod.action.UNCLAIM","[Unclaim](run_command=/mr claim %id show_text=Unclaim this ModReq to allow other mods to work on it)");
-        setDefaultString("mod.action.ELEVATE","[Elevate](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention)");
-        setDefaultString("mod.action.UNELEVATE","[Un-elevate](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq)");
-        setDefaultString("mod.action.NOTE","[Add Note](suggest_command=/mr elevate %id show_text=Add a note to this ModReq. Notes are only visible to staff.)");
+        setDefaultString("mod.list.HEADER", "&b-=-=- %count ModReq(s) -=-=-");
+        setDefaultString("mod.list.ITEM", "&6%id [&a%status%elevated%notes&6] %date &a%creator\n[Message: %message](gray)");
+        setDefaultString("mod.list.FOOTER", "&b-=-=- Page %page of %allpages -=-=-");
+        setDefaultString("mod.list.NO-RESULTS", "&aThere are no open ModReqs.");
+
+        setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id  show_text=Close this ModReq)");
+        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id show_text=Re-open this ModReq)");
+        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id show_text=Teleport to where this ModReq was created)");
+        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id show_text=Claim this ModReq to indicate you are working on it)");
+        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id show_text=Un-claim this ModReq to allow other mods to work on it)");
+        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention)");
+        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq)");
+        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id  show_text=Add a note to this ModReq. Notes are only visible to staff.)");
 
         try {
             cfg.save(file);

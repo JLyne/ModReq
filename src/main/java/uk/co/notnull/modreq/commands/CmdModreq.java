@@ -32,7 +32,7 @@ public class CmdModreq {
             return plugin.getRequestRegistry().create(player, message);
         }).thenAcceptAsync((Request request) -> {
             Messages.send(player, "player.REQUEST-FILED");
-            Messages.sendToMods("mod.NEW-MODREQ", "id", String.valueOf(request.getId()));
+            Messages.sendToMods("mod.notification.CREATED", "id", String.valueOf(request.getId()));
             plugin.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");

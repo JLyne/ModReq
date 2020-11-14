@@ -69,7 +69,7 @@ public class CmdCheck {
 		if(requests.isAfterLastPage()) {
 			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
 		} else if (requests.isEmpty()) {
-			Messages.send(player, "mod.check.NO-MODREQS");
+			Messages.send(player, "mod.list.NO-RESULTS");
 		}
 
 		Messages.send(player, "mod.list.HEADER", "count", String.valueOf(requests.getTotal()));

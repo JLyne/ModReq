@@ -57,9 +57,9 @@ public class CmdClaim {
             }
         }).thenAcceptAsync((Request result) -> {
             if(result.isClaimed()) {
-                Messages.sendToMods("mod.CLAIM", "mod", player.getName(), "id", String.valueOf(id));
+                Messages.sendToMods("mod.notification.CLAIMED", "actor", player.getName(), "id", String.valueOf(id));
             } else {
-                Messages.sendToMods("mod.UNCLAIM", "mod", player.getName(), "id", String.valueOf(id));
+                Messages.sendToMods("mod.notification.UNCLAIMED", "actor", player.getName(), "id", String.valueOf(id));
             }
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");

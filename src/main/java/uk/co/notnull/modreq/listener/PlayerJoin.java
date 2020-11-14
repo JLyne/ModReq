@@ -31,8 +31,10 @@ public class PlayerJoin {
                 OfflinePlayer mod = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
                 String modName = mod != null && mod.getName() != null ? mod.getName() : "unknown";
 
-                Messages.send(player, "player.DONE","mod", modName, "id", String.valueOf(request.getId()));
-                Messages.send(player, "general.DONE-MESSAGE", "msg", request.getResponseMessage());
+                Messages.send(player, "player.notification.CLOSED",
+                              "actor", modName,
+                              "id", String.valueOf(request.getId()),
+                              "message", request.getResponseMessage());
             }
 
             Messages.send(player, "general.HELP-LIST-MODREQS");

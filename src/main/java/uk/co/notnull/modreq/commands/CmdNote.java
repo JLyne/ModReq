@@ -35,10 +35,10 @@ public class CmdNote {
 
             return plugin.getRequestRegistry().addNote(request, player, message);
         }).thenAccept((Note note) -> {
-            Messages.sendToMods("mod.note.ADD",
-                                "mod", player.getName(),
+            Messages.sendToMods("mod.notification.NOTE-ADDED",
+                                "actor", player.getName(),
                                 "id", String.valueOf(id),
-                                "msg", message);
+                                "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
@@ -80,10 +80,10 @@ public class CmdNote {
 
             return plugin.getRequestRegistry().removeNote(note.get());
         }).thenAcceptAsync((Boolean result) -> {
-            Messages.sendToMods("mod.note.REMOVE",
-                                "mod", player.getName(),
+            Messages.sendToMods("mod.notification.NOTE-REMOVED",
+                                "actor", player.getName(),
                                 "id", String.valueOf(id),
-                                "msg", note.get().getMessage());
+                                "message", note.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;

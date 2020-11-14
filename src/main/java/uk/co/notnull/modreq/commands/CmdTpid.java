@@ -21,7 +21,7 @@ public class CmdTpid {
 
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
-                    Messages.send(player, "mod.TELEPORT", "id", String.valueOf(id));
+                    Messages.send(player, "mod.notification.TELEPORTED", "id", String.valueOf(id));
                 } else {
                     Messages.send(player, "error.TELEPORT-ERROR");
                 }

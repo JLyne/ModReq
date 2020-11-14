@@ -33,8 +33,8 @@ public class CmdElevate {
 				return new CompletableFuture<>();
             }
         }).thenAcceptAsync((Request result) -> {
-            String message = "mod.elevate." + (result.isElevated() ? "1" : "2");
-            Messages.sendToMods(message, "mod", player.getName(), "id", String.valueOf(id));
+            String message = "mod.notification." + (result.isElevated() ? "ELEVATED" : "UNELEVATED");
+            Messages.sendToMods(message, "actor", player.getName(), "id", String.valueOf(id));
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");
