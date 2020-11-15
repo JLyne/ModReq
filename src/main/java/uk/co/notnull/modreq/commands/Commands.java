@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -108,15 +107,9 @@ public class Commands {
                 .withNoPermissionHandler()
                 .withArgumentParsingHandler()
                 .withDecorator(
-                        component -> Component.text()
-                                .append(Component.text("[", NamedTextColor.DARK_GRAY))
-                                .append(Component.text("ModReq", NamedTextColor.GOLD))
-                                .append(Component.text("] ", NamedTextColor.DARK_GRAY))
-                                .append(component).build()
+                        component -> Messages.get("general.PREFIX").append(Component.space()).append(component)
                 ).apply(paperCommandManager, plugin.getBukkitAudiences()::sender);
-        //
-        // Create the commands
-        //
+
         this.constructCommands();
 	}
 
