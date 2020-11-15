@@ -19,7 +19,7 @@ public class PlayerJoin {
     public void joinChecks(Player player) {
         RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
 
-        plugin.getRequestRegistry().getAll(query).thenAcceptAsync((RequestCollection requests) -> {
+        plugin.getRequestRegistry().getUnseen(player, true).thenAcceptAsync((RequestCollection requests) -> {
             if(requests.isEmpty()) {
                 return;
             }
@@ -50,7 +50,7 @@ public class PlayerJoin {
                     return;
                 }
 
-                Messages.send(player, "mod.MODREQS-OPEN", "count", String.valueOf(count));
+                Messages.send(player, "mod.JOIN", "count", String.valueOf(count));
                 plugin.playSound(player);
             }).exceptionally(e -> {
                 e.printStackTrace();
