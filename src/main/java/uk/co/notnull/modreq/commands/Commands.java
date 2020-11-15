@@ -33,7 +33,25 @@ public class Commands {
     private AnnotationParser<CommandSender> annotationParser;
     private MinecraftHelp<CommandSender> minecraftHelp;
 
+    private final CmdCheck cmdCheck;
+    private final CmdClaim cmdClaim;
+    private final CmdDone cmdDone;
+    private final CmdElevate cmdElevate;
+    private final CmdModreq cmdModreq;
+    private final CmdNote cmdNote;
+    private final CmdReopen cmdReopen;
+    private final CmdTpid cmdTpid;
+
 	public Commands(ModReq plugin) {
+		cmdCheck = new CmdCheck(plugin);
+		cmdClaim = new CmdClaim(plugin);
+		cmdDone = new CmdDone(plugin);
+		cmdElevate = new CmdElevate(plugin);
+		cmdModreq = new CmdModreq(plugin);
+		cmdNote = new CmdNote(plugin);
+		cmdReopen = new CmdReopen(plugin);
+		cmdTpid = new CmdTpid(plugin);
+
         final Function<CommandTree<CommandSender>, CommandExecutionCoordinator<CommandSender>> executionCoordinatorFunction =
                 AsynchronousCommandExecutionCoordinator.<CommandSender>newBuilder().build();
 
@@ -139,7 +157,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("page") Integer page
     ) {
-		(new CmdCheck(ModReq.getPlugin())).checkOpenModreqs(player, page != null ? page : 1);
+		cmdCheck.checkOpenModreqs(player, page != null ? page : 1);
 	}
 
 	@CommandMethod("mr info <id>")
@@ -148,7 +166,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdCheck(ModReq.getPlugin())).checkSpecialModreq(player, id);
+		cmdCheck.checkSpecialModreq(player, id);
 	}
 
 	@CommandMethod("mr search <criteria>")
@@ -158,7 +176,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("criteria") String criteria
     ) {
-		(new CmdCheck(ModReq.getPlugin())).searchModreqs(player, criteria);
+		cmdCheck.searchModreqs(player, criteria);
 	}
 
 	@CommandMethod("mr claim <id>")
@@ -168,7 +186,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim(ModReq.getPlugin())).claimModReq(player, id, true);
+		cmdClaim.claimModReq(player, id, true);
 	}
 
 	@CommandMethod("mr unclaim <id>")
@@ -178,7 +196,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdClaim(ModReq.getPlugin())).claimModReq(player, id, false);
+		cmdClaim.claimModReq(player, id, false);
 	}
 
 	@CommandMethod("mr close <id> <message>")
@@ -189,7 +207,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") @Greedy String message
     ) {
-		(new CmdDone(ModReq.getPlugin())).doneModReq(player, id, message);
+		cmdDone.doneModReq(player, id, message);
 	}
 
 	@CommandMethod("mr open <id>")
@@ -199,7 +217,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdReopen(ModReq.getPlugin())).reopenModReq(player, id);
+		cmdReopen.reopenModReq(player, id);
 	}
 
 	@CommandMethod("mr elevate <id>")
@@ -209,7 +227,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdElevate(ModReq.getPlugin())).elevateModReq(player, id);
+		cmdElevate.elevateModReq(player, id);
 	}
 
 	@CommandMethod("mr tp <id>")
@@ -219,7 +237,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("id") Integer id
     ) {
-		(new CmdTpid(ModReq.getPlugin())).tpToModReq(player, id);
+		cmdTpid.tpToModReq(player, id);
 	}
 
 	@CommandMethod("mr note add <id> <message>")
@@ -230,7 +248,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") @Greedy String message
     ) {
-		(new CmdNote(ModReq.getPlugin())).addNote(player, id, message);
+		cmdNote.addNote(player, id, message);
 	}
 
 	@CommandMethod("mr note remove <id> <noteid>")
@@ -242,7 +260,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("noteid") Integer noteId
     ) {
-		(new CmdNote(ModReq.getPlugin())).removeNote(player, id, noteId);
+		cmdNote.removeNote(player, id, noteId);
 	}
 
 	@ProxiedBy("modreq")
@@ -252,7 +270,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("message") @Greedy String message
     ) {
-		(new CmdModreq(ModReq.getPlugin())).modreq(player, message);
+		cmdModreq.modreq(player, message);
 	}
 
 	@CommandMethod("modreq")
@@ -260,7 +278,7 @@ public class Commands {
     private void commandMe(
             final @NonNull Player player
     ) {
-		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player, 1);
+		cmdModreq.checkPlayerModReqs(player, 1);
 	}
 
 	@CommandMethod("mr me [page]")
@@ -269,7 +287,7 @@ public class Commands {
             final @NonNull Player player,
             final @Argument("page") Integer page
     ) {
-		(new CmdModreq(ModReq.getPlugin())).checkPlayerModReqs(player, page != null ? page : 1);
+		cmdModreq.checkPlayerModReqs(player, page != null ? page : 1);
 	}
 
 	@CommandMethod("mr reload")
