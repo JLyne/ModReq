@@ -15,7 +15,6 @@ public class Configuration {
     private String mysql_pass;
     private String mysql_options;
     private int modreqs_per_page;
-    private int show_last_modreqs;
     private int max_open_modreqs;
 
     public Configuration() {
@@ -50,7 +49,6 @@ public class Configuration {
         this.mysql_pass = this.getString("database.mysql.pass", "");
         this.mysql_options = this.getString("database.mysql.options", "autoreconnect=true&useSSL=false&serverTimezone=UTC");
         this.modreqs_per_page = this.getInt("settings.modreqs-per-page", 5);
-        this.show_last_modreqs = this.getInt("settings.show-last-modreqs", 5);
         this.max_open_modreqs = this.getInt("settings.max-open-modreqs", 5);
 
         try {
@@ -118,10 +116,6 @@ public class Configuration {
 
     public int getModreqs_per_page() {
         return this.modreqs_per_page;
-    }
-
-    public int getShow_last_modreqs() {
-        return this.show_last_modreqs;
     }
 
     public int getMax_open_modreqs() {
