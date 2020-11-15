@@ -378,8 +378,6 @@ public class SqlDataSource implements DataSource {
 
 		sql += buildWhere(query, parameters);
 
-		System.out.println(sql);
-
 		PreparedStatement statement = connection.prepareStatement(sql);
 
 		for(int i = 0; i < parameters.size(); i++) {
@@ -404,8 +402,6 @@ public class SqlDataSource implements DataSource {
 			parameters.add((page - 1) * cfg.getModreqs_per_page()); //Offset
 			parameters.add(cfg.getModreqs_per_page()); //Limit
 		}
-
-		System.out.println(sql);
 
 		PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -604,6 +600,10 @@ public class SqlDataSource implements DataSource {
 	}
 
 	private Map<Integer, List<Note>> getNotes(List<Integer> ids) throws SQLException {
+		if(ids.isEmpty()) {
+			new HashMap<>();
+		}
+
 		Connection connection = getConnection();
 		StringBuilder builder = new StringBuilder("SELECT id,modreq_id,uuid,note FROM modreq_notes WHERE modreq_id IN (");
 		Map<Integer, List<Note>> results = new HashMap<>();
@@ -681,10 +681,6 @@ public class SqlDataSource implements DataSource {
 				 .response(response);
 	}
 
-	private RequestCollection createPaginatedRequestCollection(ResultSet resultSet, int offset, int total) throws SQLException {
-		return populateRequestCollection(RequestCollection.builder().paginated(offset, total), resultSet);
-	}
-
 	private RequestCollection createRequestCollection(ResultSet resultSet) throws SQLException {
 		return populateRequestCollection(RequestCollection.builder(), resultSet);
 	}
@@ -692,7 +688,7 @@ public class SqlDataSource implements DataSource {
 	private RequestCollection populateRequestCollection(RequestCollectionBuilder collection, ResultSet resultSet) throws SQLException {
 		List<Integer> ids = new ArrayList<>();
 
-		if(resultSet.isAfterLast()) {
+		if(resultSet.isAfterLast() || !resultSet.next()) {
 			return collection.build();
 		}
 
