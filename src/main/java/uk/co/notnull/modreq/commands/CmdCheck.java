@@ -64,11 +64,11 @@ public class CmdCheck {
 	}
 
 	private void sendList(Player player, RequestCollection requests) {
-		if(requests.isAfterLastPage()) {
-			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
-			return;
-		} else if (requests.isEmpty()) {
+		if(requests.getTotal() == 0 && requests.getPage() == 1) {
 			Messages.send(player, "mod.list.NO-RESULTS");
+			return;
+		} else if (requests.isAfterLastPage()) {
+			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
 			return;
 		}
 

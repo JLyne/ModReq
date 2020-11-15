@@ -57,10 +57,12 @@ public class CmdModreq {
     }
 
     private void sendList(Player player, RequestCollection requests) {
-		if(requests.isAfterLastPage()) {
+    	if(requests.getTotal() == 0 && requests.getPage() == 1) {
+			Messages.send(player, "mod.list.NO-RESULTS");
+			return;
+		} else if (requests.isAfterLastPage()) {
 			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
-		} else if (requests.isEmpty()) {
-			Messages.send(player, "player.check.NO-MODREQS");
+			return;
 		}
 
 		Messages.send(player, "player.list.HEADER", "count", String.valueOf(requests.getTotal()));
