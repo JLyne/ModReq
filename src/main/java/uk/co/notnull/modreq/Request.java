@@ -193,6 +193,7 @@ public class Request {
     }
 
     public Component toComponent(Player context) {
+        boolean isMod = context != null && (context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin"));
         Component result = Component.empty();
 
         OfflinePlayer creator = Bukkit.getOfflinePlayer(getCreator());
@@ -201,18 +202,23 @@ public class Request {
         Map<String, Component> replacements = new HashMap<>();
 
         String status;
+        String username;
+        Component location;
 
-        if(isClosed()) {
-            status = Messages.getString("general.CLOSED");
-        } else if(!isClaimed()) {
-            status = Messages.getString("general.OPEN");
-        } else if(owner != null) {
-            status = owner.getName();
+        if(isMod) {
+             if(isClosed()) {
+                status = Messages.getString("general.CLOSED");
+            } else if(!isClaimed()) {
+                status = Messages.getString("general.OPEN");
+            } else if(owner != null) {
+                status = owner.getName();
+            } else {
+                status = "unknown";
+            }
         } else {
-            status = "unknown";
+             status = Messages.getString("general." + (isClosed() ? "CLOSED": "OPEN"));
         }
 
-        String username;
         if (creator.getName() != null) {
             if (creator.isOnline()) {
                 username = Messages.getString("general.ONLINE-PLAYER","player", creator.getName());
@@ -223,18 +229,27 @@ public class Request {
             username = Messages.getString("general.UNKNOWN-PLAYER");
         }
 
-        Component location = Messages.get("mod.info.LOCATION",
-                                          "id",  String.valueOf(id),
-                                          "world", getLocation().getWorld().getName(),
-                                          "x", String.valueOf(getLocation().getBlockX()),
-                                          "y", String.valueOf(getLocation().getBlockX()),
-                                          "z", String.valueOf(getLocation().getBlockX()));
+        if(isMod) {
+            replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
+            replacements.put("notes", hasNotes() ? Messages.get("general.NOTES") : Component.empty());
+            replacements.put("note_count", Component.text(getNotes().size()));
+            location = Messages.get("mod.info.LOCATION",
+                                    "id",  String.valueOf(id),
+                                    "world", getLocation().getWorld().getName(),
+                                    "x", String.valueOf(getLocation().getBlockX()),
+                                    "y", String.valueOf(getLocation().getBlockX()),
+                                    "z", String.valueOf(getLocation().getBlockX()));
+        } else {
+            location = Messages.get("player.info.LOCATION",
+                                    "id",  String.valueOf(id),
+                                    "world", getLocation().getWorld().getName(),
+                                    "x", String.valueOf(getLocation().getBlockX()),
+                                    "y", String.valueOf(getLocation().getBlockX()),
+                                    "z", String.valueOf(getLocation().getBlockX()));
+        }
 
         replacements.put("id", Component.text(getId()));
         replacements.put("status", new MineDownParser().parse(status).build());
-        replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
-        replacements.put("notes", hasNotes() ? Messages.get("general.NOTES") : Component.empty());
-        replacements.put("note_count", Component.text(getNotes().size()));
         replacements.put("creator", new MineDownParser().parse(username).build());
         replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(getCreateTime())));
         replacements.put("message", Component.text(getMessage()));
@@ -244,9 +259,13 @@ public class Request {
         replacements.put("y", Component.text(getLocation().getBlockY()));
         replacements.put("z", Component.text(getLocation().getBlockZ()));
 
-        if(context != null && (context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin"))) {
+        if(isMod) {
+            result = result.append(Messages.get("mod.info.HEADER", replacements));
+            result = result.append(Component.newline());
             result = result.append(Messages.get("mod.info.REQUEST", replacements));
         } else {
+            result = result.append(Messages.get("player.info.HEADER", replacements));
+            result = result.append(Component.newline());
             result = result.append(Messages.get("player.info.REQUEST", replacements));
         }
 
@@ -254,36 +273,50 @@ public class Request {
             replacements.put("response_date", Component.text(ModReq.getPlugin().getFormat().format(getCloseTime())));
             replacements.put("response", Component.text(getResponseMessage()));
 
-            result = result.append(Component.newline());
-
             if(responder != null && responder.getName() != null) {
                 replacements.put("responder", Component.text(responder.getName()));
             } else {
                 replacements.put("responder", Messages.get("general.UNKNOWN-PLAYER"));
             }
-
-            result = result.append(Component.newline());
-            result = result.append(Messages.get("mod.info.RESPONSE", replacements));
         }
 
-        for(Note note: notes) {
-            OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(getCreator());
-            String creatorName;
+        if(isMod) {
+            if(isClosed()) {
+                result = result.append(Component.newline());
+                result = result.append(Messages.get("mod.info.RESPONSE", replacements));
+            }
 
-            if (noteCreator.getName() != null) {
-                creatorName = noteCreator.getName();
-            } else {
-                creatorName = Messages.getString("general.UNKNOWN-PLAYER");
+            for(int i = 0; i < notes.size(); i++) {
+                Note note = notes.get(i);
+                OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(getCreator());
+                String creatorName;
+
+                if (noteCreator.getName() != null) {
+                    creatorName = noteCreator.getName();
+                } else {
+                    creatorName = Messages.getString("general.UNKNOWN-PLAYER");
+                }
+
+                result = result.append(Component.newline());
+                result = result.append(Messages.get("mod.info.NOTE",
+                                                    "id", String.valueOf(i + 1),
+                                                    "creator", creatorName,
+                                                    "message", note.getMessage()));
             }
 
             result = result.append(Component.newline());
-            result = result.append(Messages.get("mod.info.NOTE",
-                                                "id", String.valueOf(note.getId()),
-                                                "creator", creatorName,
-                                                "message", note.getMessage()));
-        }
+            result = result.append(getActions(context));
+            result = result.append(Component.newline());
+            result = result.append(Messages.get("mod.info.FOOTER", replacements));
+        } else {
+            if(isClosed()) {
+                result = result.append(Component.newline());
+                result = result.append(Messages.get("player.info.RESPONSE", replacements));
+            }
 
-        result = result.append(getActions(context));
+            result = result.append(Component.newline());
+            result = result.append(Messages.get("player.info.FOOTER", replacements));
+        }
 
         return result;
     }

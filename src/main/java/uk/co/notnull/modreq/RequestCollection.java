@@ -72,6 +72,7 @@ public class RequestCollection extends ArrayList<Request> {
 			}
 
 			replacements.put("id", Component.text(request.getId()));
+			replacements.put("link", Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId())));
 			replacements.put("status", new MineDownParser().parse(status).build());
 			replacements.put("elevated", request.isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
 			replacements.put("notes", request.hasNotes() ? Messages.get("general.NOTES") : Component.empty());

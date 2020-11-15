@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import de.themoep.minedown.adventure.MineDownParser;
 import de.themoep.minedown.adventure.Replacer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -39,74 +40,83 @@ public class Messages {
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
-        setDefaultString("error.DATABASE-ERROR", "&cError while connecting to database. Please contact an administrator.");
-        setDefaultString("error.ID-ERROR", "&cError: ModReq #%id does not exist.");
-        setDefaultString("error.NUMBER-ERROR", "&cError: %id is not a number/ID/page.");
-        setDefaultString("error.NOT-CLOSED", "&cModReq is not closed.");
-        setDefaultString("error.ALREADY-CLOSED", "&cModReq already closed.");
-        setDefaultString("error.ALREADY-CLAIMED", "&cModReq already claimed.");
-        setDefaultString("error.NOT-CLAIMED", "&cModReq is not claimed.");
-        setDefaultString("error.OTHER-CLAIMED", "&cModReq has been claimed by someone else.");
-        setDefaultString("error.TELEPORT-ERROR", "&cError while teleporting to location. Please contact an administrator.");
-        setDefaultString("error.PAGE-ERROR", "&cError: Page %page does not exist.");
-        setDefaultString("error.NOTE-DOES-NOT-EXIST", "&cError: This note id does not exist.");
-        setDefaultString("error.NOTE-OTHER", "&cError: You did not write this note.");
-        setDefaultString("error.MAX-OPEN-MODREQS", "&cYou cannot open more than &4%max &cModReq(s) at the same time.");
+        setDefaultString("error.DATABASE-ERROR", "[Error while connecting to database. Please contact an administrator.](red)");
+        setDefaultString("error.ID-ERROR", "[Error: ModReq #%id does not exist.](red)");
+        setDefaultString("error.NUMBER-ERROR", "[Error: %id is not a number/ID/page.](red)");
+        setDefaultString("error.NOT-CLOSED", "[ModReq is not closed.](red)");
+        setDefaultString("error.ALREADY-CLOSED", "[ModReq already closed.](red)");
+        setDefaultString("error.ALREADY-CLAIMED", "[ModReq already claimed.](red)");
+        setDefaultString("error.NOT-CLAIMED", "[ModReq is not claimed.](red)");
+        setDefaultString("error.OTHER-CLAIMED", "[ModReq has been claimed by someone else.](red)");
+        setDefaultString("error.TELEPORT-ERROR", "[Error while teleporting to location. Please contact an administrator.](red)");
+        setDefaultString("error.PAGE-ERROR", "[Error: Page %page does not exist.](red)");
+        setDefaultString("error.NOTE-DOES-NOT-EXIST", "[Error: This note id does not exist.](red)");
+        setDefaultString("error.NOTE-OTHER", "[Error: You did not write this note.](red)");
+        setDefaultString("error.MAX-OPEN-MODREQS", "[You cannot open more than](red) [%max](dark_red) [ModReq(s) at the same time.](red)");
 
-        setDefaultString("general.PREFIX", "[\\[MODREQ\\]](color=red format=bold)");
-        setDefaultString("general.OPEN", "&aOPEN");
-        setDefaultString("general.CLOSED", "&cCLOSED");
-        setDefaultString("general.CLAIMED", "&eCLAIMED (%actor)");
-        setDefaultString("general.ELEVATED", " &b\\[ADMIN\\]");
-        setDefaultString("general.NOTES", " &4\\[NOTES\\]");
-        setDefaultString("general.DONE-MESSAGE", "&7Message: %message");
-        setDefaultString("general.ON-JOIN-HEADER", "&b-=-=- -=-=-");
-        setDefaultString("general.HELP-LIST-MODREQS", "&b-=-=- List your last ModReqs: /modreq -=-=-");
+        setDefaultString("general.PREFIX", "[\\[MODREQ\\]](color=red)");
+        setDefaultString("general.OPEN", "[OPEN](green)");
+        setDefaultString("general.CLOSED", "[CLOSED](red)");
+        setDefaultString("general.CLAIMED", "[CLAIMED \\(%actor\\)](gold)");
+        setDefaultString("general.ELEVATED", "[\\[ADMIN\\]](aqua)");
+        setDefaultString("general.NOTES", "[\\[NOTES\\]](dark_red)");
+        setDefaultString("general.ON-JOIN-HEADER", "[-=-=- -=-=-](aqua)");
+        setDefaultString("general.HELP-LIST-MODREQS", "[-=-=- List your last ModReqs: /modreq -=-=-](aqua)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
-        setDefaultString("general.ONLINE-PLAYER", "&a%player");
-        setDefaultString("general.OFFLINE-PLAYER", "&c%player");
-        setDefaultString("general.UNKNOWN-PLAYER", "&cUnknown");
+        setDefaultString("general.ONLINE-PLAYER", "[%player](suggest_command=/w %player  show_text=Click to whisper %player color=green)");
+        setDefaultString("general.OFFLINE-PLAYER", "[%player](show_text=%player is offline color=red)");
+        setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
+        setDefaultString("general.REQUEST-LINK", "[#%id](#07a0ff)");
 
-        setDefaultString("player.notification.CLOSED", "%actor &ahas closed your ModReq (%id).\n&7Message: %message");
-        setDefaultString("player.notification.CREATED", "&aYour ModReq has been sent to the staff members. Please be patient.");
+        setDefaultString("player.notification.CLOSED", "%actor [has closed your ModReq](green) (%id).\n[Message: %response](gray)");
+        setDefaultString("player.notification.CREATED", "[Your ModReq has been sent to the staff members. Please be patient.](green)");
 
-        setDefaultString("player.list.HEADER", "&b-=-=- Last %count ModReq(s) -=-=-");
-        setDefaultString("player.list.ITEM-REQUEST", "&6%id \\[&a%status&6\\] %date\n&7Message: %message");
-        setDefaultString("player.list.ITEM-RESPONSE", "&6Answered by &a%responder &6on &a%close_time&6.\n&7Message: %response");
-        setDefaultString("player.list.FOOTER", "&b -=-=- New ModReq: /modreq <request> -=-=-");
-        setDefaultString("player.list.NO-RESULTS", "&bYou have no open ModReqs. New ModReq: /modreq <request>");
+        setDefaultString("player.list.HEADER", "[----------](color=aqua format=bold) Your ModReqs [----------](color=aqua format=bold)");
+        setDefaultString("player.list.ITEM-REQUEST", "%id [\\[](#fce469)%status[\\]](#fce469) [%date](#fce469)\n[Message: %message](gray)");
+        setDefaultString("player.list.ITEM-RESPONSE", "[Answered by %responder on](#fce469) [%close_time](green)[.](#fce469)\n[Message: %response](gray)");
+        setDefaultString("player.list.FOOTER", "");
+        setDefaultString("player.list.NO-RESULTS", "[You have no open ModReqs. New ModReq: /modreq <request>](aqua)");
 
-        setDefaultString("mod.notification.CREATED", "&a%actor created a new ModReq (#%id). %view");
-        setDefaultString("mod.notification.CLAIMED", "&2#%id &ahas been claimed by %actor. %view");
-        setDefaultString("mod.notification.UNCLAIMED", "&2#%id &ahas been un-claimed by %actor. %view");
-        setDefaultString("mod.notification.ELEVATED", "&2#%id &ahas been flagged for admin attention by %actor. %view");
-        setDefaultString("mod.notification.UNELEVATED", "&aAdmin flag has been removed from &2#%id &aby %actor. %view");
-        setDefaultString("mod.notification.CLOSED", "&2#%id &ahas been closed by %actor.\nMessage: %message\n%view");
-        setDefaultString("mod.notification.REOPENED", "&2#%id &ahas been re-opened by %actor. %view");
-        setDefaultString("mod.notification.TELEPORTED", "&aTeleported to &2#%id&a.");
-        setDefaultString("mod.notification.NOTE-ADDED", "&a%actor added a note to &2#%id&a:\n&7%message\n%view");
-        setDefaultString("mod.notification.NOTE-REMOVED", "&a%actor removed a note from &2#%id&a:\n&7%message\n%view");
+        setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) #%id - %status [----------](color=aqua format=bold)");
+        setDefaultString("player.info.REQUEST", "%world (%x %y %z)");
+        setDefaultString("player.info.REQUEST", "&eCreated on %date at [%location](green).\n[Message: %message](gray)");
+        setDefaultString("player.info.RESPONSE", "[Answered by](yellow) [%responder](green) [on](yellow) [%response_date](green)\n[Message: %response](gray)");
+        setDefaultString("player.info.LOCATION", "%world (%x %y %z)");
+        setDefaultString("player.info.FOOTER", "");
 
-        setDefaultString("mod.info.REQUEST", "&e[ModReq %id - %status](aqua)\nFiled by [%creator](green) on %date at [%location](green).\n[Message: %message](gray)");
+        setDefaultString("mod.notification.CREATED", "%prefix %actor [created a new ModReq](green) (%link). %view");
+        setDefaultString("mod.notification.CLAIMED", "%prefix %link [has been claimed by](green) %actor. %view");
+        setDefaultString("mod.notification.UNCLAIMED", "%prefix %link [has been un-claimed by](green) %actor. %view");
+        setDefaultString("mod.notification.ELEVATED", "%prefix %link [has been flagged for admin attention by](green) %actor. %view");
+        setDefaultString("mod.notification.UNELEVATED", "%prefix [Admin flag has been removed from](green) %link [by](green) %actor. %view");
+        setDefaultString("mod.notification.CLOSED", "%prefix %link has been closed by %actor.\n[Message: %message](gray)\n%view");
+        setDefaultString("mod.notification.REOPENED", "%prefix %link [has been re-opened by](green) %actor. %view");
+        setDefaultString("mod.notification.TELEPORTED", "%prefix [Teleported to](green) %link.");
+        setDefaultString("mod.notification.NOTE-ADDED", "%prefix %actor [added a note to](green) %link. %view\n[Message: %message](gray)");
+        setDefaultString("mod.notification.NOTE-REMOVED", "%prefix %actor [removed a note from](green) %link. %view\n[Message: %message](gray)");
+
+        setDefaultString("mod.info.HEADER", "[----------](color=aqua format=bold) #%id - %status [----------](color=aqua format=bold)");
+        setDefaultString("mod.info.REQUEST", "&e[#%id - %status](aqua)\nCreated by [%creator](green) on %date at [%location](green).\n[Message: %message](gray)");
         setDefaultString("mod.info.RESPONSE", "[Answered by](yellow) [%responder](green) [on](yellow) [%response_date](green)\n[Message: %response](gray)");
         setDefaultString("mod.info.LOCATION", "[%world (%x %y %z)](show_text=Click to teleport run_command=/mr tp %id)");
-        setDefaultString("mod.info.NOTE", "&4\\[%id\\] &7%actor - %message");
+        setDefaultString("mod.info.NOTE", "[\\[%id\\]](aqua) [%creator - %message](gray)");
+        setDefaultString("mod.info.FOOTER", "");
 
-        setDefaultString("mod.list.HEADER", "&b-=-=- %count ModReq(s) -=-=-");
-        setDefaultString("mod.list.ITEM", "&6%id [&a%status%elevated%notes&6] %date &a%creator\n[Message: %message](gray)");
-        setDefaultString("mod.list.FOOTER", "&b-=-=- Page %page of %allpages -=-=-");
-        setDefaultString("mod.list.NO-RESULTS", "&aThere are no open ModReqs.");
+        setDefaultString("mod.list.HEADER", "[----------](color=aqua format=bold) %count ModReq(s) [----------](color=aqua format=bold)");
+        setDefaultString("mod.list.ITEM", "%link [\\[](#fce469)[%status%elevated%notes](green)[\\]](#fce469) [%date](#fce469) %creator\n[Message: %message](gray)");
+        setDefaultString("mod.list.FOOTER", "[-=-=- Page %page of %allpages -=-=-](aqua)");
+        setDefaultString("mod.list.NO-RESULTS", "[There are no open ModReqs.](green)");
 
         setDefaultString("mod.action.VIEW","[\\[View\\]](run_command=/mr info %id show_text=Show the details of this ModReq color=gold)");
         setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id  show_text=Close this ModReq color=red)");
-        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id show_text=Re-open this ModReq color=green)");
-        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id show_text=Teleport to where this ModReq was created color=green)");
-        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id show_text=Claim this ModReq to indicate you are working on it color=green)");
-        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id show_text=Un-claim this ModReq to allow other mods to work on it color=green)");
-        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention color=green)");
-        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq color=green)");
-        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id  show_text=Add a note to this ModReq. Notes are only visible to staff. color=green)");
+        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id show_text=Re-open this ModReq color=red)");
+        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id show_text=Teleport to where this ModReq was created color=gold)");
+        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id show_text=Claim this ModReq to indicate you are working on it color=gold)");
+        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id show_text=Un-claim this ModReq to allow other mods to work on it color=gold)");
+        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention color=gold)");
+        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq color=gold)");
+        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id  show_text=Add a note to this ModReq. Notes are only visible to staff. color=gold)");
 
         try {
             cfg.save(file);
@@ -249,9 +259,12 @@ public class Messages {
 
             message = new MineDown(cfg.getString(key))
                     .placeholderPrefix("%").placeholderSuffix("")
-                    .replace("id", String.valueOf(request.getId()),
-                             "actor", username,
-                             "view", Messages.getString("mod.action.VIEW",
+                    .replace("id", String.valueOf(request.getId()))
+                    .replace("actor", new MineDownParser().parse(username).build())
+                    .replace("prefix", Messages.get("general.PREFIX"))
+                    .replace("link", Messages.get("general.REQUEST-LINK",
+                                                  "id", String.valueOf(request.getId())))
+                    .replace("view", Messages.get("mod.action.VIEW",
                                                         "id", String.valueOf(request.getId())))
                     .replace(replacements).toComponent();
         } else {

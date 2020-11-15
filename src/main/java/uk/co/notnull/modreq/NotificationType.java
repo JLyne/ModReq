@@ -3,7 +3,7 @@ package uk.co.notnull.modreq;
 public enum NotificationType {
 	CREATED,
 	CLOSED,
-	OPENED,
+	REOPENED,
 	CLAIMED,
 	UNCLAIMED,
 	ELEVATED,

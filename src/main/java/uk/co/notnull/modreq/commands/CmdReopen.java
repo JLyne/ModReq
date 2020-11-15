@@ -37,7 +37,7 @@ public class CmdReopen {
             shortcut.complete(null);
             return new CompletableFuture<>();
         }).thenAcceptAsync((Request result) -> {
-            Messages.sendModNotification(NotificationType.OPENED, player, request.get());
+            Messages.sendModNotification(NotificationType.REOPENED, player, request.get());
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");
