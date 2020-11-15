@@ -9,9 +9,7 @@ public class RequestCollectionBuilder {
 	private int offset = 1;
 	private int totalResults = 1;
 
-	RequestCollectionBuilder() {
-
-	}
+	RequestCollectionBuilder() {}
 
 	public static RequestCollectionBuilder builder() {
 		return new RequestCollectionBuilder();
@@ -32,6 +30,7 @@ public class RequestCollectionBuilder {
 	public RequestCollectionBuilder paginated(int offset, int totalResults) {
 		this.offset = offset;
 		this.totalResults = totalResults;
+		this.paginated = true;
 
 		return this;
 	}
