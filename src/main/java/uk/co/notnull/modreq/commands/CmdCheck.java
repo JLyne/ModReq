@@ -1,17 +1,28 @@
 package uk.co.notnull.modreq.commands;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import uk.co.notnull.modreq.*;
 
-public class CmdCheck {
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class CmdCheck implements Listener {
 	private final ModReq plugin;
+
+	Map<Player, String> lastSearch = new ConcurrentHashMap<>();
 
 	public CmdCheck(ModReq plugin) {
 		this.plugin = plugin;
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 
-	public void checkOpenModreqs(final Player player) {
-		checkOpenModreqs(player, 1);
+	@EventHandler
+	public void onQuit(PlayerQuitEvent event) {
+		lastSearch.remove(event.getPlayer());
+		System.out.println(lastSearch.toString());
 	}
 
 	public void checkOpenModreqs(final Player player, final int page) {
@@ -21,7 +32,7 @@ public class CmdCheck {
 		}
 
 		plugin.getRequestRegistry().get(RequestQuery.open(), page).thenAcceptAsync(requests -> {
-			sendList(player, requests);
+			Messages.sendList(player, requests, "/mr list %page%");
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
 			e.printStackTrace();
@@ -50,37 +61,29 @@ public class CmdCheck {
 		searchModreqs(player, search, 1);
 	}
 
-	public void searchModreqs(final Player player, final String search, int page) {
+	public void searchModreqs(final Player player, final int page) {
+		if(!lastSearch.containsKey(player)) {
+			Messages.send(player, "error.NO-PREVIOUS-SEARCH");
+			return;
+		}
+
+		searchModreqs(player, lastSearch.get(player), page);
+	}
+
+	public void searchModreqs(final Player player, final String search, final int page) {
 		if (page < 1) {
 			Messages.send(player, "error.NUMBER-ERROR", "id", String.valueOf(page));
 			return;
 		}
 
+		lastSearch.compute(player, (a, b) -> search);
+
 		plugin.getRequestRegistry().get(new RequestQuery().search(search), page).thenAcceptAsync(requests -> {
-			sendList(player, requests);
+			Messages.sendList(player, requests, "/mr searchpage %page%");
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
 			e.printStackTrace();
 			return null;
 		});
-	}
-
-	private void sendList(Player player, RequestCollection requests) {
-		if(requests.getTotal() == 0 && requests.getPage() == 1) {
-			Messages.send(player, "mod.list.NO-RESULTS");
-			return;
-		} else if (requests.isAfterLastPage()) {
-			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
-			return;
-		}
-
-		Messages.send(player, "mod.list.HEADER", "count", String.valueOf(requests.getTotal()));
-		Messages.send(player, requests.toComponent(player));
-
-		if(requests.isPaginated()) {
-			Messages.send(player, "mod.list.FOOTER",
-						  "page", String.valueOf(requests.getPage()),
-						  "allpages", String.valueOf(requests.getTotalPages()));
-		}
 	}
 }

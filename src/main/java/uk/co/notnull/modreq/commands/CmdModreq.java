@@ -48,31 +48,12 @@ public class CmdModreq {
         RequestQuery query = new RequestQuery().creator(player.getUniqueId());
 
 		plugin.getRequestRegistry().get(query, page).thenAcceptAsync(requests -> {
-			sendList(player, requests);
+			Messages.sendList(player, requests, "/mr me %page%");
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
 			e.printStackTrace();
 			return null;
 		});
     }
-
-    private void sendList(Player player, RequestCollection requests) {
-    	if(requests.getTotal() == 0 && requests.getPage() == 1) {
-			Messages.send(player, "mod.list.NO-RESULTS");
-			return;
-		} else if (requests.isAfterLastPage()) {
-			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
-			return;
-		}
-
-		Messages.send(player, "player.list.HEADER", "count", String.valueOf(requests.getTotal()));
-		Messages.send(player, requests.toComponent(player));
-
-		if(requests.isPaginated()) {
-			Messages.send(player, "player.list.FOOTER",
-						  "page", String.valueOf(requests.getPage()),
-						  "allpages", String.valueOf(requests.getTotalPages()));
-		}
-	}
 }
 

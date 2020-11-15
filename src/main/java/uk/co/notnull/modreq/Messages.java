@@ -68,8 +68,12 @@ public class Messages {
         setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
         setDefaultString("general.REQUEST-LINK", "[#%id%](run_command=/mr info %id% show_text=Click to show the details of #%id% color=#07a0ff)");
 
-        setDefaultString("confirmation.confirm", "%prefix%[Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
-        setDefaultString("confirmation.nothing", "%prefix%[You don't have any pending commands.](red)");
+        setDefaultString("pagination.PREV", "[\\[Prev\\]](run_command=%command% show_text=Previous page color=gray)");
+        setDefaultString("pagination.NEXT", "[\\[Next\\]](run_command=%command% show_text=Next page color=gray)");
+        setDefaultString("pagination.DISABLED", "      ");
+
+        setDefaultString("confirmation.confirm", "%prefix% [Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
+        setDefaultString("confirmation.nothing", "%prefix% [You don't have any pending commands.](red)");
 
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
@@ -77,10 +81,10 @@ public class Messages {
 
         setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
 
-        setDefaultString("player.list.HEADER", "[----------](color=aqua format=bold) Your ModReqs [----------](color=aqua format=bold)");
+        setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq show_text=Create a new ModReq color=gold)");
         setDefaultString("player.list.ITEM-REQUEST", "%id% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469)\n[Message: %message%](gray)");
         setDefaultString("player.list.ITEM-RESPONSE", "[Answered by %responder% on](#fce469) [%close_time%](green)[.](#fce469)\n[Message: %response%](gray)");
-        setDefaultString("player.list.FOOTER", "");
+        setDefaultString("player.list.FOOTER", "[%prev% %next%](white)");
         setDefaultString("player.list.NO-RESULTS", "[You have no open ModReqs. New ModReq: /modreq <request>](aqua)");
 
         setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) #%id% - %status% [----------](color=aqua format=bold)");
@@ -110,10 +114,10 @@ public class Messages {
         setDefaultString("mod.info.NOTE", "[\\[%id%\\]](aqua) [%creator% - %message%](gray)");
         setDefaultString("mod.info.FOOTER", "");
 
-        setDefaultString("mod.list.HEADER", "[----------](color=aqua format=bold) %count% ModReq(s) [----------](color=aqua format=bold)");
+        setDefaultString("mod.list.HEADER", "%prefix% %count% ModReq(s) - Page %page% of %allpages%");
         setDefaultString("mod.list.ITEM", "%link% [\\[](#fce469)[%status%](green)[\\]](#fce469) [%date%](#fce469) %creator%\n[Message: %message%](gray)");
-        setDefaultString("mod.list.FOOTER", "[-=-=- Page %page% of %allpages% -=-=-](aqua)");
-        setDefaultString("mod.list.NO-RESULTS", "%prefix%[No ModReqs found](gray)");
+        setDefaultString("mod.list.FOOTER", "[%prev% %next%](white)");
+        setDefaultString("mod.list.NO-RESULTS", "%prefix% [No ModReqs found](gray)");
 
         setDefaultString("mod.action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
         setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
@@ -226,6 +230,74 @@ public class Messages {
 
         audience.sendMessage(message);
     }
+
+    /**
+     * Send a RequestCollection to a player, which will be displayed as a mod or player focused list
+     * depending on permissions
+     * @param player The player to send the list to. Will be used for permission checks.
+     * @param requests The collection to send as a list
+     * @param command The command any present pagination buttons should run. Should contain "%page%", which
+     *               will be replaced with the relevant page number.
+     */
+    public static void sendList(Player player, RequestCollection requests, String command) {
+        boolean isMod = player.hasPermission("modreq.mod") && player.hasPermission("modreq.admin");
+        Component message = Component.empty();
+
+        if(requests.getTotal() == 0 && requests.getPage() == 1) {
+			Messages.send(player,  isMod ? "mod.list.NO-RESULTS" : "player.list.NO-RESULTS");
+			return;
+		} else if (requests.isAfterLastPage()) {
+			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
+			return;
+		}
+
+        String headerKey = isMod ? "mod.list.HEADER" : "player.list.HEADER";
+
+        message = message.append(Messages.get(headerKey,
+                                              "count", String.valueOf(requests.getTotal()),
+                                              "page", String.valueOf(requests.getPage()),
+                                              "allpages", String.valueOf(requests.getTotalPages())));
+        message = message.append(Component.newline());
+
+		message = message.append(requests.toComponent(player));
+
+		if(requests.isPaginated()) {
+		    String footerKey = isMod ? "mod.list.FOOTER" : "player.list.FOOTER";
+		    Component nextButton;
+		    Component prevButton;
+
+		    if(requests.isLastPage()) {
+                nextButton = Messages.get("pagination.DISABLED");
+            } else {
+                nextButton = Messages.get("pagination.NEXT",
+                                          "command", command.replace("%page%",
+                                                                     String.valueOf(requests.getPage() + 1)));
+            }
+
+		    if(requests.isFirstPage()) {
+                prevButton = Messages.get("pagination.DISABLED");
+            } else {
+                prevButton = Messages.get("pagination.PREV",
+                                          "command", command.replace("%page%",
+                                                                     String.valueOf(requests.getPage() - 1)));
+            }
+
+            message = message.append(Component.newline());
+		    message = message.append(new MineDown(cfg.getString(footerKey))
+                                             .placeholderIndicator("%")
+                                             .replace(
+                                                     "count", String.valueOf(requests.getTotal()),
+                                                     "page", String.valueOf(requests.getPage()),
+                                                     "allpages", String.valueOf(requests.getTotalPages())
+                                             )
+                                             .replace("next", nextButton)
+                                             .replace("prev", prevButton)
+                                             .toComponent());
+		}
+
+		Audience audience = ModReq.getPlugin().getBukkitAudiences().player(player);
+        audience.sendMessage(message);
+	}
 
     /**
      * Sends a notification regarding the given action, actor and request, to relevant players if they are online

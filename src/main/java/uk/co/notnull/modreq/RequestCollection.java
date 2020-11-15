@@ -157,6 +157,14 @@ public class RequestCollection extends ArrayList<Request> {
 		return paginated ? total / perPage + ((total % perPage == 0) ? 0 : 1) : 1;
 	}
 
+	public boolean isFirstPage() {
+		return getPage() == 1;
+	}
+
+	public boolean isLastPage() {
+		return getPage() == getTotalPages();
+	}
+
 	public boolean isAfterLastPage() {
 		return paginated && offset >= total;
 	}

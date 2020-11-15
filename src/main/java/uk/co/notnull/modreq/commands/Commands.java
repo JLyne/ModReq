@@ -179,6 +179,17 @@ public class Commands {
 		cmdCheck.searchModreqs(player, criteria);
 	}
 
+	@CommandMethod("mr searchpage <page>")
+    @CommandDescription("Search for open modreqs containing specific text")
+	@CommandPermission("modreq.mod")
+	@Hidden()
+    private void commandSearch(
+            final @NonNull Player player,
+            final @Argument("page") Integer page
+    ) {
+		cmdCheck.searchModreqs(player, page);
+	}
+
 	@CommandMethod("mr claim <id>")
     @CommandDescription("Claim the specified modreq")
 	@CommandPermission("modreq.mod")
