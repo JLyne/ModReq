@@ -69,8 +69,11 @@ public class Messages {
         setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
         setDefaultString("general.REQUEST-LINK", "[#%id](#07a0ff)");
 
-        setDefaultString("player.notification.CLOSED", "%actor [has closed your ModReq](green) (%id).\n[Message: %response](gray)");
-        setDefaultString("player.notification.CREATED", "[Your ModReq has been sent to the staff members. Please be patient.](green)");
+        setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
+        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
+        setDefaultString("player.notification.CREATED", "%prefix%[Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+
+        setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
 
         setDefaultString("player.list.HEADER", "[----------](color=aqua format=bold) Your ModReqs [----------](color=aqua format=bold)");
         setDefaultString("player.list.ITEM-REQUEST", "%id [\\[](#fce469)%status[\\]](#fce469) [%date](#fce469)\n[Message: %message](gray)");

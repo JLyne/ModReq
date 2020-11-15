@@ -47,10 +47,6 @@ public class CmdDone {
             Player creator = Bukkit.getPlayer(result.getCreator());
 
             if(creator != null) {
-                Messages.send(creator, "player.notification.CLOSED",
-                              "actor", player.getName(),
-                              "id", String.valueOf(id),
-                              "message", message);
                 plugin.playSound(creator);
             }
 
