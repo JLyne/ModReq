@@ -25,6 +25,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 
 public class Commands {
@@ -77,10 +78,8 @@ public class Commands {
         this.confirmationManager = new CommandConfirmationManager<>(
                 /* Timeout */ 30L,
                 /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> context.getCommandContext().getSender().sendMessage(
-                ChatColor.RED + "Confirmation required. Confirm using /mr confirm."),
-                /* Action when no confirmation is pending */ sender -> sender.sendMessage(
-                ChatColor.RED + "You don't have any pending commands.")
+                /* Action when confirmation is required */ context -> Messages.send((Player) context.getCommandContext().getSender(), "confirmation.confirm"),
+                /* Action when no confirmation is pending */ sender -> Messages.send((Player) sender, "confirmation.nothing")
         );
         //
         // Register the confirmation processor. This will enable confirmations for commands that require it

@@ -67,7 +67,10 @@ public class Messages {
         setDefaultString("general.ONLINE-PLAYER", "[%player](suggest_command=/w %player  show_text=Click to whisper %player color=green)");
         setDefaultString("general.OFFLINE-PLAYER", "[%player](show_text=%player is offline color=red)");
         setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
-        setDefaultString("general.REQUEST-LINK", "[#%id](#07a0ff)");
+        setDefaultString("general.REQUEST-LINK", "[#%id%](run_command=/mr info %id% show_text=Click to show the details of #%id% color=#07a0ff)");
+
+        setDefaultString("confirmation.confirm", "%prefix%[Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
+        setDefaultString("confirmation.nothing", "%prefix%[You don't have any pending commands.](red)");
 
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
