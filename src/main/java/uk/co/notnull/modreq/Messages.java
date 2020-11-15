@@ -243,7 +243,7 @@ public class Messages {
      *               will be replaced with the relevant page number.
      */
     public static void sendList(Player player, RequestCollection requests, String command) {
-        boolean isMod = player.hasPermission("modreq.mod") && player.hasPermission("modreq.admin");
+        boolean isMod = player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin");
         Component message = Component.empty();
 
         if(requests.getTotal() == 0 && requests.getPage() == 1) {
