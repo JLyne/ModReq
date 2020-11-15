@@ -45,7 +45,7 @@ public class CmdModreq {
 			return;
 		}
 
-        RequestQuery query = RequestQuery.open().creator(player.getUniqueId());
+        RequestQuery query = new RequestQuery().creator(player.getUniqueId());
 
 		plugin.getRequestRegistry().get(query, page).thenAcceptAsync(requests -> {
 			sendList(player, requests);
