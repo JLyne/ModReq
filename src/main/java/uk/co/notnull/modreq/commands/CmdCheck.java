@@ -30,8 +30,10 @@ public class CmdCheck {
 	}
 
 	public void checkSpecialModreq(final Player player, final int id) {
+		boolean isMod = (player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin"));
+
 		plugin.getRequestRegistry().get(id).thenAcceptAsync((Request request) -> {
-            if(request == null) {
+            if(request == null || (!isMod && !request.getCreator().equals(player.getUniqueId()))) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 return;
             }

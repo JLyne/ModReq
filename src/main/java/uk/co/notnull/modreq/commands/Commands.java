@@ -152,7 +152,6 @@ public class Commands {
 
 	@CommandMethod("mr info <id>")
     @CommandDescription("View information about a specific modreq")
-	@CommandPermission("modreq.mod")
     private void commandInfo(
             final @NonNull Player player,
             final @Argument("id") Integer id
