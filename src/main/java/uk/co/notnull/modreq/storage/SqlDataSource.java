@@ -239,12 +239,6 @@ public class SqlDataSource implements DataSource {
 		pStatement.setInt(5, request.getId());
 		pStatement.executeUpdate();
 
-		pStatement.close();
-		pStatement = connection.prepareStatement("DELETE FROM modreq_notes WHERE modreq_id=?");
-		pStatement.setInt(1, request.getId());
-		pStatement.executeUpdate();
-		pStatement.close();
-
 		Response response = new Response(mod.getUniqueId(), message, new Date(time), request.isCreatorOnline());
 
 		return Request.builder()
