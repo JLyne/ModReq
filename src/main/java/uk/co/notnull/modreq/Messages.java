@@ -9,7 +9,6 @@ import de.themoep.minedown.adventure.Replacer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -194,20 +193,6 @@ public class Messages {
                     .replace(replacements).replaceIn(cfg.getString(key));
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
-            return "";
-        }
-    }
-
-    @Deprecated
-    public static String getLangString(String pEntry) {
-        if(cfg == null) {
-            reload();
-        }
-
-        if (cfg.getString(pEntry) != null) {
-            return ChatColor.translateAlternateColorCodes('&', cfg.getString(pEntry, "Missing language string: " + pEntry));
-        } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + pEntry);
             return "";
         }
     }

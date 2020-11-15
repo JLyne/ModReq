@@ -36,99 +36,12 @@ public class Request {
         this.notes = notes;
     }
 
-    @Deprecated
-    public Request(int pId, String pUuid, String pRequest, long pTimestamp, String world, int x, int y, int z, String pClaimed, String pMod_uuid, String pMod_comment, long pMod_timestamp, int pDone, int pElevated) {
-        this.id = pId;
-        this.creator = UUID.fromString(pUuid);
-        this.message = pRequest;
-        this.createTime = new Date(pTimestamp);
-        this.owner = pClaimed.isEmpty() ? null : UUID.fromString(pClaimed);
-
-        if(!pMod_uuid.isEmpty()) {
-            this.response = new Response(pMod_uuid.isEmpty() ? null : UUID.fromString(pMod_uuid),
-                                         pMod_comment,
-                                         pMod_timestamp == 0 ? null : new Date(pMod_timestamp),
-                                         pDone == 2);
-        } else {
-            this.response = null;
-        }
-
-        this.elevated = pElevated == 1;
-        this.location = new Location(Bukkit.getWorld(world), x, y, z);
-        this.notes = Collections.emptyList();
-    }
-
     public static RequestBuilder.IDStep builder() {
         return RequestBuilder.builder();
     }
 
     public int getId() {
         return this.id;
-    }
-
-    @Deprecated
-    public String getUuid() {
-        return this.creator.toString();
-    }
-
-    @Deprecated
-    public String getClaimed() {
-        return this.owner != null ? this.owner.toString() : "";
-    }
-
-    @Deprecated
-    public String getMod_uuid() {
-        return hasResponse() ? response.getResponder().toString() : "";
-    }
-
-    @Deprecated
-    public int getDone() {
-        return hasResponse() ? (response.isSeen() ? 2 : 1) : 0;
-    }
-
-    @Deprecated
-    public int getElevated() {
-        return this.elevated ? 1 : 0;
-    }
-
-    @Deprecated
-    public String getWorld() {
-        return this.location.getWorld().getName();
-    }
-
-    @Deprecated
-    public int getY() {
-        return this.location.getBlockY();
-    }
-
-    @Deprecated
-    public int getX() {
-        return this.location.getBlockX();
-    }
-
-    @Deprecated
-    public int getZ() {
-        return this.location.getBlockZ();
-    }
-
-    @Deprecated
-    public long getTimestamp() {
-        return this.createTime.getTime();
-    }
-
-    @Deprecated
-    public long getMod_timestamp() {
-        return hasResponse() ? this.response.getTime().getTime() : 0;
-    }
-
-    @Deprecated
-    public String getRequest() {
-        return this.message;
-    }
-
-    @Deprecated
-    public String getMod_comment() {
-        return hasResponse() ? response.getMessage() : "";
     }
 
     public String getMessage() {
