@@ -42,7 +42,7 @@ public class RequestCollection extends ArrayList<Request> {
 	}
 
 	public Component toComponent(Player context) {
-		boolean isMod = context != null && context.hasPermission("modreq.mod") && context.hasPermission("modreq.admin");
+		boolean isMod = context != null && context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
 		Component result = Component.empty();
 		boolean first = true;
 
@@ -127,8 +127,8 @@ public class RequestCollection extends ArrayList<Request> {
 						replacements.put("responder", Messages.get("general.UNKNOWN-PLAYER"));
 					}
 
-					result = result.append(Component.newline());
 					result = result.append(Messages.get("player.list.ITEM-RESPONSE", replacements));
+					result = result.append(Component.newline());
 				}
 			}
 		}
