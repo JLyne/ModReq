@@ -224,6 +224,7 @@ public class Commands {
 	@CommandMethod("mr open <id>")
     @CommandDescription("Open the specified modreq")
 	@CommandPermission("modreq.mod")
+	@Confirmation
     private void commandClose(
             final @NonNull Player player,
             final @Argument("id") Integer id

@@ -121,7 +121,7 @@ public class Messages {
 
         setDefaultString("mod.action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
         setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
-        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id% show_text=Re-open this ModReq color=red)");
+        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](run_command=/mr open %id% show_text=Re-open this ModReq color=red)");
         setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id% show_text=Teleport to where this ModReq was created color=gold)");
         setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id% show_text=Claim this ModReq to indicate you are working on it color=gold)");
         setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id% show_text=Un-claim this ModReq to allow other mods to work on it color=gold)");
