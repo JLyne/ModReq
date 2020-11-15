@@ -39,28 +39,28 @@ public class Messages {
 
         cfg = YamlConfiguration.loadConfiguration(file);
 
-        setDefaultString("error.DATABASE-ERROR", "%prefix%[An error has occurred. please contact an administrator](red)");
-        setDefaultString("error.ID-ERROR", "%prefix%[ModReq #%id% does not exist](red)");
-        setDefaultString("error.NUMBER-ERROR", "%prefix%[%id% is not a valid number](red)");
-        setDefaultString("error.NOT-CLOSED", "%prefix%[ModReq is not closed](red)");
-        setDefaultString("error.ALREADY-CLOSED", "%prefix%[ModReq is already closed](red)");
-        setDefaultString("error.ALREADY-CLAIMED", "%prefix%[ModReq is already claimed](red)");
-        setDefaultString("error.NOT-CLAIMED", "%prefix%[ModReq is not claimed](red)");
-        setDefaultString("error.OTHER-CLAIMED", "%prefix%[ModReq has been claimed by someone else](red)");
-        setDefaultString("error.TELEPORT-ERROR", "%prefix%[An error has occurred while teleporting, Please contact an administrator.](red)");
-        setDefaultString("error.PAGE-ERROR", "%prefix%[Page %page% does not exist](red)");
-        setDefaultString("error.NOTE-DOES-NOT-EXIST", "%prefix%[This note id does not exist.](red)");
-        setDefaultString("error.NOTE-OTHER", "%prefix%[You did not create this note.](red)");
-        setDefaultString("error.MAX-OPEN-MODREQS", "%prefix%[You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
+        setDefaultString("error.DATABASE-ERROR", "%prefix% [An error has occurred. please contact an administrator](red)");
+        setDefaultString("error.ID-ERROR", "%prefix% [ModReq #%id% does not exist](red)");
+        setDefaultString("error.NUMBER-ERROR", "%prefix% [%id% is not a valid number](red)");
+        setDefaultString("error.NOT-CLOSED", "%prefix% [ModReq is not closed](red)");
+        setDefaultString("error.ALREADY-CLOSED", "%prefix% [ModReq is already closed](red)");
+        setDefaultString("error.ALREADY-CLAIMED", "%prefix% [ModReq is already claimed](red)");
+        setDefaultString("error.NOT-CLAIMED", "%prefix% [ModReq is not claimed](red)");
+        setDefaultString("error.OTHER-CLAIMED", "%prefix% [ModReq has been claimed by someone else](red)");
+        setDefaultString("error.TELEPORT-ERROR", "%prefix% [An error has occurred while teleporting, Please contact an administrator.](red)");
+        setDefaultString("error.PAGE-ERROR", "%prefix% [Page %page% does not exist](red)");
+        setDefaultString("error.NOTE-DOES-NOT-EXIST", "%prefix% [This note id does not exist.](red)");
+        setDefaultString("error.NOTE-OTHER", "%prefix% [You did not create this note.](red)");
+        setDefaultString("error.MAX-OPEN-MODREQS", "%prefix% [You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
+        setDefaultString("error.NO-PREVIOUS-SEARCH", "%prefix% [You have no previous search.](red) [\\[Start new Search\\]](suggest_command=/mr search  show_text=Start a new search color=gold)");
 
         setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white)");
         setDefaultString("general.OPEN", "[OPEN](green)");
         setDefaultString("general.CLOSED", "[CLOSED](red)");
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
-        setDefaultString("general.ELEVATED", " [\\[ADMIN\\]](show_text=This ModReq has been flagged for admin attention color=aqua");
+        setDefaultString("general.ELEVATED", " [\\[ADMIN\\]](show_text=This ModReq has been flagged for admin attention color=aqua)");
         setDefaultString("general.NOTES", " [\\[NOTES\\]](show_text=This ModReq has notes attached color=dark_red)");
-        setDefaultString("general.ON-JOIN-HEADER", "[----------](aqua)");
-        setDefaultString("general.HELP-LIST-MODREQS", "[----------](aqua) [\\[Show all\\]](gold) [----------](aqua)");
+        setDefaultString("general.ON-JOIN-HEADER", "%prefix% [Updates to your ModReqs](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
         setDefaultString("general.ONLINE-PLAYER", "[%player%](suggest_command=/w %player%  show_text=Click to whisper %player% color=green)");
@@ -77,7 +77,7 @@ public class Messages {
 
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
-        setDefaultString("player.notification.CREATED", "%prefix%[Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+        setDefaultString("player.notification.CREATED", "%prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
 
         setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
 
@@ -94,16 +94,16 @@ public class Messages {
         setDefaultString("player.info.LOCATION", "[%world% (%x% %y% %z%)](green)");
         setDefaultString("player.info.FOOTER", "");
 
-        setDefaultString("mod.JOIN", "%prefix%[%count%](#07a0ff) [ModReq(s) open](green) [\\[View\\]](run_command=/mr list show_text=View all open modreqs color=gold)");
+        setDefaultString("mod.JOIN", "%prefix% [%count%](#07a0ff) [ModReq(s) open](green) [\\[View\\]](run_command=/mr list show_text=View all open modreqs color=gold)");
 
         setDefaultString("mod.notification.CREATED", "%prefix% %actor% [created a new ModReq (%link%)](green) %view%");
         setDefaultString("mod.notification.CLAIMED", "%prefix% %link% [has been claimed by](gray) %actor% %view%");
         setDefaultString("mod.notification.UNCLAIMED", "%prefix% %link% [has been un-claimed by](gray) %actor% %view%");
         setDefaultString("mod.notification.ELEVATED", "%prefix% %link% [has been flagged for admin attention by](gray) %actor% %view%");
-        setDefaultString("mod.notification.UNELEVATED", "%prefix%[Admin flag has been removed from](gray) %link% [by](gray) %actor% %view%");
+        setDefaultString("mod.notification.UNELEVATED", "%prefix% [Admin flag has been removed from](gray) %link% [by](gray) %actor% %view%");
         setDefaultString("mod.notification.CLOSED", "%prefix% %link% [has been closed by](gray) %actor% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.REOPENED", "%prefix% %link% [has been re-opened by](gray) %actor% %view%");
-        setDefaultString("mod.notification.TELEPORTED", "%prefix%[Teleported to](gray) %link%");
+        setDefaultString("mod.notification.TELEPORTED", "%prefix% [Teleported to](gray) %link%");
         setDefaultString("mod.notification.NOTE-ADDED", "%prefix% %actor% [added a note to](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.NOTE-REMOVED", "%prefix% %actor% [removed a note from](gray) %link% %view%\n[Message: %message%](gray)");
 
@@ -155,6 +155,7 @@ public class Messages {
         if(cfg.getString(key) != null) {
             return new MineDown(cfg.getString(key))
                     .placeholderIndicator("%")
+                    .replace("prefix", new MineDownParser().parse(cfg.getString("general.PREFIX", "")).build())
                     .replace(replacements).toComponent();
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
@@ -175,6 +176,7 @@ public class Messages {
         if(cfg.getString(key) != null) {
             return new MineDown(cfg.getString(key))
                     .placeholderIndicator("%")
+                    .replace("prefix", new MineDownParser().parse(cfg.getString("general.PREFIX", "")).build())
                     .replace(replacements).toComponent();
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
@@ -194,6 +196,7 @@ public class Messages {
 
         if(cfg.getString(key) != null) {
             return new Replacer().placeholderIndicator("%")
+                    .replace("prefix", cfg.getString("general.PREFIX", ""))
                     .replace(replacements).replaceIn(cfg.getString(key));
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
