@@ -623,7 +623,7 @@ public class SqlDataSource implements DataSource {
 
 		ResultSet sqlres = pStatement.executeQuery();
 
-		while(!sqlres.isAfterLast()) {
+		while(sqlres.next()) {
 			int requestId = sqlres.getInt(2);
 			UUID creator = UUID.fromString(sqlres.getString(3));
 
@@ -633,7 +633,6 @@ public class SqlDataSource implements DataSource {
 
 			results.get(requestId).add(
 					new Note(sqlres.getInt(1), requestId, creator, sqlres.getString(4)));
-			sqlres.next();
 		}
 
 		sqlres.close();
