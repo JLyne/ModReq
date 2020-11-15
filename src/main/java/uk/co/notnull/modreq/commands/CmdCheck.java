@@ -66,8 +66,10 @@ public class CmdCheck {
 	private void sendList(Player player, RequestCollection requests) {
 		if(requests.isAfterLastPage()) {
 			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
+			return;
 		} else if (requests.isEmpty()) {
 			Messages.send(player, "mod.list.NO-RESULTS");
+			return;
 		}
 
 		Messages.send(player, "mod.list.HEADER", "count", String.valueOf(requests.getTotal()));

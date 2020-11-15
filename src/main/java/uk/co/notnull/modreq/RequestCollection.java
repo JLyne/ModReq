@@ -43,8 +43,15 @@ public class RequestCollection extends ArrayList<Request> {
 
 	public Component toComponent(Player context) {
 		Component result = Component.empty();
+		boolean first = true;
 
 		for(Request request: this) {
+			if(first) {
+				first = false;
+			} else {
+				result = result.append(Component.newline());
+			}
+
 			OfflinePlayer creator = Bukkit.getOfflinePlayer(request.getCreator());
 			OfflinePlayer owner = request.isClaimed() ? Bukkit.getOfflinePlayer(request.getOwner()) : null;
 			OfflinePlayer responder = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
@@ -102,8 +109,6 @@ public class RequestCollection extends ArrayList<Request> {
 					result = result.append(Messages.get("player.list.ITEM-RESPONSE", replacements));
 				}
 			}
-
-			result = result.append(Component.newline());
 		}
 
 		return result;
@@ -122,7 +127,7 @@ public class RequestCollection extends ArrayList<Request> {
 	}
 
 	public int getPage() {
-		return paginated ? (offset / ModReq.getPlugin().getConfiguration().getModreqs_per_page()) : 1;
+		return paginated ? (offset / ModReq.getPlugin().getConfiguration().getModreqs_per_page()) + 1 : 1;
 	}
 
 	public int getTotalPages() {
