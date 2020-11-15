@@ -3,10 +3,7 @@ package uk.co.notnull.modreq.listener;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import uk.co.notnull.modreq.Messages;
-import uk.co.notnull.modreq.ModReq;
-import uk.co.notnull.modreq.Request;
-import uk.co.notnull.modreq.RequestCollection;
+import uk.co.notnull.modreq.*;
 
 public class PlayerJoin {
     private final ModReq plugin;
@@ -20,7 +17,9 @@ public class PlayerJoin {
     }
 
     public void joinChecks(Player player) {
-        plugin.getRequestRegistry().getUnseenClosed(player, true).thenAcceptAsync((RequestCollection requests) -> {
+        RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
+
+        plugin.getRequestRegistry().getAll(query).thenAcceptAsync((RequestCollection requests) -> {
             if(requests.isEmpty()) {
                 return;
             }
@@ -46,7 +45,7 @@ public class PlayerJoin {
         });
 
         if(player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin")) {
-            plugin.getRequestRegistry().getOpenCount(player.hasPermission("modreq.admin")).thenAcceptAsync((Integer count) -> {
+            plugin.getRequestRegistry().getCount(RequestQuery.open()).thenAcceptAsync((Integer count) -> {
                 if(count == 0) {
                     return;
                 }

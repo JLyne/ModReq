@@ -121,73 +121,35 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Returns a collection containing all open requests, optionally including elevated requests
-	 * @param includeElevated Whether to include elevated requests
+	 * Returns a collection containing all requests which match the given query
+	 * @param query The query to match against
 	 * @return Future completed with a collection of results if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getAllOpen(boolean includeElevated) {
-		return makeFuture(() -> plugin.getDataSource().getAllOpenRequests(includeElevated));
+	public CompletableFuture<RequestCollection> getAll(RequestQuery query) {
+		return makeFuture(() -> plugin.getDataSource().getAllRequests(query));
 	}
 
 	/**
-	 * Returns a collection containing a page of open requests, optionally including elevated requests
-	 * The results to include will be determined by the page provided, and the configuration option for requests per page
-	 * @param page The page of results to return. An empty collection with isAfterLastPage() == true
-	 *             will be returned if this page doesn't exist.
-	 * @param includeElevated Whether to include elevated requests
-	 * @return Future completed with a collection of results if successful. The collection may be empty if there aren't
-	 *         sufficient open requests to reach the requested page.
-	 *         Future completed exceptionally if a storage error occurs.
-	 */
-	public CompletableFuture<RequestCollection> getOpen(int page, boolean includeElevated) {
-		if(page < 1) {
-			throw new IllegalArgumentException("Page cannot be less than 1");
-		}
-
-		return makeFuture(() -> plugin.getDataSource().getOpenRequests(includeElevated, page));
-	}
-
-	/**
-	 * Returns a collection containing the a page of open requests created by the given player.
-	 * @param player The player to retrieve the created requests for
+	 * Returns a collection containing the given page of requests, which match the given query
+	 * @param query The query to match against
+	 * @param page The page to return. Will return an empty collection with isAfterLastPage() == true,
+	 *                if there are not enough results
 	 * @return Future completed with a collection of results if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getOpen(Player player, int page) {
-		return makeFuture(() -> plugin.getDataSource().getOpenRequests(player, page));
+	public CompletableFuture<RequestCollection> get(RequestQuery query, int page) {
+		return makeFuture(() -> plugin.getDataSource().getRequests(query, page));
 	}
 
 	/**
-	 * Returns a collection containing all the requests with the specified text in the request message
-	 * @param search The tect to search for
-	 * @param page The page of results to return. An empty collection with isAfterLastPage() == true
-	 *             will be returned if this page doesn't exist.
-	 * @return Future completed with a collection of results if successful.
+	 * Returns the number of requests in storage, which match the given query
+	 * @param query The query to match against
+	 * @return Future completed with the number of matching requests if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> search(String search, int page) {
-		return makeFuture(() -> plugin.getDataSource().searchRequests(search, page));
-	}
-
-	/**
-	 * Returns the number of currently open requests, optionally including elevated requests.
-	 * @param includeElevated Whether to include elevated requests
-	 * @return Future completed with the request count if successful.
-	 *         Future completed exceptionally if a storage error occurs.
-	 */
-	public CompletableFuture<Integer> getOpenCount(boolean includeElevated) {
-		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(includeElevated));
-	}
-
-	/**
-	 * Returns the number of currently open requests, created by the given player.
-	 * @param player The player to count the created requests for
-	 * @return Future completed with the request count if successful.
-	 *         Future completed exceptionally if a storage error occurs.
-	 */
-	public CompletableFuture<Integer> getOpenCount(Player player) {
-		return makeFuture(() -> plugin.getDataSource().getOpenRequestCount(player));
+	public CompletableFuture<Integer> getCount(RequestQuery query) {
+		return makeFuture(() -> plugin.getDataSource().getRequestCount(query));
 	}
 
 	/**
@@ -229,9 +191,10 @@ public class RequestRegistry {
 	 * @return Future completed with the request count if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getUnseenClosed(Player player, boolean markSeen) {
+	public CompletableFuture<RequestCollection> getUnseen(Player player, boolean markSeen) {
 		return makeFuture(() -> {
-			RequestCollection requests = plugin.getDataSource().getUnseenClosedRequests(player);
+			RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
+			RequestCollection requests = plugin.getDataSource().getAllRequests(query);
 
 			if(markSeen) {
 				return plugin.getDataSource().markRequestsAsSeen(requests);

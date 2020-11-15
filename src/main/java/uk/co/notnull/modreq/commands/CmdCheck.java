@@ -15,14 +15,12 @@ public class CmdCheck {
 	}
 
 	public void checkOpenModreqs(final Player player, final int page) {
-    	boolean includeElevated = player.hasPermission("modreq.admin");
-
 		if(page < 1) {
 			Messages.send(player, "error.NUMBER-ERROR", "id", String.valueOf(page));
 			return;
 		}
 
-		plugin.getRequestRegistry().getOpen(page, includeElevated).thenAcceptAsync(requests -> {
+		plugin.getRequestRegistry().get(RequestQuery.open(), page).thenAcceptAsync(requests -> {
 			sendList(player, requests);
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
@@ -56,7 +54,7 @@ public class CmdCheck {
 			return;
 		}
 
-		plugin.getRequestRegistry().search(search, page).thenAcceptAsync(requests -> {
+		plugin.getRequestRegistry().get(new RequestQuery().search(search), page).thenAcceptAsync(requests -> {
 			sendList(player, requests);
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");

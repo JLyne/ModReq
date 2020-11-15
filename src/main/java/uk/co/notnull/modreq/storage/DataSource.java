@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Note;
 import uk.co.notnull.modreq.Request;
 import uk.co.notnull.modreq.RequestCollection;
+import uk.co.notnull.modreq.RequestQuery;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -14,13 +15,11 @@ public interface DataSource {
 	boolean init();
 	void destroy();
 
-
 	boolean requestExists(int id) throws Exception;
 
-	RequestCollection getAllOpenRequests(boolean includeElevated) throws Exception;
-	RequestCollection getOpenRequests(boolean includeElevated, int page) throws Exception;
-	RequestCollection getOpenRequests(Player player, int page) throws Exception;
-	RequestCollection searchRequests(String search, int page) throws Exception;
+	RequestCollection getAllRequests(RequestQuery query) throws Exception;
+	RequestCollection getRequests(RequestQuery query, int page) throws Exception;
+	int getRequestCount(RequestQuery query) throws Exception;
 	Request getRequest(int id) throws Exception;
 	Request elevateRequest(Request request, boolean elevated) throws Exception;
 	Request reopenRequest(Request request) throws Exception;
@@ -28,9 +27,6 @@ public interface DataSource {
 	Request unclaim(Request request) throws Exception;
 	Request closeRequest(Request request, Player mod, String message) throws Exception;
 	Request createRequest(Player player, String message) throws Exception;
-	int getOpenRequestCount(boolean includeElevated) throws Exception;
-	int getOpenRequestCount(Player player) throws Exception;
-	RequestCollection getUnseenClosedRequests(Player player) throws Exception;
 	RequestCollection markRequestsAsSeen(RequestCollection ids) throws Exception;
 	Note addNoteToRequest(Request request, Player player, String note) throws Exception;
 	boolean removeNote(Note note) throws Exception;

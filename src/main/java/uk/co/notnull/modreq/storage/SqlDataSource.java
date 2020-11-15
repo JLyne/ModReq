@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import uk.co.notnull.modreq.*;
 
 import java.io.File;
@@ -131,6 +132,54 @@ public class SqlDataSource implements DataSource {
 		pStatement.close();
 
 		return exists;
+	}
+
+	public RequestCollection getAllRequests(RequestQuery query) throws SQLException {
+		PreparedStatement statement = getQuery(query, null);
+		ResultSet results = statement.executeQuery();
+
+		RequestCollection collection = createRequestCollection(results);
+
+		statement.close();
+		results.close();
+
+		return collection;
+	}
+
+	public RequestCollection getRequests(RequestQuery query, int page) throws SQLException {
+		int offset = (page - 1) * cfg.getModreqs_per_page();
+		int count = getRequestCount(query);
+		RequestCollectionBuilder builder = RequestCollection.builder().paginated(offset, count);
+
+		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
+			return builder.build();
+		}
+
+		PreparedStatement statement = getQuery(query, page);
+		ResultSet results = statement.executeQuery();
+		RequestCollection collection = populateRequestCollection(builder, results);
+
+		statement.close();
+		results.close();
+
+		return collection;
+	}
+
+	public int getRequestCount(RequestQuery query) throws SQLException {
+		PreparedStatement statement = getCountQuery(query);
+		ResultSet sqlres = statement.executeQuery();
+
+		if(!sqlres.next()) {
+			sqlres.close();
+			statement.close();
+			throw new SQLException("Invalid response");
+		}
+
+		int count = sqlres.getInt(1);
+		sqlres.close();
+		statement.close();
+
+		return count;
 	}
 
 	public Request getRequest(int id) throws SQLException {
@@ -321,121 +370,122 @@ public class SqlDataSource implements DataSource {
 				.build();
 	}
 
-	public RequestCollection getAllOpenRequests(boolean includeElevated) throws SQLException {
+	private PreparedStatement getCountQuery(RequestQuery query) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement;
-		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'";
 
-		if(!includeElevated) {
-			sql += " AND elevated = '0'";
+		String sql = "SELECT COUNT(*) FROM modreq WHERE ";
+		List<Object> parameters = new ArrayList<>();
+
+		sql += buildWhere(query, parameters);
+
+		System.out.println(sql);
+
+		PreparedStatement statement = connection.prepareStatement(sql);
+
+		for(int i = 0; i < parameters.size(); i++) {
+			statement.setObject(i + 1, parameters.get(i));
 		}
 
-		pStatement = connection.prepareStatement(sql);
-
-		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createRequestCollection(sqlres);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
+		return statement;
 	}
 
-	public RequestCollection getOpenRequests(boolean includeElevated, int page) throws SQLException {
+	private PreparedStatement getQuery(RequestQuery query, @Nullable Integer page) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement;
 
-		int offset = (page - 1) * cfg.getModreqs_per_page();
-		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0'";
+		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE ";
+		List<Object> parameters = new ArrayList<>();
 
-		if(!includeElevated) {
-			sql += " AND elevated = '0'";
+		sql += buildWhere(query, parameters);
+		sql += " ORDER BY done ASC, timestamp DESC";
+
+		if(page != null) {
+			sql += " LIMIT ?,?";
+
+			parameters.add((page - 1) * cfg.getModreqs_per_page()); //Offset
+			parameters.add(cfg.getModreqs_per_page()); //Limit
 		}
 
-		sql += " LIMIT ?,?";
+		System.out.println(sql);
 
-		int count = getOpenRequestCount(includeElevated);
+		PreparedStatement statement = connection.prepareStatement(sql);
 
-		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
-			return RequestCollection.builder().paginated(offset, count).build();
+		for(int i = 0; i < parameters.size(); i++) {
+			statement.setObject(i + 1, parameters.get(i));
 		}
 
-		pStatement = connection.prepareStatement(sql);
-		pStatement.setInt(1, offset);
-		pStatement.setInt(2, cfg.getModreqs_per_page());
-
-		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createPaginatedRequestCollection(sqlres, offset, count);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
+		return statement;
 	}
 
-	public RequestCollection getOpenRequests(Player player, int page) throws SQLException {
-		Connection connection = getConnection();
+	private String buildWhere(RequestQuery query, List<Object> parameters) {
+		List<String> where = new ArrayList<>();
 
-		int offset = (page - 1) * cfg.getModreqs_per_page();
-		int count = getOpenRequestCount(player);
+		if(query.hasIds()) {
+			List<Integer> ids = query.getIds();
+			parameters.addAll(ids);
 
-		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
-			return RequestCollection.builder().paginated(offset, count).build();
+			if(ids.size() == 1) {
+				where.add("id = ?");
+			} else {
+				where.add(buildIn("id ", ids.size()));
+			}
 		}
 
-		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done='0' AND uuid=? LIMIT ?,?");
-		pStatement.setString(1, player.getUniqueId().toString());
-		pStatement.setInt(2, (page - 1) * cfg.getModreqs_per_page());
-		pStatement.setInt(3, cfg.getModreqs_per_page());
+		if(query.hasCreators()) {
+			List<UUID> creators = query.getCreators();
+			parameters.addAll(creators.stream().map(UUID::toString).collect(Collectors.toList()));
 
-		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createPaginatedRequestCollection(sqlres, page, count);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
-	}
-
-	public int getOpenRequestCount(boolean includeElevated) throws SQLException {
-		Connection connection = getConnection();
-		PreparedStatement pStatement;
-
-		if(includeElevated) {
-			pStatement= connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0'");
-		} else {
-			pStatement= connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE done='0' AND elevated='0'");
+			if(creators.size() == 1) {
+				where.add("uuid = ?");
+			} else {
+				where.add(buildIn("uuid ", creators.size()));
+			}
 		}
 
-		int count = getCount(pStatement);
-		pStatement.close();
+		if(query.hasResponders()) {
+			List<UUID> responders = query.getResponders();
+			parameters.addAll(responders.stream().map(UUID::toString).collect(Collectors.toList()));
 
-		return count;
+			if(responders.size() == 1) {
+				where.add("mod_uuid = ?");
+			} else {
+				where.add(buildIn("mod_uuid ", responders.size()));
+			}
+		}
+
+		if(query.hasOwners()) {
+			List<UUID> owners = query.getOwners();
+			parameters.addAll(owners.stream().map(UUID::toString).collect(Collectors.toList()));
+
+			if(owners.size() == 1) {
+				where.add("claimed = ?");
+			} else {
+				where.add(buildIn("claimed ", owners.size()));
+			}
+		}
+
+		if(query.hasStatuses()) {
+			List<RequestStatus> statuses = query.getStatuses();
+			parameters.addAll(statuses.stream().map(RequestStatus::ordinal).collect(Collectors.toList()));
+
+			if(statuses.size() == 1) {
+				where.add("done = ?");
+			} else {
+				where.add(buildIn("done ", statuses.size()));
+			}
+		}
+
+		if(query.hasSearch()) {
+			parameters.add("%" + query.getSearch() + "%");
+
+			where.add("request LIKE ?");
+		}
+
+		return String.join(" AND ", where);
 	}
 
-	public int getOpenRequestCount(Player player) throws SQLException {
-		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("SELECT COUNT(id) FROM modreq WHERE uuid=? AND done='0'");
-		pStatement.setString(1, player.getUniqueId().toString());
-
-		int count = getCount(pStatement);
-		pStatement.close();
-
-		return count;
-	}
-
-	public RequestCollection getUnseenClosedRequests(Player player) throws SQLException {
-		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE done=1 AND uuid=?");
-		pStatement.setString(1, player.getUniqueId().toString());
-		ResultSet sqlres = pStatement.executeQuery();
-
-		RequestCollection requests = createRequestCollection(sqlres);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
+	private String buildIn(String sql, int count) {
+		sql += "IN(?" + ",?".repeat(Math.max(0, count - 1)) + ")";
+		return sql;
 	}
 
 	public RequestCollection markRequestsAsSeen(RequestCollection requests) throws SQLException {
@@ -477,37 +527,6 @@ public class SqlDataSource implements DataSource {
 		).collect(Collectors.toList());
 
 		return requests.toBuilder().requests(results).build();
-	}
-
-	public RequestCollection searchRequests(String search, int page) throws SQLException {
-		Connection connection = getConnection();
-
-		int offset = cfg.getModreqs_per_page() * page;
-		String countSql = "SELECT COUNT(*) FROM modreq WHERE request LIKE ?";
-		String sql = "SELECT id,uuid,request,timestamp,world,x,y,z,claimed,mod_uuid,mod_comment,mod_timestamp,done,elevated FROM modreq WHERE request LIKE ? ORDER BY done DESC, timestamp DESC LIMIT ?,?";
-
-		PreparedStatement pStatement = connection.prepareStatement(countSql);
-		pStatement.setString(1, "%" + search +"%"); //TODO: Full text search?
-
-		int count = getCount(pStatement);
-		pStatement.close();
-
-		if(count == 0 || count < ((cfg.getModreqs_per_page() * (page - 1)) + 1)) {
-			return RequestCollection.builder().paginated(offset, count).build();
-		}
-
-		pStatement = connection.prepareStatement(sql);
-		pStatement.setString(1, "%" + search +"%"); //TODO: Full text search?
-		pStatement.setInt(2, (page - 1) * cfg.getModreqs_per_page()); //TODO: Full text search?
-		pStatement.setInt(3, cfg.getModreqs_per_page()); //TODO: Full text search?
-
-		ResultSet sqlres = pStatement.executeQuery();
-		RequestCollection requests = createPaginatedRequestCollection(sqlres, page, count);
-
-		sqlres.close();
-		pStatement.close();
-
-		return requests;
 	}
 
 	public List<Note> getNotesForRequest(Request request) throws SQLException {

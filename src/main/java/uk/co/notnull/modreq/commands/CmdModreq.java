@@ -16,7 +16,9 @@ public class CmdModreq {
     public void modreq(final Player player, final String message) {
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
 
-        plugin.getRequestRegistry().getOpenCount(player).thenComposeAsync((Integer count) -> {
+        RequestQuery query = RequestQuery.open().creator(player.getUniqueId());
+
+        plugin.getRequestRegistry().getCount(query).thenComposeAsync((Integer count) -> {
             if(count >= plugin.getConfiguration().getMax_open_modreqs()) {
 
                 Messages.send(player, "error.MAX-OPEN-MODREQS", "max",
@@ -43,7 +45,9 @@ public class CmdModreq {
 			return;
 		}
 
-		plugin.getRequestRegistry().getOpen(player, page).thenAcceptAsync(requests -> {
+        RequestQuery query = RequestQuery.open().creator(player.getUniqueId());
+
+		plugin.getRequestRegistry().get(query, page).thenAcceptAsync(requests -> {
 			sendList(player, requests);
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
