@@ -209,7 +209,7 @@ public class Request {
 
             for(int i = 0; i < notes.size(); i++) {
                 Note note = notes.get(i);
-                OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(getCreator());
+                OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(note.getCreator());
                 String creatorName;
 
                 if (noteCreator.getName() != null) {
