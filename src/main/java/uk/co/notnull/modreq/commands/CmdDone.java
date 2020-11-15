@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
 
 public class CmdDone {
@@ -53,10 +54,7 @@ public class CmdDone {
                 plugin.playSound(creator);
             }
 
-            Messages.sendToMods("player.notification.CLOSED",
-                                "actor", player.getName(),
-                                "id", String.valueOf(id),
-                                "message", message);
+            Messages.sendModNotification(NotificationType.CLOSED, player, result, "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;

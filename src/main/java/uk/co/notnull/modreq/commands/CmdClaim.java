@@ -6,6 +6,7 @@ import java.util.function.Function;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
 
 public class CmdClaim {
@@ -57,9 +58,9 @@ public class CmdClaim {
             }
         }).thenAcceptAsync((Request result) -> {
             if(result.isClaimed()) {
-                Messages.sendToMods("mod.notification.CLAIMED", "actor", player.getName(), "id", String.valueOf(id));
+                Messages.sendModNotification(NotificationType.CLAIMED, player, result);
             } else {
-                Messages.sendToMods("mod.notification.UNCLAIMED", "actor", player.getName(), "id", String.valueOf(id));
+                Messages.sendModNotification(NotificationType.UNCLAIMED, player, result);
             }
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");

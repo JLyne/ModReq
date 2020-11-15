@@ -9,6 +9,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.util.MineDown;
@@ -52,6 +53,7 @@ public class Messages {
         setDefaultString("error.NOTE-OTHER", "&cError: You did not write this note.");
         setDefaultString("error.MAX-OPEN-MODREQS", "&cYou cannot open more than &4%max &cModReq(s) at the same time.");
 
+        setDefaultString("general.PREFIX", "[\\[MODREQ\\]](color=red format=bold)");
         setDefaultString("general.OPEN", "&aOPEN");
         setDefaultString("general.CLOSED", "&cCLOSED");
         setDefaultString("general.CLAIMED", "&eCLAIMED (%actor)");
@@ -60,13 +62,13 @@ public class Messages {
         setDefaultString("general.DONE-MESSAGE", "&7Message: %message");
         setDefaultString("general.ON-JOIN-HEADER", "&b-=-=- -=-=-");
         setDefaultString("general.HELP-LIST-MODREQS", "&b-=-=- List your last ModReqs: /modreq -=-=-");
-        setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy 'at' HH:mm:ss");
+        setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
         setDefaultString("general.ONLINE-PLAYER", "&a%player");
         setDefaultString("general.OFFLINE-PLAYER", "&c%player");
         setDefaultString("general.UNKNOWN-PLAYER", "&cUnknown");
 
-        setDefaultString("player.notification.CLOSED", "&2%actor &ahas closed your ModReq (%id).\n&7Message: %message");
+        setDefaultString("player.notification.CLOSED", "%actor &ahas closed your ModReq (%id).\n&7Message: %message");
         setDefaultString("player.notification.CREATED", "&aYour ModReq has been sent to the staff members. Please be patient.");
 
         setDefaultString("player.list.HEADER", "&b-=-=- Last %count ModReq(s) -=-=-");
@@ -75,16 +77,16 @@ public class Messages {
         setDefaultString("player.list.FOOTER", "&b -=-=- New ModReq: /modreq <request> -=-=-");
         setDefaultString("player.list.NO-RESULTS", "&bYou have no open ModReqs. New ModReq: /modreq <request>");
 
-        setDefaultString("mod.notification.CREATED", "&4&l[MODREQ] &aNew ModReq. Write &2/check %id &ato get more information.");
-        setDefaultString("mod.notification.CLAIMED", "&aModReq &2#%id &ahas been claimed by &2%actor&a.");
-        setDefaultString("mod.notification.UNCLAIMED", "&aModReq &2#%id &ahas been un-claimed by &2%actor&a.");
-        setDefaultString("mod.notification.ELEVATED", "&aModReq &2#%id &ahas been flagged for admin attention by &2%actor&a.");
-        setDefaultString("mod.notification.UNELEVATED", "&aAdmin flag has been removed from ModReq &2#%id &aby &2%actor&a.");
-        setDefaultString("mod.notification.CLOSED", "&aModReq &2#%id &ahas been closed by &2%actor&a.");
-        setDefaultString("mod.notification.REOPENED", "&aModReq &2#%id &ahas been re-opened by &2%actor&a.");
+        setDefaultString("mod.notification.CREATED", "&a%actor created a new ModReq (#%id). %view");
+        setDefaultString("mod.notification.CLAIMED", "&2#%id &ahas been claimed by %actor. %view");
+        setDefaultString("mod.notification.UNCLAIMED", "&2#%id &ahas been un-claimed by %actor. %view");
+        setDefaultString("mod.notification.ELEVATED", "&2#%id &ahas been flagged for admin attention by %actor. %view");
+        setDefaultString("mod.notification.UNELEVATED", "&aAdmin flag has been removed from &2#%id &aby %actor. %view");
+        setDefaultString("mod.notification.CLOSED", "&2#%id &ahas been closed by %actor.\nMessage: %message\n%view");
+        setDefaultString("mod.notification.REOPENED", "&2#%id &ahas been re-opened by %actor. %view");
         setDefaultString("mod.notification.TELEPORTED", "&aTeleported to &2#%id&a.");
-        setDefaultString("mod.notification.NOTE-ADDED", "&2%actor &aadded a note to ModReq &2#%id&a:\n&7%message");
-        setDefaultString("mod.notification.NOTE-REMOVED", "&2%actor &aremoved a note from ModReq &2#%id&a:\n&7%message");
+        setDefaultString("mod.notification.NOTE-ADDED", "&a%actor added a note to &2#%id&a:\n&7%message\n%view");
+        setDefaultString("mod.notification.NOTE-REMOVED", "&a%actor removed a note from &2#%id&a:\n&7%message\n%view");
 
         setDefaultString("mod.info.REQUEST", "&e[ModReq %id - %status](aqua)\nFiled by [%creator](green) on %date at [%location](green).\n[Message: %message](gray)");
         setDefaultString("mod.info.RESPONSE", "[Answered by](yellow) [%responder](green) [on](yellow) [%response_date](green)\n[Message: %response](gray)");
@@ -96,14 +98,15 @@ public class Messages {
         setDefaultString("mod.list.FOOTER", "&b-=-=- Page %page of %allpages -=-=-");
         setDefaultString("mod.list.NO-RESULTS", "&aThere are no open ModReqs.");
 
-        setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id  show_text=Close this ModReq)");
-        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id show_text=Re-open this ModReq)");
-        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id show_text=Teleport to where this ModReq was created)");
-        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id show_text=Claim this ModReq to indicate you are working on it)");
-        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id show_text=Un-claim this ModReq to allow other mods to work on it)");
-        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention)");
-        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq)");
-        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id  show_text=Add a note to this ModReq. Notes are only visible to staff.)");
+        setDefaultString("mod.action.VIEW","[\\[View\\]](run_command=/mr info %id show_text=Show the details of this ModReq color=gold)");
+        setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id  show_text=Close this ModReq color=red)");
+        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id show_text=Re-open this ModReq color=green)");
+        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id show_text=Teleport to where this ModReq was created color=green)");
+        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id show_text=Claim this ModReq to indicate you are working on it color=green)");
+        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id show_text=Un-claim this ModReq to allow other mods to work on it color=green)");
+        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id show_text=Flag this ModReq for admin attention color=green)");
+        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id show_text=Remove the admin flag from this ModReq color=green)");
+        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id  show_text=Add a note to this ModReq. Notes are only visible to staff. color=green)");
 
         try {
             cfg.save(file);
@@ -222,15 +225,34 @@ public class Messages {
 
     /**
      * Send a language string to all online players with mod permissions
-     * @param key The key for the language string to send
+     * @param action The action to notify about
+     * @param actor The player who performed the action
+     * @param request The request that was acted on
      * @param replacements A list of placeholders and their replacements
      */
-    public static void sendToMods(String key, String ...replacements) {
+    public static void sendModNotification(NotificationType action, OfflinePlayer actor, Request request, String ...replacements) {
         Component message;
+        String key = "mod.notification." + action.toString();
 
         if(cfg.getString(key) != null) {
+            String username;
+
+            if(actor.getName() != null) {
+                if (actor.isOnline()) {
+                    username = Messages.getString("general.ONLINE-PLAYER","player", actor.getName());
+                } else {
+                    username = Messages.getString("general.OFFLINE-PLAYER", "player", actor.getName());
+                }
+            } else {
+                username = Messages.getString("general.UNKNOWN-PLAYER");
+            }
+
             message = new MineDown(cfg.getString(key))
                     .placeholderPrefix("%").placeholderSuffix("")
+                    .replace("id", String.valueOf(request.getId()),
+                             "actor", username,
+                             "view", Messages.getString("mod.action.VIEW",
+                                                        "id", String.valueOf(request.getId())))
                     .replace(replacements).toComponent();
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);

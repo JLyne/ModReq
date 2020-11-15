@@ -6,10 +6,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.bukkit.entity.Player;
-import uk.co.notnull.modreq.Messages;
-import uk.co.notnull.modreq.ModReq;
-import uk.co.notnull.modreq.Note;
-import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.*;
 
 public class CmdNote {
     private final ModReq plugin;
@@ -19,26 +16,28 @@ public class CmdNote {
     }
 
     public void addNote(final Player player, final int id, final String message) {
+        AtomicReference<Request> request = new AtomicReference<>();
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
-        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
-            if(request == null) {
+
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
+            request.set(result);
+
+            if(result == null) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-            if(request.isClosed()) {
+            if(result.isClosed()) {
                 Messages.send(player, "error.ALREADY-CLOSED");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-            return plugin.getRequestRegistry().addNote(request, player, message);
+            return plugin.getRequestRegistry().addNote(result, player, message);
         }).thenAccept((Note note) -> {
-            Messages.sendToMods("mod.notification.NOTE-ADDED",
-                                "actor", player.getName(),
-                                "id", String.valueOf(id),
-                                "message", message);
+            Messages.sendModNotification(NotificationType.NOTE_ADDED, player, request.get(),
+                                         "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
@@ -47,22 +46,25 @@ public class CmdNote {
 
     public void removeNote(final Player player, final int id, final int noteId) {
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
+        AtomicReference<Request> request = new AtomicReference<>();
         AtomicReference<Note> note = new AtomicReference<>();
 
-        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
-            if(request == null) {
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
+            request.set(result);
+
+            if(result == null) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-            if(request.isClosed()) {
+            if(result.isClosed()) {
                 Messages.send(player, "error.ALREADY-CLOSED");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-             return plugin.getRequestRegistry().getNotes(request);
+             return plugin.getRequestRegistry().getNotes(result);
         }).thenComposeAsync((List<Note> notes) -> {
             note.set(notes.get(noteId));
 
@@ -80,10 +82,8 @@ public class CmdNote {
 
             return plugin.getRequestRegistry().removeNote(note.get());
         }).thenAcceptAsync((Boolean result) -> {
-            Messages.sendToMods("mod.notification.NOTE-REMOVED",
-                                "actor", player.getName(),
-                                "id", String.valueOf(id),
-                                "message", note.get().getMessage());
+            Messages.sendModNotification(NotificationType.NOTE_REMOVED, player, request.get(),
+                                         "message", note.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;

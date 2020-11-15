@@ -6,6 +6,7 @@ import java.util.function.Function;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
 
 public class CmdElevate {
@@ -33,8 +34,8 @@ public class CmdElevate {
 				return new CompletableFuture<>();
             }
         }).thenAcceptAsync((Request result) -> {
-            String message = "mod.notification." + (result.isElevated() ? "ELEVATED" : "UNELEVATED");
-            Messages.sendToMods(message, "actor", player.getName(), "id", String.valueOf(id));
+            NotificationType type = result.isElevated() ? NotificationType.ELEVATED : NotificationType.UNELEVATED;
+            Messages.sendModNotification(type, player, result);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");

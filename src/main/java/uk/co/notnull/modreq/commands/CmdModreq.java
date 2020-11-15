@@ -4,10 +4,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.bukkit.entity.Player;
-import uk.co.notnull.modreq.Messages;
-import uk.co.notnull.modreq.ModReq;
-import uk.co.notnull.modreq.Request;
-import uk.co.notnull.modreq.RequestCollection;
+import uk.co.notnull.modreq.*;
 
 public class CmdModreq {
     private final ModReq plugin;
@@ -32,7 +29,7 @@ public class CmdModreq {
             return plugin.getRequestRegistry().create(player, message);
         }).thenAcceptAsync((Request request) -> {
             Messages.send(player, "player.REQUEST-FILED");
-            Messages.sendToMods("mod.notification.CREATED", "id", String.valueOf(request.getId()));
+            Messages.sendModNotification(NotificationType.CREATED, player, request);
             plugin.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
