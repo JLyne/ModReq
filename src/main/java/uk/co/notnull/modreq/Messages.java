@@ -54,7 +54,7 @@ public class Messages {
         setDefaultString("error.NOTE-OTHER", "%prefix%[You did not create this note.](red)");
         setDefaultString("error.MAX-OPEN-MODREQS", "%prefix%[You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
 
-        setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white) ");
+        setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white)");
         setDefaultString("general.OPEN", "[OPEN](green)");
         setDefaultString("general.CLOSED", "[CLOSED](red)");
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
