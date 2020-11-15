@@ -60,8 +60,8 @@ public class Messages {
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%actor\\)](gold)");
         setDefaultString("general.ELEVATED", "[\\[ADMIN\\]](aqua)");
         setDefaultString("general.NOTES", "[\\[NOTES\\]](dark_red)");
-        setDefaultString("general.ON-JOIN-HEADER", "[-=-=- -=-=-](aqua)");
-        setDefaultString("general.HELP-LIST-MODREQS", "[-=-=- List your last ModReqs: /modreq -=-=-](aqua)");
+        setDefaultString("general.ON-JOIN-HEADER", "[----------](aqua)");
+        setDefaultString("general.HELP-LIST-MODREQS", "[----------](aqua) [\\[Show all\\]](gold) [----------](aqua)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
         setDefaultString("general.ONLINE-PLAYER", "[%player](suggest_command=/w %player  show_text=Click to whisper %player color=green)");
@@ -86,15 +86,15 @@ public class Messages {
         setDefaultString("player.info.FOOTER", "");
 
         setDefaultString("mod.notification.CREATED", "%prefix %actor [created a new ModReq](green) (%link). %view");
-        setDefaultString("mod.notification.CLAIMED", "%prefix %link [has been claimed by](green) %actor. %view");
-        setDefaultString("mod.notification.UNCLAIMED", "%prefix %link [has been un-claimed by](green) %actor. %view");
-        setDefaultString("mod.notification.ELEVATED", "%prefix %link [has been flagged for admin attention by](green) %actor. %view");
-        setDefaultString("mod.notification.UNELEVATED", "%prefix [Admin flag has been removed from](green) %link [by](green) %actor. %view");
+        setDefaultString("mod.notification.CLAIMED", "%prefix %link [has been claimed by](gray) %actor. %view");
+        setDefaultString("mod.notification.UNCLAIMED", "%prefix %link [has been un-claimed by](gray) %actor. %view");
+        setDefaultString("mod.notification.ELEVATED", "%prefix %link [has been flagged for admin attention by](gray) %actor. %view");
+        setDefaultString("mod.notification.UNELEVATED", "%prefix [Admin flag has been removed from](gray) %link [by](gray) %actor. %view");
         setDefaultString("mod.notification.CLOSED", "%prefix %link has been closed by %actor.\n[Message: %message](gray)\n%view");
-        setDefaultString("mod.notification.REOPENED", "%prefix %link [has been re-opened by](green) %actor. %view");
+        setDefaultString("mod.notification.REOPENED", "%prefix %link [has been re-opened by](gray) %actor. %view");
         setDefaultString("mod.notification.TELEPORTED", "%prefix [Teleported to](green) %link.");
-        setDefaultString("mod.notification.NOTE-ADDED", "%prefix %actor [added a note to](green) %link. %view\n[Message: %message](gray)");
-        setDefaultString("mod.notification.NOTE-REMOVED", "%prefix %actor [removed a note from](green) %link. %view\n[Message: %message](gray)");
+        setDefaultString("mod.notification.NOTE-ADDED", "%prefix %actor [added a note to](gray) %link. %view\n[Message: %message](gray)");
+        setDefaultString("mod.notification.NOTE-REMOVED", "%prefix %actor [removed a note from](gray) %link. %view\n[Message: %message](gray)");
 
         setDefaultString("mod.info.HEADER", "[----------](color=aqua format=bold) #%id - %status [----------](color=aqua format=bold)");
         setDefaultString("mod.info.REQUEST", "&e[#%id - %status](aqua)\nCreated by [%creator](green) on %date at [%location](green).\n[Message: %message](gray)");
