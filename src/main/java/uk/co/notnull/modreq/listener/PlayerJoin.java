@@ -36,6 +36,8 @@ public class PlayerJoin {
                             .replace("actor", Messages.getPlayer(mod))
                             .replace("link", Messages.get("general.REQUEST-LINK",
                                                           "id", String.valueOf(request.getId())))
+                            .replace("view", Messages.get("player.action.VIEW",
+                                                          "id", String.valueOf(request.getId())))
                             .toComponent());
             }
 
