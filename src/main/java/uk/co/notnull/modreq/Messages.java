@@ -57,9 +57,9 @@ public class Messages {
         setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white) ");
         setDefaultString("general.OPEN", "[OPEN](green)");
         setDefaultString("general.CLOSED", "[CLOSED](red)");
-        setDefaultString("general.CLAIMED", "[CLAIMED \\(%actor%\\)](gold)");
-        setDefaultString("general.ELEVATED", "[\\[ADMIN\\]](aqua)");
-        setDefaultString("general.NOTES", "[\\[NOTES\\]](dark_red)");
+        setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
+        setDefaultString("general.ELEVATED", " [\\[ADMIN\\]](show_text=This ModReq has been flagged for admin attention color=aqua");
+        setDefaultString("general.NOTES", " [\\[NOTES\\]](show_text=This ModReq has notes attached color=dark_red)");
         setDefaultString("general.ON-JOIN-HEADER", "[----------](aqua)");
         setDefaultString("general.HELP-LIST-MODREQS", "[----------](aqua) [\\[Show all\\]](gold) [----------](aqua)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
@@ -112,7 +112,7 @@ public class Messages {
         setDefaultString("mod.info.FOOTER", "");
 
         setDefaultString("mod.list.HEADER", "[----------](color=aqua format=bold) %count% ModReq(s) [----------](color=aqua format=bold)");
-        setDefaultString("mod.list.ITEM", "%link% [\\[](#fce469)[%status%%elevated%%notes%](green)[\\]](#fce469) [%date%](#fce469) %creator%\n[Message: %message%](gray)");
+        setDefaultString("mod.list.ITEM", "%link% [\\[](#fce469)[%status%](green)[\\]](#fce469) [%date%](#fce469) %creator%\n[Message: %message%](gray)");
         setDefaultString("mod.list.FOOTER", "[-=-=- Page %page% of %allpages% -=-=-](aqua)");
         setDefaultString("mod.list.NO-RESULTS", "%prefix%[No ModReqs found](gray)");
 

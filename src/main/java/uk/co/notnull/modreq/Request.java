@@ -205,18 +205,26 @@ public class Request {
         String username;
         Component location;
 
-        if(isMod) {
-             if(isClosed()) {
+        if (isMod) {
+            if (isClosed()) {
                 status = Messages.getString("general.CLOSED");
-            } else if(!isClaimed()) {
-                status = Messages.getString("general.OPEN");
-            } else if(owner != null) {
-                status = owner.getName();
+            } else if(isClaimed()) {
+                if (owner == null || owner.getName() == null) {
+                    status = Messages.getString("general.UNKNOWN-PLAYER");
+                } else if (owner.isOnline()) {
+                    status = Messages.getString("general.ONLINE-PLAYER", "player", owner.getName());
+                } else {
+                    status = Messages.getString("general.OFFLINE-PLAYER", "player", owner.getName());
+                }
             } else {
-                status = "unknown";
+                status = Messages.getString("general.OPEN");
             }
+
+            if(isElevated()) {
+				status += Messages.getString("general.ELEVATED");
+			}
         } else {
-             status = Messages.getString("general." + (isClosed() ? "CLOSED": "OPEN"));
+            status = Messages.getString("general." + (isClosed() ? "CLOSED": "OPEN"));
         }
 
         if (creator.getName() != null) {

@@ -42,6 +42,7 @@ public class RequestCollection extends ArrayList<Request> {
 	}
 
 	public Component toComponent(Player context) {
+		boolean isMod = context != null && context.hasPermission("modreq.mod") && context.hasPermission("modreq.admin");
 		Component result = Component.empty();
 		boolean first = true;
 
@@ -59,12 +60,30 @@ public class RequestCollection extends ArrayList<Request> {
 
 			String status;
 
-			if(!request.isClaimed()) {
-				status = Messages.getString("general.OPEN");
-			} else if(owner != null) {
-				status = owner.getName();
+			if(isMod) {
+				if (request.isClosed()) {
+					status = Messages.getString("general.CLOSED");
+				} else if (request.isClaimed()) {
+					if (owner == null || owner.getName() == null) {
+						status = Messages.getString("general.UNKNOWN-PLAYER");
+					} else if (owner.isOnline()) {
+						status = Messages.getString("general.ONLINE-PLAYER", "player", owner.getName());
+					} else {
+						status = Messages.getString("general.OFFLINE-PLAYER", "player", owner.getName());
+					}
+				} else {
+					status = Messages.getString("general.OPEN");
+				}
+
+				if(request.isElevated()) {
+					status += Messages.getString("general.ELEVATED");
+				}
+
+				if(request.hasNotes()) {
+					status += Messages.getString("general.NOTES");
+				}
 			} else {
-				status = "unknown";
+				status = Messages.getString("general." + (request.isClosed() ? "CLOSED": "OPEN"));
 			}
 
 			String username;
@@ -78,17 +97,20 @@ public class RequestCollection extends ArrayList<Request> {
 				username = Messages.getString("general.UNKNOWN-PLAYER");
 			}
 
+			if(isMod) {
+				replacements.put("elevated", request.isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
+				replacements.put("notes", request.hasNotes() ? Messages.get("general.NOTES") : Component.empty());
+				replacements.put("note_count", Component.text(request.getNotes().size()));
+			}
+
 			replacements.put("id", Component.text(request.getId()));
 			replacements.put("link", Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId())));
 			replacements.put("status", new MineDownParser().parse(status).build());
-			replacements.put("elevated", request.isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
-			replacements.put("notes", request.hasNotes() ? Messages.get("general.NOTES") : Component.empty());
-			replacements.put("note_count", Component.text(request.getNotes().size()));
 			replacements.put("creator", new MineDownParser().parse(username).build());
 			replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(request.getCreateTime())));
 			replacements.put("message", Component.text(request.getMessage()));
 
-			if(context != null && context.hasPermission("modreq.mod") && context.hasPermission("modreq.admin")) {
+			if(isMod) {
 				result = result.append(Messages.get("mod.list.ITEM", replacements));
 			} else {
 				result = result.append(Messages.get("player.list.ITEM-REQUEST", replacements));
