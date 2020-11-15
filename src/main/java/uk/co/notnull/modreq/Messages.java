@@ -204,6 +204,26 @@ public class Messages {
     }
 
     /**
+     * Returns the language string for a player, taking into account their online status
+     * @param player The player
+     */
+    public static Component getPlayer(OfflinePlayer player) {
+        if(cfg == null) {
+            reload();
+        }
+
+        if(player.getName() != null) {
+            if (player.isOnline()) {
+                return Messages.get("general.ONLINE-PLAYER","player", player.getName());
+            } else {
+                return Messages.get("general.OFFLINE-PLAYER", "player", player.getName());
+            }
+        } else {
+            return Messages.get("general.UNKNOWN-PLAYER");
+        }
+    }
+
+    /**
      * Send a language string to the specified player
      * @param recipient The player to send the message to
      * @param key The key for the language string to send

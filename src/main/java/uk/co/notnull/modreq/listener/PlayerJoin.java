@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.util.MineDown;
 
 public class PlayerJoin {
     private final ModReq plugin;
@@ -17,8 +18,6 @@ public class PlayerJoin {
     }
 
     public void joinChecks(Player player) {
-        RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
-
         plugin.getRequestRegistry().getUnseen(player, true).thenAcceptAsync((RequestCollection requests) -> {
             if(requests.isEmpty()) {
                 return;
@@ -27,13 +26,17 @@ public class PlayerJoin {
             Messages.send(player, "general.ON-JOIN-HEADER");
 
             for(Request request: requests) {
-                OfflinePlayer mod = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
-                String modName = mod != null && mod.getName() != null ? mod.getName() : "unknown";
+                OfflinePlayer mod = Bukkit.getOfflinePlayer(request.getResponder());
 
-                Messages.send(player, "player.notification.CLOSED",
-                              "actor", modName,
-                              "id", String.valueOf(request.getId()),
-                              "message", request.getResponseMessage());
+                Messages.send(player, new MineDown(Messages.getString("player.notification.CLOSED"))
+                            .placeholderIndicator("%")
+                            .replace(
+                                    "id", String.valueOf(request.getId()),
+                                    "message", request.getResponseMessage())
+                            .replace("actor", Messages.getPlayer(mod))
+                            .replace("link", Messages.get("general.REQUEST-LINK",
+                                                          "id", String.valueOf(request.getId())))
+                            .toComponent());
             }
 
             Messages.send(player, "general.HELP-LIST-MODREQS");
