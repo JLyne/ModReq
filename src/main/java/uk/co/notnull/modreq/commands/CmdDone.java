@@ -36,7 +36,7 @@ public class CmdDone {
             boolean canClaimOther = player.hasPermission("modreq.admin")
                     || player.hasPermission("modreq.mod.overrideclaimed");
 
-            if(!request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
+            if(request.isClaimed() && !request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
                 Messages.send(player, "error.OTHER-CLAIMED");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
