@@ -30,7 +30,6 @@ public class CmdModreq {
 
             return plugin.getRequestRegistry().create(player, message);
         }).thenAcceptAsync((Request request) -> {
-            Messages.send(player, "player.REQUEST-FILED");
             Messages.sendModNotification(NotificationType.CREATED, player, request);
             plugin.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
