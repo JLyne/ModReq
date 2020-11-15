@@ -81,17 +81,16 @@ public class Messages {
 
         setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
 
-        setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq show_text=Create a new ModReq color=gold)");
-        setDefaultString("player.list.ITEM-REQUEST", "%id% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469)\n[Message: %message%](gray)");
+        setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq  show_text=Create a new ModReq color=gold)");
+        setDefaultString("player.list.ITEM-REQUEST", "%link% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469)\n[Message: %message%](gray)");
         setDefaultString("player.list.ITEM-RESPONSE", "[Answered by %responder% on](#fce469) [%close_time%](green)[.](#fce469)\n[Message: %response%](gray)");
         setDefaultString("player.list.FOOTER", "[%prev% %next%](white)");
         setDefaultString("player.list.NO-RESULTS", "[You have no open ModReqs. New ModReq: /modreq <request>](aqua)");
 
-        setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) #%id% - %status% [----------](color=aqua format=bold)");
-        setDefaultString("player.info.REQUEST", "%world% (%x% %y% %z%)");
+        setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
+        setDefaultString("player.info.LOCATION", "[%world% (%x% %y% %z%)](green)");
         setDefaultString("player.info.REQUEST", "[Created on %date% at %location%](#fce469)\n[Message: %message%](gray)");
         setDefaultString("player.info.RESPONSE", "[Answered by %responder% on](#fce469) [%response_date%](green)\n[Message: %response%](gray)");
-        setDefaultString("player.info.LOCATION", "[%world% (%x% %y% %z%)](green)");
         setDefaultString("player.info.FOOTER", "");
 
         setDefaultString("mod.JOIN", "%prefix% [%count%](#07a0ff) [ModReq(s) open](green) [\\[View\\]](run_command=/mr list show_text=View all open modreqs color=gold)");
