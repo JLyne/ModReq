@@ -22,7 +22,6 @@ public class CmdCheck implements Listener {
 	@EventHandler
 	public void onQuit(PlayerQuitEvent event) {
 		lastSearch.remove(event.getPlayer());
-		System.out.println(lastSearch.toString());
 	}
 
 	public void checkOpenModreqs(final Player player, final int page) {
