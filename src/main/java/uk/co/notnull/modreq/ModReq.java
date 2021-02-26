@@ -6,10 +6,8 @@
 package uk.co.notnull.modreq;
 
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 import java.util.Locale;
 
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -25,7 +23,6 @@ public final class ModReq extends JavaPlugin {
     private DataSource dataSource;
     private SimpleDateFormat format;
     private RequestRegistry requestRegistry;
-    private BukkitAudiences bukkitAudiences;
 
     public ModReq() {}
 
@@ -34,7 +31,6 @@ public final class ModReq extends JavaPlugin {
         this.reloadConfiguration();
 
         this.requestRegistry = new RequestRegistry(this);
-        this.bukkitAudiences = BukkitAudiences.create(plugin);
 
         new Commands(this);
 
@@ -71,10 +67,6 @@ public final class ModReq extends JavaPlugin {
         return requestRegistry;
     }
 
-    public BukkitAudiences getBukkitAudiences() {
-        return bukkitAudiences;
-    }
-
     public void reloadConfiguration() {
         Messages.reload();
         Locale locale = Locale.forLanguageTag(Messages.getString("general.LANGUAGE-TAG"));
@@ -103,8 +95,7 @@ public final class ModReq extends JavaPlugin {
         } catch (Exception var6) {
             try {
                 sound = Sound.valueOf("BLOCK_NOTE_BLOCK_HARP");
-            } catch (Exception var5) {
-            }
+            } catch (Exception ignored) { }
         }
 
         if (sound != null) {
@@ -116,14 +107,10 @@ public final class ModReq extends JavaPlugin {
     }
 
     public void playModSound() {
-        Iterator var2 = Bukkit.getOnlinePlayers().iterator();
-
-        while(var2.hasNext()) {
-            Player player = (Player)var2.next();
+        for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("modreq.mod")) {
                 this.playSound(player);
             }
         }
-
     }
 }

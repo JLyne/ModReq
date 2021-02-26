@@ -19,6 +19,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -73,7 +74,7 @@ public class Commands {
         //
         this.minecraftHelp = new MinecraftHelp<>(
                 /* Help Prefix */ "/mr",
-                /* Audience mapper */ plugin.getBukkitAudiences()::sender,
+                /* Audience mapper */ (sender) -> (Audience) sender,
                 /* Manager */ this.paperCommandManager
         );
         //
@@ -126,7 +127,7 @@ public class Commands {
                 .withArgumentParsingHandler()
                 .withDecorator(
                         component -> Messages.get("general.PREFIX").append(Component.space()).append(component)
-                ).apply(paperCommandManager, plugin.getBukkitAudiences()::sender);
+                ).apply(paperCommandManager, (sender) -> (Audience) sender);
 
         this.constructCommands();
 	}

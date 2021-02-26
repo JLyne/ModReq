@@ -54,10 +54,6 @@
                            <shadedPattern>uk.co.notnull.modreq.shaded.typetoken</shadedPattern>
                        </relocation>
                        <relocation>
-                           <pattern>net.kyori</pattern>
-                           <shadedPattern>uk.co.notnull.modreq.shaded.kyori</shadedPattern>
-                       </relocation>
-                       <relocation>
                            <pattern>com.zaxxer</pattern>
                            <shadedPattern>uk.co.notnull.modreq.shaded.zaxxer</shadedPattern>
                        </relocation>
@@ -106,7 +102,7 @@
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.15.2-R0.1-SNAPSHOT</version>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -123,11 +119,6 @@
             <groupId>cloud.commandframework</groupId>
             <artifactId>cloud-annotations</artifactId>
             <version>1.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>adventure-platform-bukkit</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>

@@ -6,7 +6,6 @@ import java.util.Map;
 
 import de.themoep.minedown.adventure.MineDownParser;
 import de.themoep.minedown.adventure.Replacer;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -230,10 +229,8 @@ public class Messages {
      * @param replacements A list of placeholders and their replacements
      */
     public static void send(Player recipient, String key, String ...replacements) {
-        Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
-
         if(cfg.getString(key) != null) {
-            audience.sendMessage(new MineDown(cfg.getString(key))
+            recipient.sendMessage(new MineDown(cfg.getString(key))
                                          .placeholderIndicator("%")
                                          .replace("prefix", Messages.get("general.PREFIX"))
                                          .replace(replacements).toComponent());
@@ -248,9 +245,7 @@ public class Messages {
      * @param message The component message to send
      */
     public static void send(Player recipient, Component message) {
-        Audience audience = ModReq.getPlugin().getBukkitAudiences().player(recipient);
-
-        audience.sendMessage(message);
+        recipient.sendMessage(message);
     }
 
     /**
@@ -317,8 +312,7 @@ public class Messages {
                                              .toComponent());
 		}
 
-		Audience audience = ModReq.getPlugin().getBukkitAudiences().player(player);
-        audience.sendMessage(message);
+        player.sendMessage(message);
 	}
 
     /**
@@ -362,8 +356,7 @@ public class Messages {
 
             for(Player p : Bukkit.getOnlinePlayers()) {
                 if(p.hasPermission("modreq.mod")) {
-                    Audience audience = ModReq.getPlugin().getBukkitAudiences().player(p);
-                    audience.sendMessage(message);
+                    p.sendMessage(message);
                 }
             }
         } else {
@@ -388,8 +381,7 @@ public class Messages {
                                                         "id", String.valueOf(request.getId())))
                     .replace(replacements).toComponent();
 
-            Audience audience = ModReq.getPlugin().getBukkitAudiences().player((Player) creator);
-                    audience.sendMessage(message);
+            ((Player) creator).sendMessage(message);
         }
     }
 }
