@@ -158,15 +158,15 @@ public class Request {
                                     "id",  String.valueOf(id),
                                     "world", getLocation().getWorld().getName(),
                                     "x", String.valueOf(getLocation().getBlockX()),
-                                    "y", String.valueOf(getLocation().getBlockX()),
-                                    "z", String.valueOf(getLocation().getBlockX()));
+                                    "y", String.valueOf(getLocation().getBlockY()),
+                                    "z", String.valueOf(getLocation().getBlockZ()));
         } else {
             location = Messages.get("player.info.LOCATION",
                                     "id",  String.valueOf(id),
                                     "world", getLocation().getWorld().getName(),
                                     "x", String.valueOf(getLocation().getBlockX()),
-                                    "y", String.valueOf(getLocation().getBlockX()),
-                                    "z", String.valueOf(getLocation().getBlockX()));
+                                    "y", String.valueOf(getLocation().getBlockY()),
+                                    "z", String.valueOf(getLocation().getBlockZ()));
         }
 
         replacements.put("id", Component.text(getId()));
