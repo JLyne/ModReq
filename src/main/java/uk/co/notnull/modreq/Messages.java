@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import de.themoep.minedown.adventure.MineDown;
 import de.themoep.minedown.adventure.MineDownParser;
 import de.themoep.minedown.adventure.Replacer;
 import net.kyori.adventure.text.Component;
@@ -11,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import uk.co.notnull.modreq.util.MineDown;
 
 public class Messages {
     private static File file;

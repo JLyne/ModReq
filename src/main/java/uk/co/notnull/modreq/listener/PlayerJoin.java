@@ -1,10 +1,10 @@
 package uk.co.notnull.modreq.listener;
 
+import de.themoep.minedown.adventure.MineDown;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
-import uk.co.notnull.modreq.util.MineDown;
 
 public class PlayerJoin {
     private final ModReq plugin;

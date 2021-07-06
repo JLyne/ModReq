@@ -1,11 +1,11 @@
 package uk.co.notnull.modreq.commands;
 
+import de.themoep.minedown.adventure.MineDown;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
-import uk.co.notnull.modreq.util.MineDown;
 
 public class CmdTpid {
     private final ModReq plugin;
