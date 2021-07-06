@@ -5,13 +5,12 @@ import cloud.commandframework.CommandTree;
 import cloud.commandframework.annotations.*;
 import cloud.commandframework.annotations.specifier.Greedy;
 import cloud.commandframework.arguments.parser.ParserParameters;
-import cloud.commandframework.arguments.parser.StandardParameters;
-import cloud.commandframework.bukkit.BukkitCommandMetaBuilder;
 import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.extra.confirmation.CommandConfirmationManager;
 import cloud.commandframework.meta.CommandMeta;
+import cloud.commandframework.meta.SimpleCommandMeta;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
@@ -19,7 +18,6 @@ import cloud.commandframework.paper.PaperCommandManager;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -74,7 +72,7 @@ public class Commands {
         //
         this.minecraftHelp = new MinecraftHelp<>(
                 /* Help Prefix */ "/mr",
-                /* Audience mapper */ (sender) -> (Audience) sender,
+                /* Audience mapper */ (sender) -> sender,
                 /* Manager */ this.paperCommandManager
         );
         //
@@ -108,10 +106,8 @@ public class Commands {
         // @CommandMethod
         //
         final Function<ParserParameters, CommandMeta> commandMetaFunction = p ->
-                BukkitCommandMetaBuilder.builder()
-                        // This will allow you to decorate commands with descriptions
-                        .withDescription(p.get(StandardParameters.DESCRIPTION, "No description"))
-                        .build();
+                 SimpleCommandMeta.builder().with(CommandMeta.DESCRIPTION, "No description").build();
+
         this.annotationParser = new AnnotationParser<>(
                 /* Manager */ this.paperCommandManager,
                 /* Command sender type */ CommandSender.class,
@@ -127,7 +123,7 @@ public class Commands {
                 .withArgumentParsingHandler()
                 .withDecorator(
                         component -> Messages.get("general.PREFIX").append(Component.space()).append(component)
-                ).apply(paperCommandManager, (sender) -> (Audience) sender);
+                ).apply(paperCommandManager, (sender) -> sender);
 
         this.constructCommands();
 	}
@@ -138,7 +134,7 @@ public class Commands {
 		this.annotationParser.parse(this);
 
 		this.paperCommandManager.command(builder.literal("confirm")
-                .meta("description", "Confirm a pending command")
+                .meta(CommandMeta.DESCRIPTION, "Confirm a pending command")
                 .handler(this.confirmationManager.createConfirmationExecutionHandler()));
 	}
 
