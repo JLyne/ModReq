@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+@SuppressWarnings("serial")
 public class RequestCollection extends ArrayList<Request> {
 	private final boolean paginated;
 	private final int offset;
