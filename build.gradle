@@ -49,12 +49,12 @@ repositories {
 
 dependencies {
     implementation 'de.themoep:minedown-adventure:1.7.1-SNAPSHOT'
-    implementation 'cloud.commandframework:cloud-paper:1.5.0'
-    implementation 'cloud.commandframework:cloud-minecraft-extras:1.5.0'
-    implementation 'cloud.commandframework:cloud-annotations:1.5.0'
-    implementation 'com.zaxxer:HikariCP:4.0.3'
+    implementation 'cloud.commandframework:cloud-paper:1.6.2'
+    implementation 'cloud.commandframework:cloud-minecraft-extras:1.6.2'
+    implementation 'cloud.commandframework:cloud-annotations:1.6.2'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
     
-    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
 }
 
 group = 'uk.co.notnull'
