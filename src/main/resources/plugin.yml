@@ -2,5 +2,5 @@ name: ModReq
 version: @project.version@
 main: uk.co.notnull.modreq.ModReq
 author: Jim (NotKatuen)
-api-version: 1.16
+api-version: 1.17
 description: File moderator requests.
