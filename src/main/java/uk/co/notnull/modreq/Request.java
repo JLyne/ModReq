@@ -172,23 +172,35 @@ public class Request {
             username = Messages.getString("general.UNKNOWN-PLAYER");
         }
 
+        String world = getLocation().getWorld() != null ? getLocation().getWorld().getName() : Messages.getString("general.UNKNOWN-WORLD");
+
         if(isMod) {
             replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
             replacements.put("notes", hasNotes() ? Messages.get("general.NOTES") : Component.empty());
             replacements.put("note_count", Component.text(getNotes().size()));
-            location = Messages.get("mod.info.LOCATION",
-                                    "id",  String.valueOf(id),
-                                    "world", getLocation().getWorld().getName(),
-                                    "x", String.valueOf(getLocation().getBlockX()),
-                                    "y", String.valueOf(getLocation().getBlockY()),
-                                    "z", String.valueOf(getLocation().getBlockZ()));
+
+
+            if(getLocation().getWorld() != null) {
+                location = Messages.get("mod.info.LOCATION",
+                                        "id",  String.valueOf(id),
+                                        "world", world,
+                                        "x", String.valueOf(getLocation().getBlockX()),
+                                        "y", String.valueOf(getLocation().getBlockY()),
+                                        "z", String.valueOf(getLocation().getBlockZ()));
+            } else {
+                location = Messages.get("mod.info.UNKNOWN-LOCATION");
+            }
         } else {
-            location = Messages.get("player.info.LOCATION",
-                                    "id",  String.valueOf(id),
-                                    "world", getLocation().getWorld().getName(),
-                                    "x", String.valueOf(getLocation().getBlockX()),
-                                    "y", String.valueOf(getLocation().getBlockY()),
-                                    "z", String.valueOf(getLocation().getBlockZ()));
+            if(getLocation().getWorld() != null) {
+                location = Messages.get("player.info.LOCATION",
+                                        "id",  String.valueOf(id),
+                                        "world", world,
+                                        "x", String.valueOf(getLocation().getBlockX()),
+                                        "y", String.valueOf(getLocation().getBlockY()),
+                                        "z", String.valueOf(getLocation().getBlockZ()));
+            } else {
+                location = Messages.get("player.info.UNKNOWN-LOCATION");
+            }
         }
 
         replacements.put("id", Component.text(getId()));
@@ -197,7 +209,7 @@ public class Request {
         replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(getCreateTime())));
         replacements.put("message", Component.text(getMessage()));
         replacements.put("location", location);
-        replacements.put("world", Component.text(getLocation().getWorld().getName()));
+        replacements.put("world", Component.text(world));
         replacements.put("x", Component.text(getLocation().getBlockX()));
         replacements.put("y", Component.text(getLocation().getBlockY()));
         replacements.put("z", Component.text(getLocation().getBlockZ()));

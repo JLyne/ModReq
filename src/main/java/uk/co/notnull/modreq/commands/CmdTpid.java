@@ -42,6 +42,11 @@ public class CmdTpid {
                 return;
             }
 
+            if(request.getLocation().getWorld() == null) {
+                Messages.send(player, "error.TELEPORT-UNLOADED");
+                return;
+            }
+
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
                     Messages.send(player, new MineDown(Messages.getString("mod.notification.TELEPORTED"))

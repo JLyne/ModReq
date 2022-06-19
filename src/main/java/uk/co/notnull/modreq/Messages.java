@@ -69,6 +69,7 @@ public class Messages {
         setDefaultString("error.NOT-CLAIMED", "%prefix% [ModReq is not claimed](red)");
         setDefaultString("error.OTHER-CLAIMED", "%prefix% [ModReq has been claimed by someone else](red)");
         setDefaultString("error.TELEPORT-ERROR", "%prefix% [An error has occurred while teleporting, Please contact an administrator.](red)");
+        setDefaultString("error.TELEPORT-UNLOADED", "%prefix% [The world this ModReq was created in is not loaded.](red)");
         setDefaultString("error.PAGE-ERROR", "%prefix% [Page %page% does not exist](red)");
         setDefaultString("error.NOTE-DOES-NOT-EXIST", "%prefix% [This note id does not exist.](red)");
         setDefaultString("error.NOTE-OTHER", "%prefix% [You did not create this note.](red)");
@@ -87,6 +88,7 @@ public class Messages {
         setDefaultString("general.ONLINE-PLAYER", "[%player%](suggest_command=/w %player%  show_text=Click to whisper %player% color=green)");
         setDefaultString("general.OFFLINE-PLAYER", "[%player%](show_text=%player% is offline color=red)");
         setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
+        setDefaultString("general.UNKNOWN-WORLD", "[Unknown world](show_text=The world this ModReq was created in is not loaded)");
         setDefaultString("general.REQUEST-LINK", "[#%id%](run_command=/mr info %id% show_text=Click to show the details of #%id% color=#07a0ff)");
 
         setDefaultString("pagination.PREV", "[\\[Prev\\]](run_command=%command% show_text=Previous page color=gray)");
@@ -110,6 +112,7 @@ public class Messages {
 
         setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
         setDefaultString("player.info.LOCATION", "[%world% (%x% %y% %z%)](green)");
+        setDefaultString("player.info.UNKNOWN-LOCATION", "[Unknown location](show_text=This ModReq was created in a world that is not currently loaded)");
         setDefaultString("player.info.REQUEST", "[Created on %date% at %location%](#fce469)\n[Message: %message%](gray)");
         setDefaultString("player.info.RESPONSE", "[Answered by %responder% on](#fce469) [%response_date%](green)\n[Message: %response%](gray)");
         setDefaultString("player.info.FOOTER", "");
@@ -131,6 +134,7 @@ public class Messages {
         setDefaultString("mod.info.REQUEST", "[Created by %creator% on %date% at %location%](#fce469)\n[Message: %message%](gray)");
         setDefaultString("mod.info.RESPONSE", "[Answered by %responder% on](#fce469) [%response_date%](green)\n[Message: %response%](gray)");
         setDefaultString("mod.info.LOCATION", "[%world% (%x% %y% %z%)](show_text=Click to teleport run_command=/mr tp %id% color=green)");
+        setDefaultString("mod.info.UNKNOWN-LOCATION", "[Unknown location](show_text=This ModReq was created in a world that is not currently loaded)");
         setDefaultString("mod.info.NOTE", "[\\[%id%\\]](aqua) [%creator% - %message%](gray)");
         setDefaultString("mod.info.FOOTER", "");
 
