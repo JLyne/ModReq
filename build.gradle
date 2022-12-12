@@ -49,9 +49,9 @@ repositories {
 
 dependencies {
     implementation 'de.themoep:minedown-adventure:1.7.1-SNAPSHOT'
-    implementation 'cloud.commandframework:cloud-paper:1.7.0'
-    implementation 'cloud.commandframework:cloud-minecraft-extras:1.7.0'
-    implementation 'cloud.commandframework:cloud-annotations:1.7.0'
+    implementation 'cloud.commandframework:cloud-paper:1.7.1'
+    implementation 'cloud.commandframework:cloud-minecraft-extras:1.7.1'
+    implementation 'cloud.commandframework:cloud-annotations:1.7.1'
     implementation 'com.zaxxer:HikariCP:5.0.1'
     
     compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
