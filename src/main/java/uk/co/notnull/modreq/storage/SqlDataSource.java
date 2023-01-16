@@ -106,28 +106,73 @@ public class SqlDataSource implements DataSource {
 				ds = new HikariDataSource(config);
 			}
 
-    		Connection connection = getConnection();
-			PreparedStatement statement;
-
-			if(cfg.isMySQL()) {
-				statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq (id INTEGER(10) UNSIGNED PRIMARY KEY auto_increment, uuid CHAR(36), request VARCHAR(256), timestamp BIGINT(13) UNSIGNED, world VARCHAR(256), x INTEGER(11), y INTEGER(11), z INTEGER(11), claimed CHAR(36) NOT NULL DEFAULT '', mod_uuid CHAR(36) NOT NULL DEFAULT '', mod_comment VARCHAR(256) NOT NULL DEFAULT '', mod_timestamp BIGINT(13) UNSIGNED NOT NULL DEFAULT '0', done TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', elevated TINYINT(1) UNSIGNED NOT NULL DEFAULT '0');");
-				statement.executeUpdate();
-				statement.close();
-				statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq_notes (id INTEGER(10) UNSIGNED PRIMARY KEY auto_increment, modreq_id INTEGER(10) UNSIGNED, uuid CHAR(36), note VARCHAR(256));");
-			} else {
-				statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq (id INTEGER PRIMARY KEY AUTOINCREMENT, uuid CHAR(36), request VARCHAR(256), timestamp UNSIGNED BIGINT(13), world VARCHAR(256), x INTEGER(11), y INTEGER(11), z INTEGER(11), claimed CHAR(36) NOT NULL DEFAULT '', mod_uuid CHAR(36) NOT NULL DEFAULT '', mod_comment VARCHAR(256) NOT NULL DEFAULT '', mod_timestamp UNSIGNED BIGINT(13) NOT NULL DEFAULT '0', done UNSIGNED TINYINT(1) NOT NULL DEFAULT '0', elevated UNSIGNED TINYINT(1) NOT NULL DEFAULT '0');");
-				statement.executeUpdate();
-				statement.close();
-				statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq_notes (id INTEGER PRIMARY KEY AUTOINCREMENT, modreq_id UNSIGNED INTEGER(10), uuid CHAR(36), note VARCHAR(256));");
-			}
-
-			statement.executeUpdate();
-			statement.close();
+			migrateData();
 
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+
+	private int getCurrentDataVersion() throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement statement = connection.prepareStatement("PRAGMA user_version");
+		ResultSet result = statement.executeQuery();
+
+		int version = result.getInt(1);
+		plugin.getLogger().info(String.valueOf(version));
+		result.close();
+		statement.close();
+
+		return version;
+	}
+
+	private int getLatestDataVersion() {
+		return 2;
+	}
+
+	public void migrateData() throws SQLException {
+		int currentVersion = getCurrentDataVersion();
+		int latestVersion = getLatestDataVersion();
+		Connection connection = getConnection();
+		connection.setAutoCommit(false);
+
+		for(int version = currentVersion + 1; version <= latestVersion; version++) {
+			migrateToVersion(connection, version);
+			plugin.getLogger().info("Commit");
+			connection.commit();
+		}
+
+		connection.setAutoCommit(true);
+	}
+
+	private void migrateToVersion(Connection connection, int version) throws SQLException {
+		PreparedStatement statement;
+
+		plugin.getLogger().info("Migrating DB to version " + version);
+
+		switch (version) {
+			case 1 -> {
+				if(cfg.isMySQL()) {
+					statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq (id INTEGER(10) UNSIGNED PRIMARY KEY auto_increment, uuid CHAR(36), request VARCHAR(256), timestamp BIGINT(13) UNSIGNED, world VARCHAR(256), x INTEGER(11), y INTEGER(11), z INTEGER(11), claimed CHAR(36) NOT NULL DEFAULT '', mod_uuid CHAR(36) NOT NULL DEFAULT '', mod_comment VARCHAR(256) NOT NULL DEFAULT '', mod_timestamp BIGINT(13) UNSIGNED NOT NULL DEFAULT '0', done TINYINT(1) UNSIGNED NOT NULL DEFAULT '0', elevated TINYINT(1) UNSIGNED NOT NULL DEFAULT '0');");
+					statement.executeUpdate();
+					statement.close();
+					statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq_notes (id INTEGER(10) UNSIGNED PRIMARY KEY auto_increment, modreq_id INTEGER(10) UNSIGNED, uuid CHAR(36), note VARCHAR(256));");
+				} else {
+					statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq (id INTEGER PRIMARY KEY AUTOINCREMENT, uuid CHAR(36), request VARCHAR(256), timestamp UNSIGNED BIGINT(13), world VARCHAR(256), x INTEGER(11), y INTEGER(11), z INTEGER(11), claimed CHAR(36) NOT NULL DEFAULT '', mod_uuid CHAR(36) NOT NULL DEFAULT '', mod_comment VARCHAR(256) NOT NULL DEFAULT '', mod_timestamp UNSIGNED BIGINT(13) NOT NULL DEFAULT '0', done UNSIGNED TINYINT(1) NOT NULL DEFAULT '0', elevated UNSIGNED TINYINT(1) NOT NULL DEFAULT '0');");
+					statement.executeUpdate();
+					statement.close();
+					statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS modreq_notes (id INTEGER PRIMARY KEY AUTOINCREMENT, modreq_id UNSIGNED INTEGER(10), uuid CHAR(36), note VARCHAR(256));");
+				}
+
+				statement.executeUpdate();
+				statement.close();
+
+				statement = connection.prepareStatement("PRAGMA user_version = 1");
+				statement.executeUpdate();
+				statement.close();
+			}
 		}
 	}
 
