@@ -75,6 +75,7 @@ public class Messages {
         setDefaultString("error.NOTE-OTHER", "%prefix% [You did not create this note.](red)");
         setDefaultString("error.MAX-OPEN-MODREQS", "%prefix% [You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
         setDefaultString("error.NO-PREVIOUS-SEARCH", "%prefix% [You have no previous search.](red) [\\[Start new Search\\]](suggest_command=/mr search  show_text=Start a new search color=gold)");
+        setDefaultString("error.NO-PERMISSION", "%prefix% [You do not have permssion to do this.](red)");
 
         setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white)");
         setDefaultString("general.OPEN", "[OPEN](green)");
@@ -389,7 +390,7 @@ public class Messages {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + modKey);
         }
 
-        if(action.sendToCreator()) {
+        if(action.sendToCreator() && !player.getUniqueId().equals(request.getCreator())) {
             OfflinePlayer creator = Bukkit.getOfflinePlayer(request.getCreator());
             String playerKey = "player.notification." + action.toString().replace("_", "-");
 
