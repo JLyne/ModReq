@@ -489,7 +489,7 @@ public class SqlDataSource implements DataSource {
 
 		if(query.hasCreators()) {
 			List<UUID> creators = query.getCreators();
-			parameters.addAll(creators.stream().map(UUID::toString).collect(Collectors.toList()));
+			parameters.addAll(creators.stream().map(UUID::toString).toList());
 
 			if(creators.size() == 1) {
 				where.add("uuid = ?");
@@ -500,7 +500,7 @@ public class SqlDataSource implements DataSource {
 
 		if(query.hasResponders()) {
 			List<UUID> responders = query.getResponders();
-			parameters.addAll(responders.stream().map(UUID::toString).collect(Collectors.toList()));
+			parameters.addAll(responders.stream().map(UUID::toString).toList());
 
 			if(responders.size() == 1) {
 				where.add("mod_uuid = ?");
@@ -511,7 +511,7 @@ public class SqlDataSource implements DataSource {
 
 		if(query.hasOwners()) {
 			List<UUID> owners = query.getOwners();
-			parameters.addAll(owners.stream().map(UUID::toString).collect(Collectors.toList()));
+			parameters.addAll(owners.stream().map(UUID::toString).toList());
 
 			if(owners.size() == 1) {
 				where.add("claimed = ?");
@@ -522,7 +522,7 @@ public class SqlDataSource implements DataSource {
 
 		if(query.hasStatuses()) {
 			List<RequestStatus> statuses = query.getStatuses();
-			parameters.addAll(statuses.stream().map(RequestStatus::ordinal).collect(Collectors.toList()));
+			parameters.addAll(statuses.stream().map(RequestStatus::ordinal).toList());
 
 			if(statuses.size() == 1) {
 				where.add("done = ?");
@@ -554,9 +554,7 @@ public class SqlDataSource implements DataSource {
 
 		StringBuilder builder = new StringBuilder("UPDATE modreq SET done='2' WHERE id IN (");
 
-		for(int i = 0 ; i < requests.size(); i++) {
-			builder.append("?,");
-		}
+		builder.append("?,".repeat(requests.size()));
 
 		String sql = builder.deleteCharAt(builder.length() -1).append(")").toString();
 		PreparedStatement pStatement = connection.prepareStatement(sql);
