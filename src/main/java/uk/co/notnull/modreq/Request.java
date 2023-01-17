@@ -249,41 +249,42 @@ public class Request {
         boolean isMod = context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
 
         if (isClosed() && isMod) {
-            actions = actions.append(Messages.get("mod.action.OPEN", "id", String.valueOf(id)));
+            actions = actions.append(Messages.get("action.OPEN", "id", String.valueOf(id)));
             actions = actions.append(Component.space());
         } else if(!isClosed()) {
-            actions = actions.append(Messages.get("mod.action.CLOSE", "id", String.valueOf(id)));
+            actions = actions.append(Messages.get("action.CLOSE", "id", String.valueOf(id)));
             actions = actions.append(Component.space());
         }
 
         if(isMod) {
-            actions = actions.append(Messages.get("mod.action.TELEPORT", "id", String.valueOf(id)));
+            actions = actions.append(Messages.get("action.TELEPORT", "id", String.valueOf(id)));
 
             if (!isClosed()) {
                 actions = actions.append(Component.space());
 
                 if (isClaimedBy(context.getUniqueId())) {
-                    actions = actions.append(Messages.get("mod.action.UNCLAIM", "id", String.valueOf(id)));
+                    actions = actions.append(Messages.get("action.UNCLAIM", "id", String.valueOf(id)));
                     actions = actions.append(Component.space());
                 } else if (!isClaimed()) {
-                    actions = actions.append(Messages.get("mod.action.CLAIM", "id", String.valueOf(id)));
+                    actions = actions.append(Messages.get("action.CLAIM", "id", String.valueOf(id)));
                     actions = actions.append(Component.space());
                 }
 
                 if (isElevated()) {
-                    actions = actions.append(Messages.get("mod.action.UNELEVATE", "id", String.valueOf(id)));
+                    actions = actions.append(Messages.get("action.UNELEVATE", "id", String.valueOf(id)));
                     actions = actions.append(Component.space());
                 } else {
-                    actions = actions.append(Messages.get("mod.action.ELEVATE", "id", String.valueOf(id)));
+                    actions = actions.append(Messages.get("action.ELEVATE", "id", String.valueOf(id)));
                     actions = actions.append(Component.space());
                 }
             }
         }
 
-        actions = actions.append(Messages.get("mod.action.COMMENT", "id", String.valueOf(id)));
+        actions = actions.append(Messages.get("action.COMMENT", "id", String.valueOf(id)));
+        actions = actions.append(Component.space());
 
         if(isMod) {
-            actions = actions.append(Messages.get("mod.action.PRIVATE_COMMENT", "id", String.valueOf(id)));
+            actions = actions.append(Messages.get("action.PRIVATE_COMMENT", "id", String.valueOf(id)));
         }
 
         return actions;

@@ -103,6 +103,7 @@ public class Messages {
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
         setDefaultString("player.notification.CREATED", "%prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+        setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link% %view%\n[Message: %message%](gray)");
 
         setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
 
@@ -129,8 +130,9 @@ public class Messages {
         setDefaultString("mod.notification.CLOSED", "%prefix% %link% [has been closed by](gray) %actor% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.REOPENED", "%prefix% %link% [has been re-opened by](gray) %actor% %view%");
         setDefaultString("mod.notification.TELEPORTED", "%prefix% [Teleported to](gray) %link%");
-        setDefaultString("mod.notification.NOTE-ADDED", "%prefix% %actor% [added a note to](gray) %link% %view%\n[Message: %message%](gray)");
-        setDefaultString("mod.notification.NOTE-REMOVED", "%prefix% %actor% [removed a note from](gray) %link% %view%\n[Message: %message%](gray)");
+        setDefaultString("mod.notification.COMMENT-ADDED", "%prefix% %actor% [commented on](gray) %link% %view%\n[Message: %message%](gray)");
+        setDefaultString("mod.notification.PRIVATE-COMMENT-ADDED", "%prefix% %actor% [commented privately on](gray) %link% %view%\n[Message: %message%](gray)");
+        setDefaultString("mod.notification.COMMENT-REMOVED", "%prefix% %actor% [removed a comment from](gray) %link% %view%\n[Message: %message%](gray)");
 
         setDefaultString("mod.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
         setDefaultString("mod.info.REQUEST", "[Created by %creator% on %date% at %location%](#fce469)\n[Message: %message%](gray)");
@@ -145,15 +147,16 @@ public class Messages {
         setDefaultString("mod.list.FOOTER", "[%prev% %next%](white)");
         setDefaultString("mod.list.NO-RESULTS", "%prefix% [No ModReqs found](gray)");
 
-        setDefaultString("mod.action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
-        setDefaultString("mod.action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
-        setDefaultString("mod.action.OPEN","[\\[Re-open\\]](run_command=/mr open %id% show_text=Re-open this ModReq color=red)");
-        setDefaultString("mod.action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id% show_text=Teleport to where this ModReq was created color=gold)");
-        setDefaultString("mod.action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id% show_text=Claim this ModReq to indicate you are working on it color=gold)");
-        setDefaultString("mod.action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id% show_text=Un-claim this ModReq to allow other mods to work on it color=gold)");
-        setDefaultString("mod.action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id% show_text=Flag this ModReq for admin attention color=gold)");
-        setDefaultString("mod.action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id% show_text=Remove the admin flag from this ModReq color=gold)");
-        setDefaultString("mod.action.NOTE","[\\[Add Note\\]](suggest_command=/mr note add %id%  show_text=Add a note to this ModReq. Notes are only visible to staff. color=gold)");
+        setDefaultString("action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
+        setDefaultString("action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
+        setDefaultString("action.OPEN","[\\[Re-open\\]](run_command=/mr open %id% show_text=Re-open this ModReq color=red)");
+        setDefaultString("action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id% show_text=Teleport to where this ModReq was created color=gold)");
+        setDefaultString("action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id% show_text=Claim this ModReq to indicate you are working on it color=gold)");
+        setDefaultString("action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id% show_text=Un-claim this ModReq to allow other staff to work on it color=gold)");
+        setDefaultString("action.ELEVATE","[\\[Elevate\\]](run_command=/mr elevate %id% show_text=Flag this ModReq for admin attention color=gold)");
+        setDefaultString("action.UNELEVATE","[\\[Un-elevate\\]](run_command=/mr elevate %id% show_text=Remove the admin flag from this ModReq color=gold)");
+        setDefaultString("action.COMMENT","[\\[Add Comment\\]](suggest_command=/mr comment add %id%  show_text=Add a comment to this ModReq. color=gold)");
+        setDefaultString("action.PRIVATE_COMMENT","[\\[Add Private Comment\\]](suggest_command=/mr comment addprivate %id%  show_text=Add a private comment to this ModReq. Private comments are only visible to staff. color=gold)");
 
         try {
             cfg.save(file);
@@ -378,7 +381,7 @@ public class Messages {
                     .replace("actor", actor)
                     .replace("prefix", prefix)
                     .replace("link", link)
-                    .replace("view", Messages.get("mod.action.VIEW",
+                    .replace("view", Messages.get("general.action.VIEW",
                                                         "id", String.valueOf(request.getId())))
                     .replace(replacements).toComponent();
 

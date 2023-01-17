@@ -84,15 +84,21 @@ public class SqlDataSource implements DataSource {
 
 	@Override
 	public Connection getConnection() throws SQLException {
+		Connection connection;
+
 		if(cfg.isMySQL()) {
-        	return ds.getConnection();
+        	connection = ds.getConnection();
 		} else {
 			if(sqliteConnection == null || sqliteConnection.isClosed()) {
 				sqliteConnection = DriverManager.getConnection("jdbc:sqlite:" + this.sqliteFile.getAbsolutePath());
 			}
 
-			return sqliteConnection;
+			connection = sqliteConnection;
 		}
+
+		connection.setAutoCommit(false);
+
+		return connection;
     }
 
 	@Override
@@ -132,15 +138,11 @@ public class SqlDataSource implements DataSource {
 		int currentVersion = getCurrentDataVersion();
 		int latestVersion = getLatestDataVersion();
 		Connection connection = getConnection();
-		connection.setAutoCommit(false);
 
 		for(int version = currentVersion + 1; version <= latestVersion; version++) {
 			migrateToVersion(connection, version);
-			plugin.getLogger().info("Commit");
 			connection.commit();
 		}
-
-		connection.setAutoCommit(true);
 	}
 
 	private void migrateToVersion(Connection connection, int version) throws SQLException {
@@ -338,6 +340,7 @@ public class SqlDataSource implements DataSource {
 
 	public Request elevateRequest(Request request, Player mod, boolean elevated) throws SQLException {
 		Connection connection = getConnection();
+
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET elevated=? WHERE id=?");
 		pStatement.setInt(1, elevated ? 1 : 0);
 		pStatement.setInt(2, request.getId());
@@ -348,7 +351,8 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(request, UpdateType.ELEVATE, mod, null);
+		Update update = addUpdateToRequest(connection, request, UpdateType.ELEVATE, mod, null);
+		connection.commit();
 
 		//TODO Add to update list
 
@@ -380,8 +384,8 @@ public class SqlDataSource implements DataSource {
 		pStatement.executeUpdate();
 		pStatement.close();
 
-		Update update = addUpdateToRequest(request, UpdateType.CLOSE, mod, message);
-
+		Update update = addUpdateToRequest(connection, request, UpdateType.CLOSE, mod, message);
+		connection.commit();
 		//TODO Add to update list
 
 		return Request.builder()
@@ -409,8 +413,8 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(request, UpdateType.REOPEN, mod, null);
-
+		Update update = addUpdateToRequest(connection, request, UpdateType.REOPEN, mod, null);
+		connection.commit();
 		//TODO Add to update list
 
 		return Request.builder()
@@ -426,6 +430,7 @@ public class SqlDataSource implements DataSource {
 
 	public Request claim(Request request, Player player) throws SQLException {
 		Connection connection = getConnection();
+
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed=? WHERE id=?");
 
 		pStatement.setString(1, player.getUniqueId().toString());
@@ -438,8 +443,8 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(request, UpdateType.CLAIM, player, null);
-
+		Update update = addUpdateToRequest(connection, request, UpdateType.CLAIM, player, null);
+		connection.commit();
 		//TODO Add to update list
 
 		return Request.builder()
@@ -468,7 +473,8 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(request, UpdateType.UNCLAIM, mod, null);
+		Update update = addUpdateToRequest(connection, request, UpdateType.UNCLAIM, mod, null);
+		connection.commit();
 
 		return Request.builder()
 				.id(request.getId())
@@ -508,6 +514,8 @@ public class SqlDataSource implements DataSource {
 
 		id = rs.getInt(1);
 		pStatement.close();
+
+		//Update
 
 		return Request.builder()
 				.id(id)
@@ -664,6 +672,7 @@ public class SqlDataSource implements DataSource {
 
 		pStatement.executeUpdate();
 		pStatement.close();
+		connection.commit();
 
 		//FIXME: There must be a better way
 		List<Request> results = requests.stream().map(request -> Request.builder()
@@ -685,7 +694,7 @@ public class SqlDataSource implements DataSource {
 	public List<Update> getUpdatesForRequest(Request request) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement(
-				"SELECT id,type,actor,time,content,seen FROM modreq_updates WHERE modreq_id=? ORDER BY time DESC");
+				"SELECT id,type,actor,timestamp,content,seen FROM modreq_updates WHERE modreq_id=? ORDER BY time DESC");
 		pStatement.setInt(1, request.getId());
 		ResultSet sqlres = pStatement.executeQuery();
 
@@ -709,8 +718,12 @@ public class SqlDataSource implements DataSource {
 
 	public Update addCommentToRequest(Request request, Player player, boolean isPublic, String message) throws SQLException {
 		UpdateType type = isPublic ? UpdateType.PUBLIC_COMMENT : UpdateType.PRIVATE_COMMENT;
+		Connection connection = getConnection();
 
-		return addUpdateToRequest(request, type, player, message);
+		Update update = addUpdateToRequest(connection, request, type, player, message);
+		connection.commit();
+
+		return update;
 	}
 
 	public boolean removeComment(Update update) throws SQLException {
@@ -720,18 +733,20 @@ public class SqlDataSource implements DataSource {
 		pStatement.setInt(1, update.getId());
 		int result = pStatement.executeUpdate();
 		pStatement.close();
+		connection.commit();
 
 		return result > 0;
 	}
 
-	private Update addUpdateToRequest(Request request, UpdateType type, Player player, String message) throws SQLException {
-		Connection connection = getConnection();
+	private Update addUpdateToRequest(Connection connection, Request request, UpdateType type, Player player, String message) throws SQLException {
 		long time = System.currentTimeMillis();
 
-		message = message.trim();
+		if(message != null) {
+			message = message.trim();
+		}
 
 		PreparedStatement pStatement = connection.prepareStatement(
-				"INSERT INTO modreq_updates (modreq_id,type,actor,time,content) VALUES (?,?,?,?,?)",
+				"INSERT INTO modreq_updates (modreq_id,type,actor,timestamp,content) VALUES (?,?,?,?,?)",
 				Statement.RETURN_GENERATED_KEYS);
 		pStatement.setInt(1, request.getId());
 		pStatement.setInt(2, type.ordinal());
