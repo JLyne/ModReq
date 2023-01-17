@@ -27,6 +27,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -64,8 +65,8 @@ public class RequestCollection extends ArrayList<Request> {
 		return builder;
 	}
 
-	public Component toComponent(Player context) {
-		boolean isMod = context != null && context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
+	public Component toComponent(@NotNull Player context) {
+		boolean isMod = context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
 		Component result = Component.empty();
 		boolean first = true;
 
@@ -78,7 +79,6 @@ public class RequestCollection extends ArrayList<Request> {
 
 			OfflinePlayer creator = Bukkit.getOfflinePlayer(request.getCreator());
 			OfflinePlayer owner = request.isClaimed() ? Bukkit.getOfflinePlayer(request.getOwner()) : null;
-			OfflinePlayer responder = request.getResponder() != null ? Bukkit.getOfflinePlayer(request.getResponder()) : null;
 			Map<String, Component> replacements = new HashMap<>();
 
 			String status;
@@ -101,10 +101,6 @@ public class RequestCollection extends ArrayList<Request> {
 				if(request.isElevated()) {
 					status += Messages.getString("general.ELEVATED");
 				}
-
-				if(request.hasNotes()) {
-					status += Messages.getString("general.NOTES");
-				}
 			} else {
 				status = Messages.getString("general." + (request.isClosed() ? "CLOSED": "OPEN"));
 			}
@@ -122,8 +118,6 @@ public class RequestCollection extends ArrayList<Request> {
 
 			if(isMod) {
 				replacements.put("elevated", request.isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
-				replacements.put("notes", request.hasNotes() ? Messages.get("general.NOTES") : Component.empty());
-				replacements.put("note_count", Component.text(request.getNotes().size()));
 			}
 
 			replacements.put("id", Component.text(request.getId()));
@@ -139,16 +133,8 @@ public class RequestCollection extends ArrayList<Request> {
 				result = result.append(Messages.get("player.list.ITEM-REQUEST", replacements));
 
 				if(request.isClosed()) {
-					replacements.put("close_time", Component.text(ModReq.getPlugin().getFormat().format(request.getCloseTime())));
-					replacements.put("response", Component.text(request.getResponseMessage()));
-
 					result = result.append(Component.newline());
 
-					if(responder != null && responder.getName() != null) {
-						replacements.put("responder", Component.text(responder.getName()));
-					} else {
-						replacements.put("responder", Messages.get("general.UNKNOWN-PLAYER"));
-					}
 
 					result = result.append(Messages.get("player.list.ITEM-RESPONSE", replacements));
 					result = result.append(Component.newline());

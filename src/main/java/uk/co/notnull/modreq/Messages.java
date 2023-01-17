@@ -34,6 +34,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class Messages {
     private static File file;
@@ -283,7 +284,7 @@ public class Messages {
      * @param command The command any present pagination buttons should run. Should contain "%page%", which
      *               will be replaced with the relevant page number.
      */
-    public static void sendList(Player player, RequestCollection requests, String command) {
+    public static void sendList(@NotNull Player player, @NotNull RequestCollection requests, @NotNull String command) {
         boolean isMod = player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin");
         Component message = Component.empty();
 

@@ -49,7 +49,7 @@ public class CmdElevate {
             }
 
             if(!request.isClosed()) {
-                return plugin.getRequestRegistry().elevate(request, !request.isElevated());
+                return plugin.getRequestRegistry().elevate(request, player, !request.isElevated());
             } else {
                 Messages.send(player, "error.ALREADY-CLOSED");
                 shortcut.complete(null);

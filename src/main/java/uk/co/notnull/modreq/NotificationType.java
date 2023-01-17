@@ -30,8 +30,9 @@ public enum NotificationType {
 	UNCLAIMED(false),
 	ELEVATED(false),
 	UNELEVATED(false),
-	NOTE_ADDED(false),
-	NOTE_REMOVED(false);
+	COMMENT_ADDED(true),
+	COMMENT_REMOVED(false),
+	PRIVATE_COMMENT_ADDED(false);
 
 	private final boolean sendToCreator;
 

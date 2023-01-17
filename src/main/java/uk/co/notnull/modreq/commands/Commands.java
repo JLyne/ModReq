@@ -59,7 +59,7 @@ public class Commands {
     private final CmdDone cmdDone;
     private final CmdElevate cmdElevate;
     private final CmdModreq cmdModreq;
-    private final CmdNote cmdNote;
+    private final CmdComment cmdComment;
     private final CmdReopen cmdReopen;
     private final CmdTpid cmdTpid;
 
@@ -69,7 +69,7 @@ public class Commands {
 		cmdDone = new CmdDone(plugin);
 		cmdElevate = new CmdElevate(plugin);
 		cmdModreq = new CmdModreq(plugin);
-		cmdNote = new CmdNote(plugin);
+		cmdComment = new CmdComment(plugin);
 		cmdReopen = new CmdReopen(plugin);
 		cmdTpid = new CmdTpid(plugin);
 
@@ -270,27 +270,37 @@ public class Commands {
 		cmdTpid.tpToModReq(player, id);
 	}
 
-	@CommandMethod("mr note add <id> <message>")
-    @CommandDescription("Add a note to the specified modreq")
-	@CommandPermission("modreq.mod")
-    private void commandNoteAdd(
+	@CommandMethod("mr comment add <id> <message>")
+    @CommandDescription("Add a comment to the specified modreq")
+    private void commandCommentAdd(
             final @NonNull Player player,
             final @Argument("id") Integer id,
             final @Argument("message") @Greedy String message
     ) {
-		cmdNote.addNote(player, id, message);
+		cmdComment.addComment(player, id, true, message);
 	}
 
-	@CommandMethod("mr note remove <id> <noteid>")
-    @CommandDescription("Remove the specified note from the specified modreq")
+	@CommandMethod("mr comment addprivate <id> <message>")
+    @CommandDescription("Add a private comment, only visible to staff, to the specified modreq")
+	@CommandPermission("modreq.mod")
+    private void commandPrivateCommentAdd(
+            final @NonNull Player player,
+            final @Argument("id") Integer id,
+            final @Argument("message") @Greedy String message
+    ) {
+		cmdComment.addComment(player, id, false, message);
+	}
+
+	@CommandMethod("mr comment remove <id> <noteid>")
+    @CommandDescription("Remove the specified comment from the specified modreq")
 	@CommandPermission("modreq.mod")
 	@Confirmation
-    private void commandNoteRemove(
+    private void commandCommentRemove(
             final @NonNull Player player,
             final @Argument("id") Integer id,
             final @Argument("noteid") Integer noteId
     ) {
-		cmdNote.removeNote(player, id, noteId);
+		cmdComment.removeComment(player, id, noteId);
 	}
 
 	@ProxiedBy("modreq")

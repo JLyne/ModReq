@@ -80,11 +80,12 @@ public class RequestRegistry {
 	/**
 	 * Elevates the given request
 	 * @param request The request to elevate
+	 * @param mod The player elevating the request
 	 * @return Future completed with the updated Request if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Request> elevate(Request request, boolean elevated) {
-		return makeFuture(() -> plugin.getDataSource().elevateRequest(request, elevated));
+	public CompletableFuture<Request> elevate(Request request, Player mod, boolean elevated) {
+		return makeFuture(() -> plugin.getDataSource().elevateRequest(request, mod, elevated));
 	}
 
 	/**
@@ -102,11 +103,12 @@ public class RequestRegistry {
 	/**
 	 * Reopens the given request
 	 * @param request The request to reopen
+	 * @param mod The player reopening the request
 	 * @return Future completed with the updated Request if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Request> reopen(Request request) {
-		return makeFuture(() -> plugin.getDataSource().reopenRequest(request));
+	public CompletableFuture<Request> reopen(Request request, Player mod) {
+		return makeFuture(() -> plugin.getDataSource().reopenRequest(request, mod));
 	}
 
 	/**
@@ -122,12 +124,13 @@ public class RequestRegistry {
 
 	/**
 	 * Removes any existing claim for the given request
-	 * @param request The request to claim
+	 * @param request The request from which to remove the claim
+	 * @param mod The player removing the claim
 	 * @return Future completed with the updated Request if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Request> unclaim(Request request) {
-		return makeFuture(() -> plugin.getDataSource().unclaim(request));
+	public CompletableFuture<Request> unclaim(Request request, Player mod) {
+		return makeFuture(() -> plugin.getDataSource().unclaim(request, mod));
 	}
 
 	/**
@@ -175,35 +178,36 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Retrieves the notes added to the given request
-	 * @param request The request to retrieve the notes for
-	 * @return Future completed with a collection of notes if successful.
+	 * Retrieves the update history for the given request
+	 * @param request The request to retrieve the history for
+	 * @return Future completed with a collection of updates if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<List<Note>> getNotes(Request request) {
-		return makeFuture(() -> plugin.getDataSource().getNotesForRequest(request));
+	public CompletableFuture<List<Update>> getUpdates(Request request) {
+		return makeFuture(() -> plugin.getDataSource().getUpdatesForRequest(request));
 	}
 
 	/**
-	 * Adds a note by the given player, to the given request
+	 * Adds a comment by the given player, to the given request
 	 * @param request The request to add the note to
 	 * @param player The player to create the note for
-	 * @param note The note
+	 * @param isPublic Whether the comment can be seen by the request creator
+	 * @param comment The comment
 	 * @return Future completed with the created note if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Note> addNote(Request request, Player player, String note) {
-		return makeFuture(() -> plugin.getDataSource().addNoteToRequest(request, player, note));
+	public CompletableFuture<Update> addComment(Request request, Player player, boolean isPublic, String comment) {
+		return makeFuture(() -> plugin.getDataSource().addCommentToRequest(request, player, isPublic, comment));
 	}
 
 	/**
 	 * Removes the given note from storage
-	 * @param note The note to remove
+	 * @param update The note to remove
 	 * @return Future completed a boolean indicating whether the removal was successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Boolean> removeNote(Note note) {
-		return makeFuture(() -> plugin.getDataSource().removeNote(note));
+	public CompletableFuture<Boolean> removeComment(Update update) {
+		return makeFuture(() -> plugin.getDataSource().removeComment(update));
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
  * ModReq
- * Copyright (C) 2021 James Lyne
+ * Copyright (C) 2023 James Lyne
  *
  * Based on ModReq 1.2 (https://www.spigotmc.org/resources/modreq.57560/)
  * Copyright (C) 2019 Aladram and contributors
@@ -22,34 +22,30 @@
 
 package uk.co.notnull.modreq;
 
-import java.util.UUID;
+public enum UpdateType {
+	CREATE(true, false),
+	PRIVATE_COMMENT(false, true),
+	PUBLIC_COMMENT(true, true),
+	CLOSE(true, false),
+	REOPEN(true, false),
+	ELEVATE(true, false),
+	UNELEVATE(false, false),
+	CLAIM(false, false),
+	UNCLAIM(false, false);
 
-public class Note {
-    private final int id;
-    private final int requestId;
-    private final UUID creator;
-    private final String message;
+	private final boolean isPublic;
+	private final boolean isMessageRequired;
 
-    public Note(int id, int requestId, UUID creator, String message) {
-        this.id = id;
-        this.requestId = requestId;
-        this.creator = creator;
-        this.message = message;
-    }
+	private UpdateType(boolean isPublic, boolean isMessageRequired) {
+		this.isPublic = isPublic;
+		this.isMessageRequired = isMessageRequired;
+	}
 
-    public int getId() {
-        return this.id;
-    }
+	public boolean isPublic() {
+		return isPublic;
+	}
 
-    public int getRequestId() {
-        return this.requestId;
-    }
-
-    public UUID getCreator() {
-        return this.creator;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
+	public boolean isMessageRequired() {
+		return isMessageRequired;
+	}
 }

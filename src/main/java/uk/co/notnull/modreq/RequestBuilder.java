@@ -61,8 +61,9 @@ public class RequestBuilder {
 	public interface BuildStep {
 		BuildStep claimedBy(UUID owner);
 		BuildStep elevated(boolean elevated);
-		BuildStep response(Response owner);
-		BuildStep notes(List<Note> notes);
+		BuildStep status(RequestStatus status);
+		BuildStep lastUpdate(Update lastUpdate);
+		BuildStep updates(List<Update> updates);
 		Request build();
 	}
 
@@ -73,9 +74,10 @@ public class RequestBuilder {
 		private Location location;
 		private Date createTime;
 		private boolean elevated = false;
+		private RequestStatus status = RequestStatus.OPEN;
 		private UUID owner = null;
-		private Response response = null;
-		private List<Note> notes = Collections.emptyList();
+		private Update lastUpdate = null;
+		private List<Update> updates = Collections.emptyList();
 
 		public CreatorStep id(int id) {
 			this.id = id;
@@ -112,18 +114,23 @@ public class RequestBuilder {
 			return this;
 		}
 
-		public BuildStep response(Response response) {
-			this.response = response;
+		public BuildStep status(RequestStatus status) {
+			this.status = status;
 			return this;
 		}
 
-		public BuildStep notes(List<Note> notes) {
-			this.notes = notes;
+		public BuildStep lastUpdate(Update lastUpdate) {
+			this.lastUpdate = lastUpdate;
+			return this;
+		}
+
+		public BuildStep updates(List<Update> updates) {
+			this.updates = updates;
 			return this;
 		}
 
 		public Request build() {
-			return new Request(id, creator, message, createTime, location, owner, elevated, response, notes);
+			return new Request(id, creator, status, message, createTime, location, owner, elevated, lastUpdate, updates);
 		}
 	}
 }

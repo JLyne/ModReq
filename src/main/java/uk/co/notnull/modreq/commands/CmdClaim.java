@@ -72,7 +72,7 @@ public class CmdClaim {
 				    return new CompletableFuture<>();
                 }
 
-                return plugin.getRequestRegistry().unclaim(request);
+                return plugin.getRequestRegistry().unclaim(request, player);
             } else {
                 Messages.send(player, "error.NOT-CLAIMED");
                 shortcut.complete(null);

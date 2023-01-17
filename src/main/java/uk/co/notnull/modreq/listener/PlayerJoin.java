@@ -47,21 +47,9 @@ public class PlayerJoin {
 
             Messages.send(player, "general.ON-JOIN-HEADER");
 
-            for(Request request: requests) {
-                OfflinePlayer mod = Bukkit.getOfflinePlayer(request.getResponder());
-
-                Messages.send(player, new MineDown(Messages.getString("player.notification.CLOSED"))
-                            .placeholderIndicator("%")
-                            .replace(
-                                    "id", String.valueOf(request.getId()),
-                                    "message", request.getResponseMessage())
-                            .replace("actor", Messages.getPlayer(mod))
-                            .replace("link", Messages.get("general.REQUEST-LINK",
-                                                          "id", String.valueOf(request.getId())))
-                            .replace("view", Messages.get("player.action.VIEW",
-                                                          "id", String.valueOf(request.getId())))
-                            .toComponent());
-            }
+            Messages.send(player, new MineDown(Messages.getString("player.notification.UPDATES"))
+                    .placeholderIndicator("%")
+                    .toComponent());
 
             Messages.send(player, "general.HELP-LIST-MODREQS");
             plugin.playSound(player);

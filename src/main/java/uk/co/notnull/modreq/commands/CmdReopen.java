@@ -47,7 +47,7 @@ public class CmdReopen {
             request.set(result);
 
             if(result != null && result.isClosed()) {
-                return plugin.getRequestRegistry().reopen(result);
+                return plugin.getRequestRegistry().reopen(result, player);
             }
 
             if(result == null) {

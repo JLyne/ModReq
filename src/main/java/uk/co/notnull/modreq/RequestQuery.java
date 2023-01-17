@@ -33,6 +33,7 @@ public class RequestQuery {
 	private List<UUID> responders = new ArrayList<>();
 	private List<UUID> owners = new ArrayList<>();
 	private String search = null;
+	private Boolean seenState = null;
 
 	public RequestQuery() {
 
@@ -43,15 +44,15 @@ public class RequestQuery {
 	}
 
 	public static RequestQuery closed() {
-		return new RequestQuery().status(RequestStatus.CLOSED_SEEN, RequestStatus.CLOSED_UNSEEN);
+		return new RequestQuery().status(RequestStatus.CLOSED);
 	}
 
 	public static RequestQuery unseen() {
-		return new RequestQuery().status(RequestStatus.CLOSED_UNSEEN);
+		return new RequestQuery().seenState(true);
 	}
 
 	public static RequestQuery seen() {
-		return new RequestQuery().status(RequestStatus.CLOSED_SEEN);
+		return new RequestQuery().seenState(false);
 	}
 
 	public RequestQuery id(int id) {
@@ -96,6 +97,11 @@ public class RequestQuery {
 
 	public RequestQuery status(List<RequestStatus> statuses) {
 		this.statuses.addAll(statuses);
+		return this;
+	}
+
+	public RequestQuery seenState(Boolean seenState) {
+		this.seenState = seenState;
 		return this;
 	}
 
@@ -158,6 +164,10 @@ public class RequestQuery {
 		return search;
 	}
 
+	public Boolean getSeenState() {
+		return seenState;
+	}
+
 	public boolean hasIds() {
 		return !ids.isEmpty();
 	}
@@ -168,6 +178,10 @@ public class RequestQuery {
 
 	public boolean hasStatuses() {
 		return !statuses.isEmpty();
+	}
+
+	public boolean hasSeenState() {
+		return seenState != null;
 	}
 
 	public boolean hasResponders() {

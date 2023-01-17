@@ -30,14 +30,14 @@ import java.util.function.Function;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
 
-public class CmdNote {
+public class CmdComment {
     private final ModReq plugin;
 
-    public CmdNote(ModReq plugin) {
+    public CmdComment(ModReq plugin) {
         this.plugin = plugin;
     }
 
-    public void addNote(final Player player, final int id, final String message) {
+    public void addComment(final Player player, final int id, final boolean isPublic, final String message) {
         AtomicReference<Request> request = new AtomicReference<>();
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
 
@@ -50,26 +50,21 @@ public class CmdNote {
 				return new CompletableFuture<>();
             }
 
-            if(result.isClosed()) {
-                Messages.send(player, "error.ALREADY-CLOSED");
-                shortcut.complete(null);
-				return new CompletableFuture<>();
-            }
-
-            return plugin.getRequestRegistry().addNote(result, player, message);
-        }).thenAccept((Note note) -> {
-            Messages.sendModNotification(NotificationType.NOTE_ADDED, player, request.get(),
-                                         "message", message);
+            return plugin.getRequestRegistry().addComment(result, player, isPublic, message);
+        }).thenAccept((Update update) -> {
+            Messages.sendModNotification(
+                    isPublic ? NotificationType.COMMENT_ADDED : NotificationType.PRIVATE_COMMENT_ADDED, player,
+                    request.get(), "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
     }
 
-    public void removeNote(final Player player, final int id, final int noteId) {
+    public void removeComment(final Player player, final int id, final int commentId) {
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
         AtomicReference<Request> request = new AtomicReference<>();
-        AtomicReference<Note> note = new AtomicReference<>();
+        AtomicReference<Update> comment = new AtomicReference<>();
 
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
             request.set(result);
@@ -80,32 +75,26 @@ public class CmdNote {
 				return new CompletableFuture<>();
             }
 
-            if(result.isClosed()) {
-                Messages.send(player, "error.ALREADY-CLOSED");
-                shortcut.complete(null);
-				return new CompletableFuture<>();
-            }
+             return plugin.getRequestRegistry().getUpdates(result);
+        }).thenComposeAsync((List<Update> updates) -> {
+            comment.set(updates.get(commentId));
 
-             return plugin.getRequestRegistry().getNotes(result);
-        }).thenComposeAsync((List<Note> notes) -> {
-            note.set(notes.get(noteId));
-
-            if(note.get() == null) {
+            if(comment.get() == null) {
                 Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-            if(!note.get().getCreator().equals(player.getUniqueId()) && !player.hasPermission("modreq.admin")) {
+            if(!comment.get().getCreator().equals(player.getUniqueId()) && !player.hasPermission("modreq.admin")) {
                 Messages.send(player, "error.NOTE-OTHER");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
-            return plugin.getRequestRegistry().removeNote(note.get());
+            return plugin.getRequestRegistry().removeComment(comment.get());
         }).thenAcceptAsync((Boolean result) -> {
-            Messages.sendModNotification(NotificationType.NOTE_REMOVED, player, request.get(),
-                                         "message", note.get().getMessage());
+            Messages.sendModNotification(NotificationType.COMMENT_REMOVED, player, request.get(),
+                                         "message", comment.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
