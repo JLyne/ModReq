@@ -39,7 +39,7 @@ import java.util.function.Function;
 public class CmdCheck implements Listener {
 	private final ModReq plugin;
 
-	Map<Player, String> lastSearch = new ConcurrentHashMap<>();
+	final Map<Player, String> lastSearch = new ConcurrentHashMap<>();
 
 	public CmdCheck(ModReq plugin) {
 		this.plugin = plugin;
@@ -92,11 +92,14 @@ public class CmdCheck implements Listener {
 				return;
 			}
 
-			Component message = request.get().toComponent(player)
-					.append(Component.newline())
-					.append(Component.newline()) //???
-					.append(updates.toComponent(player, "/mr info " + request.get().getId() + " %page%"))
-					.append(Component.newline());
+			Component message = request.get().toComponent(player).append(Component.newline());
+
+			if(!updates.isEmpty()) {
+				message = message.append(Component.newline()) //???
+						.append(updates.toComponent(player, "/mr info " + request.get().getId() + " %page%"))
+						.append(Component.newline());
+			}
+
 			Messages.send(player, message);
 		}).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");

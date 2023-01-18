@@ -36,7 +36,7 @@ public enum UpdateType {
 	private final boolean isPublic;
 	private final boolean isMessageRequired;
 
-	private UpdateType(boolean isPublic, boolean isMessageRequired) {
+	UpdateType(boolean isPublic, boolean isMessageRequired) {
 		this.isPublic = isPublic;
 		this.isMessageRequired = isMessageRequired;
 	}

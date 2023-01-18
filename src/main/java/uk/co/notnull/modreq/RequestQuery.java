@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class RequestQuery {
-	private List<Integer> ids = new ArrayList<>();
-	private List<UUID> creators = new ArrayList<>();
-	private List<RequestStatus> statuses = new ArrayList<>();
-	private List<UUID> responders = new ArrayList<>();
-	private List<UUID> owners = new ArrayList<>();
+	private final List<Integer> ids = new ArrayList<>();
+	private final List<UUID> creators = new ArrayList<>();
+	private final List<RequestStatus> statuses = new ArrayList<>();
+	private final List<UUID> responders = new ArrayList<>();
+	private final List<UUID> owners = new ArrayList<>();
 	private String search = null;
 	private Boolean seenState = null;
 

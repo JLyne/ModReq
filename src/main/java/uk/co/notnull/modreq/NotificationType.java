@@ -36,7 +36,7 @@ public enum NotificationType {
 
 	private final boolean sendToCreator;
 
-	private NotificationType(boolean sendToCreator) {
+	NotificationType(boolean sendToCreator) {
 		this.sendToCreator = sendToCreator;
 	}
 

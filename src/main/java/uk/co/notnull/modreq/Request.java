@@ -220,11 +220,11 @@ public class Request {
 
                 if (isElevated()) {
                     actions = actions.append(Messages.get("action.UNELEVATE", "id", String.valueOf(id)));
-                    actions = actions.append(Component.space());
                 } else {
                     actions = actions.append(Messages.get("action.ELEVATE", "id", String.valueOf(id)));
-                    actions = actions.append(Component.space());
                 }
+
+                actions = actions.append(Component.space());
             }
         }
 

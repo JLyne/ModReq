@@ -47,7 +47,7 @@ public interface DataSource {
 	Request unclaim(Request request, Player mod) throws Exception;
 	Request closeRequest(Request request, Player mod, String message) throws Exception;
 	Request createRequest(Player player, String message) throws Exception;
-	Request markRequestAsSeen(Request request) throws Exception;
+	void markRequestAsSeen(Request request) throws Exception;
 	Update addCommentToRequest(Request request, Player player, boolean isPublic, String content) throws Exception;
 	boolean removeComment(Update update) throws Exception;
 	UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws Exception;

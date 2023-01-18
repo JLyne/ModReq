@@ -655,7 +655,7 @@ public class SqlDataSource implements DataSource {
 		return sql;
 	}
 
-	public Request markRequestAsSeen(@NotNull Request request) throws SQLException {
+	public void markRequestAsSeen(@NotNull Request request) throws SQLException {
 		Connection connection = getConnection();
 
 		PreparedStatement pStatement = connection.prepareStatement(
@@ -665,18 +665,6 @@ public class SqlDataSource implements DataSource {
 		pStatement.executeUpdate();
 		pStatement.close();
 		connection.commit();
-
-		//FIXME: There must be a better way
-		return Request.builder()
-				.id(request.getId())
-				.creator(request.getCreator())
-				.message(request.getMessage())
-				.createdAt(request.getCreateTime())
-				.location(request.getLocation())
-				.claimedBy(request.getOwner())
-				.elevated(request.isElevated())
-				.lastUpdate(request.getLastUpdate())
-				.build();
 	}
 
 	public UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws SQLException {

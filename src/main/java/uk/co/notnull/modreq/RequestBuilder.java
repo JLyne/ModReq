@@ -63,7 +63,6 @@ public class RequestBuilder {
 		BuildStep elevated(boolean elevated);
 		BuildStep status(RequestStatus status);
 		BuildStep lastUpdate(Update lastUpdate);
-		BuildStep updates(List<Update> updates);
 		Request build();
 	}
 
@@ -77,7 +76,6 @@ public class RequestBuilder {
 		private RequestStatus status = RequestStatus.OPEN;
 		private UUID owner = null;
 		private Update lastUpdate = null;
-		private List<Update> updates = Collections.emptyList();
 
 		public CreatorStep id(int id) {
 			this.id = id;
@@ -121,11 +119,6 @@ public class RequestBuilder {
 
 		public BuildStep lastUpdate(Update lastUpdate) {
 			this.lastUpdate = lastUpdate;
-			return this;
-		}
-
-		public BuildStep updates(List<Update> updates) {
-			this.updates = updates;
 			return this;
 		}
 

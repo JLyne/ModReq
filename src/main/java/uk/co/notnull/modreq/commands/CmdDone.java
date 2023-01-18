@@ -55,7 +55,7 @@ public class CmdDone {
 				return new CompletableFuture<>();
             }
 
-            if(!player.getUniqueId().equals(request.getCreator())) {
+            if(player.getUniqueId().equals(request.getCreator())) {
                 return plugin.getRequestRegistry().close(request, player, message);
             } else if(!player.hasPermission("modreq.mod")) {
                 Messages.send(player, "error.NO-PERMISSION");

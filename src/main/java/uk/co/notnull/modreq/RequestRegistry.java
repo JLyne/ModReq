@@ -251,8 +251,7 @@ public class RequestRegistry {
 		return makeFuture(() -> {
 			RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
 
-			RequestCollection collection = plugin.getDataSource().getAllRequests(query, false);
-			return collection;
+			return plugin.getDataSource().getAllRequests(query, false);
 		});
 	}
 
@@ -262,7 +261,10 @@ public class RequestRegistry {
 	 * @return Future completed with the request count if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Request> markAsSeen(Request request) {
-		return makeFuture(() -> plugin.getDataSource().markRequestAsSeen(request));
+	public CompletableFuture<Void> markAsSeen(Request request) {
+		return makeFuture(() -> {
+			plugin.getDataSource().markRequestAsSeen(request);
+			return null;
+		});
 	}
 }

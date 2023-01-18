@@ -27,8 +27,8 @@ import java.io.IOException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Configuration {
-    private File file;
-    private YamlConfiguration cfg;
+    private final File file;
+    private final YamlConfiguration cfg;
     private boolean isMySQL;
     private String mysql_host;
     private String mysql_port;
