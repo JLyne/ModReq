@@ -42,7 +42,7 @@ public interface DataSource {
 	int getRequestCount(RequestQuery query) throws Exception;
 	Request getRequest(int id, boolean includePrivateUpdates) throws Exception;
 	Request elevateRequest(Request request, Player mod, boolean elevated) throws Exception;
-	Request reopenRequest(Request request, Player mod) throws Exception;
+	Request reopenRequest(Request request, Player mod, String message) throws Exception;
 	Request claim(Request request, Player player) throws Exception;
 	Request unclaim(Request request, Player mod) throws Exception;
 	Request closeRequest(Request request, Player mod, String message) throws Exception;

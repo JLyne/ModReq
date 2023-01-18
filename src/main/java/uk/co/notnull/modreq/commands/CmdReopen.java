@@ -39,7 +39,7 @@ public class CmdReopen {
         this.plugin = plugin;
     }
 
-    public void reopenModReq(final Player player, final int id) {
+    public void reopenModReq(final Player player, final int id, final String message) {
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
         AtomicReference<Request> request = new AtomicReference<>();
 
@@ -47,7 +47,7 @@ public class CmdReopen {
             request.set(result);
 
             if(result != null && result.isClosed()) {
-                return plugin.getRequestRegistry().reopen(result, player);
+                return plugin.getRequestRegistry().reopen(result, player, message);
             }
 
             if(result == null) {
@@ -59,7 +59,8 @@ public class CmdReopen {
             shortcut.complete(null);
             return new CompletableFuture<>();
         }).thenAcceptAsync((Request result) -> {
-            Messages.sendModNotification(NotificationType.REOPENED, player, request.get());
+            Messages.sendModNotification(NotificationType.REOPENED, player, request.get(),
+                                         "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");

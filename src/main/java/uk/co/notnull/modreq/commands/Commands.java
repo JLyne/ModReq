@@ -240,7 +240,7 @@ public class Commands {
 		cmdDone.doneModReq(player, id, message);
 	}
 
-	@CommandMethod("mr open <id> [message]")
+	@CommandMethod("mr open <id> <message>")
     @CommandDescription("Open the specified modreq")
 	@CommandPermission("modreq.mod")
 	@Confirmation
@@ -249,7 +249,7 @@ public class Commands {
             final @Argument("id") Integer id,
             final @Argument("message") @Greedy String message
     ) {
-		cmdReopen.reopenModReq(player, id);
+		cmdReopen.reopenModReq(player, id, message);
 	}
 
 	@CommandMethod("mr elevate <id>")

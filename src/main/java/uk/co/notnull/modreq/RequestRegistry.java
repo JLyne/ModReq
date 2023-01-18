@@ -120,11 +120,12 @@ public class RequestRegistry {
 	 * Reopens the given request
 	 * @param request The request to reopen
 	 * @param mod The player reopening the request
+	 * @param message The reopen message
 	 * @return Future completed with the updated Request if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<Request> reopen(Request request, Player mod) {
-		return makeFuture(() -> plugin.getDataSource().reopenRequest(request, mod));
+	public CompletableFuture<Request> reopen(Request request, Player mod, String message) {
+		return makeFuture(() -> plugin.getDataSource().reopenRequest(request, mod, message));
 	}
 
 	/**

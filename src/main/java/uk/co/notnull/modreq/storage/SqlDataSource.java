@@ -405,7 +405,7 @@ public class SqlDataSource implements DataSource {
 				.build();
 	}
 
-	public Request reopenRequest(Request request, Player mod) throws SQLException {
+	public Request reopenRequest(Request request, Player mod, String message) throws SQLException {
 		Connection connection = getConnection();
 		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',done=0,elevated=0 WHERE id=?");
 
@@ -417,7 +417,7 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(connection, request, UpdateType.REOPEN, mod, null);
+		Update update = addUpdateToRequest(connection, request, UpdateType.REOPEN, mod, message);
 		connection.commit();
 
 		return Request.builder()
