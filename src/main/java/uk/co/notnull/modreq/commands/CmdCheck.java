@@ -22,14 +22,19 @@
 
 package uk.co.notnull.modreq.commands;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.collections.UpdateCollection;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 public class CmdCheck implements Listener {
 	private final ModReq plugin;
@@ -52,26 +57,48 @@ public class CmdCheck implements Listener {
 			return;
 		}
 
-		plugin.getRequestRegistry().get(RequestQuery.open(), page).thenAcceptAsync(requests -> {
-			Messages.sendList(player, requests, "/mr list %page%");
-		}).exceptionally((e) -> {
-			Messages.send(player, "error.DATABASE-ERROR");
-			e.printStackTrace();
-			return null;
-		});
+		plugin.getRequestRegistry().get(RequestQuery.open(), page, true)
+				.thenAcceptAsync(requests -> {
+					player.sendMessage(requests.toComponent(player, "/mr list %page%"));
+				}).exceptionally((e) -> {
+					Messages.send(player, "error.DATABASE-ERROR");
+					e.printStackTrace();
+					return null;
+				});
 	}
 
-	public void checkSpecialModreq(final Player player, final int id) {
+	public void checkSpecialModreq(final Player player, final int id, final Integer page) {
+		CompletableFuture<Void> shortcut = new CompletableFuture<>();
+        AtomicReference<Request> request = new AtomicReference<>();
 		boolean isMod = (player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin"));
 
-		plugin.getRequestRegistry().get(id).thenAcceptAsync((Request request) -> {
-            if(request == null || (!isMod && !request.getCreator().equals(player.getUniqueId()))) {
+		plugin.getRequestRegistry().get(id, isMod).thenComposeAsync((Request result) -> {
+            if(result == null || (!isMod && !result.getCreator().equals(player.getUniqueId()))) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
-                return;
+				shortcut.complete(null);
+                return new CompletableFuture<>();
             }
 
-			Messages.send(player, request.toComponent(player));
-		}).exceptionally((e) -> {
+			request.set(result);
+
+			return plugin.getRequestRegistry().getUpdates(result, page, isMod);
+		}).thenAcceptAsync((UpdateCollection updates) -> {
+			if(request.get().getCreator().equals(player.getUniqueId())) {
+				plugin.getRequestRegistry().markAsSeen(request.get());
+			}
+
+			if(updates.isAfterLastPage()) {
+				Messages.send(player, "error.PAGE-ERROR", "page", "" + updates.getPage());
+				return;
+			}
+
+			Component message = request.get().toComponent(player)
+					.append(Component.newline())
+					.append(Component.newline()) //???
+					.append(updates.toComponent(player, "/mr info " + request.get().getId() + " %page%"))
+					.append(Component.newline());
+			Messages.send(player, message);
+		}).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
 			e.printStackTrace();
 			return null;
@@ -99,12 +126,13 @@ public class CmdCheck implements Listener {
 
 		lastSearch.compute(player, (a, b) -> search);
 
-		plugin.getRequestRegistry().get(new RequestQuery().search(search), page).thenAcceptAsync(requests -> {
-			Messages.sendList(player, requests, "/mr searchpage %page%");
-		}).exceptionally((e) -> {
-			Messages.send(player, "error.DATABASE-ERROR");
-			e.printStackTrace();
-			return null;
-		});
+		plugin.getRequestRegistry().get(new RequestQuery().search(search), page, true)
+				.thenAcceptAsync(requests -> {
+					player.sendMessage(requests.toComponent(player, "/mr searchpage %page%"));
+				}).exceptionally((e) -> {
+					Messages.send(player, "error.DATABASE-ERROR");
+					e.printStackTrace();
+					return null;
+				});
 	}
 }

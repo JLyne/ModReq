@@ -80,13 +80,13 @@ public class CmdComment {
             comment.set(updates.get(commentId));
 
             if(comment.get() == null) {
-                Messages.send(player, "error.NOTE-DOES-NOT-EXIST");
+                Messages.send(player, "error.COMMENT-DOES-NOT-EXIST");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
             if(!comment.get().getCreator().equals(player.getUniqueId()) && !player.hasPermission("modreq.admin")) {
-                Messages.send(player, "error.NOTE-OTHER");
+                Messages.send(player, "error.COMMENT-OTHER");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }

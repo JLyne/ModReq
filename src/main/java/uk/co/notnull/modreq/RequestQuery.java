@@ -48,11 +48,11 @@ public class RequestQuery {
 	}
 
 	public static RequestQuery unseen() {
-		return new RequestQuery().seenState(true);
+		return new RequestQuery().seenState(false);
 	}
 
 	public static RequestQuery seen() {
-		return new RequestQuery().seenState(false);
+		return new RequestQuery().seenState(true);
 	}
 
 	public RequestQuery id(int id) {

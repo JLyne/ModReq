@@ -34,7 +34,7 @@ public class Update {
     private final String message;
     private final Date time;
     private final UpdateType type;
-    private final boolean seen;
+    private final UpdateSeenStatus status;
 
     public Update(int id, int requestId, UpdateType type, Date time, UUID creator) {
         if(type.isMessageRequired()) {
@@ -48,7 +48,7 @@ public class Update {
         this.creator = creator;
 
         message = null;
-        seen = true;
+        status = UpdateSeenStatus.PRIVATE;
     }
 
     public Update(int id, int requestId, UpdateType type, Date time, UUID creator, @Nullable String message) {
@@ -58,17 +58,17 @@ public class Update {
         this.time = time;
         this.creator = creator;
         this.message = message;
-        this.seen = true;
+        this.status = UpdateSeenStatus.PRIVATE;
     }
 
-    public Update(int id, int requestId, UpdateType type, Date time, UUID creator, @Nullable String message, boolean seen) {
+    public Update(int id, int requestId, UpdateType type, Date time, UUID creator, @Nullable String message, UpdateSeenStatus status) {
         this.id = id;
         this.requestId = requestId;
         this.type = type;
         this.time = time;
         this.creator = creator;
         this.message = message;
-        this.seen = seen;
+        this.status = status;
     }
 
     public int getId() {
@@ -83,6 +83,10 @@ public class Update {
         return creator;
     }
 
+    public boolean hasMessage() {
+        return message != null;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -95,7 +99,20 @@ public class Update {
         return type;
     }
 
-    public boolean isSeen() {
-        return seen;
+    public UpdateSeenStatus getSeenStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Update{" +
+                "id=" + id +
+                ", requestId=" + requestId +
+                ", creator=" + creator +
+                ", message='" + message + '\'' +
+                ", time=" + time +
+                ", type=" + type +
+                ", status=" + status +
+                '}';
     }
 }

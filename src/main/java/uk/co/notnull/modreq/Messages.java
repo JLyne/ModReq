@@ -24,6 +24,7 @@ package uk.co.notnull.modreq;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 
 import de.themoep.minedown.adventure.MineDown;
@@ -35,6 +36,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Messages {
     private static File file;
@@ -69,59 +71,67 @@ public class Messages {
         setDefaultString("error.ALREADY-CLAIMED", "%prefix% [ModReq is already claimed](red)");
         setDefaultString("error.NOT-CLAIMED", "%prefix% [ModReq is not claimed](red)");
         setDefaultString("error.OTHER-CLAIMED", "%prefix% [ModReq has been claimed by someone else](red)");
-        setDefaultString("error.TELEPORT-ERROR", "%prefix% [An error has occurred while teleporting, Please contact an administrator.](red)");
+        setDefaultString("error.TELEPORT-ERROR", "%prefix% [An error has occurred while teleporting, please contact an administrator.](red)");
         setDefaultString("error.TELEPORT-UNLOADED", "%prefix% [The world this ModReq was created in is not loaded.](red)");
         setDefaultString("error.PAGE-ERROR", "%prefix% [Page %page% does not exist](red)");
-        setDefaultString("error.NOTE-DOES-NOT-EXIST", "%prefix% [This note id does not exist.](red)");
-        setDefaultString("error.NOTE-OTHER", "%prefix% [You did not create this note.](red)");
+        setDefaultString("error.COMMENT-DOES-NOT-EXIST", "%prefix% [This comment id does not exist.](red)");
+        setDefaultString("error.COMMENT-OTHER", "%prefix% [You did not create this comment.](red)");
         setDefaultString("error.MAX-OPEN-MODREQS", "%prefix% [You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
         setDefaultString("error.NO-PREVIOUS-SEARCH", "%prefix% [You have no previous search.](red) [\\[Start new Search\\]](suggest_command=/mr search  show_text=Start a new search color=gold)");
-        setDefaultString("error.NO-PERMISSION", "%prefix% [You do not have permssion to do this.](red)");
+        setDefaultString("error.NO-PERMISSION", "%prefix% [You do not have permission to do this.](red)");
 
         setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white)");
         setDefaultString("general.OPEN", "[OPEN](green)");
         setDefaultString("general.CLOSED", "[CLOSED](red)");
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
         setDefaultString("general.ELEVATED", " [\\[ADMIN\\]](show_text=This ModReq has been flagged for admin attention color=aqua)");
-        setDefaultString("general.NOTES", " [\\[NOTES\\]](show_text=This ModReq has notes attached color=dark_red)");
-        setDefaultString("general.ON-JOIN-HEADER", "%prefix% [Updates to your ModReqs](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
+        setDefaultString("general.UNREAD", " [\\[UNREAD\\]](show_text=This ModReq has activity you have not yet seen color=aqua)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
         setDefaultString("general.ONLINE-PLAYER", "[%player%](suggest_command=/w %player%  show_text=Click to whisper %player% color=green)");
         setDefaultString("general.OFFLINE-PLAYER", "[%player%](show_text=%player% is offline color=red)");
+        setDefaultString("general.YOU", "[You](show_text=You are online, believe it or not color=green)");
         setDefaultString("general.UNKNOWN-PLAYER", "[Unknown](show_text=Unknown player color=red)");
         setDefaultString("general.UNKNOWN-WORLD", "[Unknown world](show_text=The world this ModReq was created in is not loaded)");
+        setDefaultString("general.UNKNOWN-DATE", "[Unknown Date](show_text=This update was created in a previous version of ModReq which lacks date information color=red)");
         setDefaultString("general.REQUEST-LINK", "[#%id%](run_command=/mr info %id% show_text=Click to show the details of #%id% color=#07a0ff)");
 
-        setDefaultString("pagination.PREV", "[\\[Prev\\]](run_command=%command% show_text=Previous page color=gray)");
-        setDefaultString("pagination.NEXT", "[\\[Next\\]](run_command=%command% show_text=Next page color=gray)");
-        setDefaultString("pagination.DISABLED", "      ");
+        setDefaultString("pagination.requests.PREV", "[\\[< Prev\\]](run_command=%command% show_text=Previous page color=gray)");
+        setDefaultString("pagination.requests.NEXT", "[\\[Next >\\]](run_command=%command% show_text=Next page color=gray)");
+        setDefaultString("pagination.requests.DISABLED", "         ");
+
+        setDefaultString("pagination.activity.PREV", "[\\[< Older Activity\\]](run_command=%command% show_text=View older activity on this ModReq color=gray)");
+        setDefaultString("pagination.activity.NEXT", "[\\[Newer Activity >\\]](run_command=%command% show_text=View more recent activity on this ModReq color=gray)");
+        setDefaultString("pagination.activity.DISABLED", "                     ");
 
         setDefaultString("confirmation.confirm", "%prefix% [Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
         setDefaultString("confirmation.nothing", "%prefix% [You don't have any pending commands.](red)");
 
+        setDefaultString("player.notification.JOIN", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
-        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has been re-opened your ModReq](green) %link% %view%");
-        setDefaultString("player.notification.CREATED", "%prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has re-opened your ModReq](green) %link% %view%");
         setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link% %view%\n[Message: %message%](gray)");
-
-        setDefaultString("player.action.VIEW", "[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
+        setDefaultString("player.notification.MULTIPLE-UPDATES", "%prefix% [%count% updates on your ModReq](green) %link% %view%");
 
         setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq  show_text=Create a new ModReq color=gold)");
-        setDefaultString("player.list.ITEM-REQUEST", "%link% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469)\n[Message: %message%](gray)");
-        setDefaultString("player.list.ITEM-RESPONSE", "[Answered by %responder% on](#fce469) [%close_time%](green)[.](#fce469)\n[Message: %response%](gray)");
-        setDefaultString("player.list.FOOTER", "[%prev% %next%](white)");
+        setDefaultString("player.list.ITEM", "%link% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469) %view%\n%last_update%[Message: %message%](gray)\n");
+        setDefaultString("player.list.ITEM-LAST-UPDATE", "[Updated by %update_actor% on](#fce469) [%update_time%](green)\n");
+        setDefaultString("player.list.PAGINATION", "[%prev% %next%](white)");
         setDefaultString("player.list.NO-RESULTS", "[You have no open ModReqs. New ModReq: /modreq <request>](aqua)");
 
         setDefaultString("player.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
         setDefaultString("player.info.LOCATION", "[%world% (%x% %y% %z%)](green)");
         setDefaultString("player.info.UNKNOWN-LOCATION", "[Unknown location](show_text=This ModReq was created in a world that is not currently loaded)");
         setDefaultString("player.info.REQUEST", "[Created on %date% at %location%](#fce469)\n[Message: %message%](gray)");
-        setDefaultString("player.info.RESPONSE", "[Answered by %responder% on](#fce469) [%response_date%](green)\n[Message: %response%](gray)");
-        setDefaultString("player.info.FOOTER", "");
 
-        setDefaultString("mod.JOIN", "%prefix% [%count%](#07a0ff) [ModReq(s) open](green) [\\[View\\]](run_command=/mr list show_text=View all open modreqs color=gold)");
+        setDefaultString("player.activity.HEADER", "[------](color=aqua format=bold) Activity - Page %page% of %allpages% [------](color=aqua format=bold)");
+        setDefaultString("player.activity.COMMENT", "[\\[%id%\\]](aqua) [%date% - %actor% commented](color=#fce469 format=italic)\n[%message%](gray)");
+        setDefaultString("player.activity.CLOSE", "[\\[%id%\\]](aqua) [%date% - %actor% closed](color=#fce469 format=italic)\n[%message%](gray)");
+        setDefaultString("player.activity.REOPEN", "[\\[%id%\\]](aqua) [%date% - %actor% reopened](color=#fce469 format=italic)\n[%message%](gray)");
+        setDefaultString("player.activity.CREATE", "[\\[%id%\\]](aqua) [%date% - %actor% created](color=#fce469 format=italic)\n[%message%](gray)");
+        setDefaultString("player.activity.PAGINATION", "[%prev% %next%](white)");
 
+        setDefaultString("mod.notification.JOIN", "%prefix% [%count%](#07a0ff) [ModReq(s) open](green) [\\[View\\]](run_command=/mr list show_text=View all open modreqs color=gold)");
         setDefaultString("mod.notification.CREATED", "%prefix% %actor% [created a new ModReq (%link%)](green) %view%");
         setDefaultString("mod.notification.CLAIMED", "%prefix% %link% [has been claimed by](gray) %actor% %view%");
         setDefaultString("mod.notification.UNCLAIMED", "%prefix% %link% [has been un-claimed by](gray) %actor% %view%");
@@ -147,16 +157,27 @@ public class Messages {
 
         setDefaultString("mod.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
         setDefaultString("mod.info.REQUEST", "[Created by %creator% on %date% at %location%](#fce469)\n[Message: %message%](gray)");
-        setDefaultString("mod.info.RESPONSE", "[Answered by %responder% on](#fce469) [%response_date%](green)\n[Message: %response%](gray)");
         setDefaultString("mod.info.LOCATION", "[%world% (%x% %y% %z%)](show_text=Click to teleport run_command=/mr tp %id% color=green)");
         setDefaultString("mod.info.UNKNOWN-LOCATION", "[Unknown location](show_text=This ModReq was created in a world that is not currently loaded)");
-        setDefaultString("mod.info.NOTE", "[\\[%id%\\]](aqua) [%creator% - %message%](gray)");
-        setDefaultString("mod.info.FOOTER", "");
 
         setDefaultString("mod.list.HEADER", "%prefix% %count% ModReq(s) - Page %page% of %allpages%");
-        setDefaultString("mod.list.ITEM", "%link% [\\[](#fce469)[%status%](green)[\\]](#fce469) [%date%](#fce469) %creator%\n[Message: %message%](gray)");
-        setDefaultString("mod.list.FOOTER", "[%prev% %next%](white)");
+        setDefaultString("mod.list.ITEM", "%link% [\\[](#fce469)[%status%](green)[\\]](#fce469) [%date%](#fce469) %creator% %view%\n[%last_update%](format=italic)[Message: %message%](gray)");
+        setDefaultString("mod.list.ITEM-LAST-UPDATE", "[Updated by %update_actor% on](#fce469) [%update_time%](green)\n");
+        setDefaultString("mod.list.PAGINATION", "[%prev% %next%](white)");
         setDefaultString("mod.list.NO-RESULTS", "%prefix% [No ModReqs found](gray)");
+
+
+        setDefaultString("mod.activity.HEADER", "[------](color=aqua format=bold) Activity - Page %page% of %allpages% [------](color=aqua format=bold)");
+        setDefaultString("mod.activity.PUBLIC_COMMENT", "[\\[%id%\\]](aqua) [%date% - %actor% [commented](bold)](color=#fce469)\n[%message%](gray)");
+        setDefaultString("mod.activity.PRIVATE_COMMENT", "[\\[%id%\\]](aqua) [%date% - %actor% [commented privately](bold)](color=#fce469)\n[%message%](gray)");
+        setDefaultString("mod.activity.CLOSE", "[\\[%id%\\]](aqua) [%date% - %actor% [closed](bold)](color=#fce469)\n[%message%](gray)");
+        setDefaultString("mod.activity.REOPEN", "[\\[%id%\\]](aqua) [%date% - %actor% [reopened](bold)](color=#fce469)\n[%message%](gray)");
+        setDefaultString("mod.activity.CREATE", "[\\[%id%\\]](aqua) [%date% - %actor% [created](bold)](color=#fce469)\n[%message%](gray)");
+        setDefaultString("mod.activity.ELEVATE", "[\\[%id%\\]](aqua) [%date% - %actor% [flagged](bold) for admin attention](color=#fce469)");
+        setDefaultString("mod.activity.UNELEVATE", "[\\[%id%\\]](aqua) [%date% - %actor% [removed](bold) the admin flag](color=#fce469)");
+        setDefaultString("mod.activity.CLAIM", "[\\[%id%\\]](aqua) [%date% - %actor% [unclaimed](bold)](color=#fce469)");
+        setDefaultString("mod.activity.UNCLAIM", "[\\[%id%\\]](aqua) [%date% - %actor% [claimed](bold)](color=#fce469)");
+        setDefaultString("mod.activity.PAGINATION", "[%prev% %next%](white)");
 
         setDefaultString("action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
         setDefaultString("action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
@@ -245,10 +266,20 @@ public class Messages {
     }
 
     /**
-     * Returns the language string for a player, taking into account their online status
+     * Returns the language string for a player, parsed into a component, taking into account their online status
      * @param player The player
      */
     public static Component getPlayer(OfflinePlayer player) {
+        return getPlayer(player, null);
+    }
+
+    /**
+     * Returns the language string for a player, parsed into a component, taking into account their online status.
+     * "You" will be returned if the context and player are the same player.
+     * @param player The player
+     * @param context The player this string will be shown to.
+     */
+    public static Component getPlayer(OfflinePlayer player, @Nullable OfflinePlayer context) {
         if(cfg == null) {
             reload();
         }
@@ -262,6 +293,53 @@ public class Messages {
         } else {
             return Messages.get("general.UNKNOWN-PLAYER");
         }
+    }
+
+    public static String getPlayerString(OfflinePlayer player) {
+        return getPlayerString(player, null);
+    }
+
+    /**
+     * Returns the language string for a player, taking into account their online status.
+     * "You" will be returned if the context and player are the same player.
+     * @param player The player
+     * @param context The player this string will be shown to.
+     */
+    public static String getPlayerString(OfflinePlayer player, @Nullable OfflinePlayer context) {
+        if(cfg == null) {
+            reload();
+        }
+
+        if(player != null && player.getName() != null) {
+            if(player.equals(context)) {
+                return Messages.getString("general.YOU");
+            } else if (player.isOnline()) {
+                return Messages.getString("general.ONLINE-PLAYER","player", player.getName());
+            } else {
+                return Messages.getString("general.OFFLINE-PLAYER", "player", player.getName());
+            }
+        } else {
+            return Messages.getString("general.UNKNOWN-PLAYER");
+        }
+    }
+
+    /**
+     * Returns the given date formatted according to the configured date format
+     * @param date The Data
+     */
+    public static Component getFormattedDate(@NotNull Date date) {
+        return date.getTime() > 0
+                ? Component.text(getFormattedDateString(date)) : Messages.get("general.UNKNOWN-DATE");
+    }
+
+    /**
+     * Returns the given date formatted according to the configured date format
+     * @param date The Data
+     */
+    public static String getFormattedDateString(@NotNull Date date) {
+        return date.getTime() > 0
+                ? ModReq.getPlugin().getFormat().format(date.getTime()) :
+                Messages.getString("general.UNKNOWN-DATE");
     }
 
     /**
@@ -289,73 +367,6 @@ public class Messages {
     public static void send(Player recipient, Component message) {
         recipient.sendMessage(message);
     }
-
-    /**
-     * Send a RequestCollection to a player, which will be displayed as a mod or player focused list
-     * depending on permissions
-     * @param player The player to send the list to. Will be used for permission checks.
-     * @param requests The collection to send as a list
-     * @param command The command any present pagination buttons should run. Should contain "%page%", which
-     *               will be replaced with the relevant page number.
-     */
-    public static void sendList(@NotNull Player player, @NotNull RequestCollection requests, @NotNull String command) {
-        boolean isMod = player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin");
-        Component message = Component.empty();
-
-        if(requests.getTotal() == 0 && requests.getPage() == 1) {
-			Messages.send(player,  isMod ? "mod.list.NO-RESULTS" : "player.list.NO-RESULTS");
-			return;
-		} else if (requests.isAfterLastPage()) {
-			Messages.send(player, "error.PAGE-ERROR", "page", "" + requests.getPage());
-			return;
-		}
-
-        String headerKey = isMod ? "mod.list.HEADER" : "player.list.HEADER";
-
-        message = message.append(Messages.get(headerKey,
-                                              "count", String.valueOf(requests.getTotal()),
-                                              "page", String.valueOf(requests.getPage()),
-                                              "allpages", String.valueOf(requests.getTotalPages())));
-        message = message.append(Component.newline());
-
-		message = message.append(requests.toComponent(player));
-
-		if(requests.isPaginated()) {
-		    String footerKey = isMod ? "mod.list.FOOTER" : "player.list.FOOTER";
-		    Component nextButton;
-		    Component prevButton;
-
-		    if(requests.isLastPage()) {
-                nextButton = Messages.get("pagination.DISABLED");
-            } else {
-                nextButton = Messages.get("pagination.NEXT",
-                                          "command", command.replace("%page%",
-                                                                     String.valueOf(requests.getPage() + 1)));
-            }
-
-		    if(requests.isFirstPage()) {
-                prevButton = Messages.get("pagination.DISABLED");
-            } else {
-                prevButton = Messages.get("pagination.PREV",
-                                          "command", command.replace("%page%",
-                                                                     String.valueOf(requests.getPage() - 1)));
-            }
-
-            message = message.append(Component.newline());
-		    message = message.append(new MineDown(cfg.getString(footerKey))
-                                             .placeholderIndicator("%")
-                                             .replace(
-                                                     "count", String.valueOf(requests.getTotal()),
-                                                     "page", String.valueOf(requests.getPage()),
-                                                     "allpages", String.valueOf(requests.getTotalPages())
-                                             )
-                                             .replace("next", nextButton)
-                                             .replace("prev", prevButton)
-                                             .toComponent());
-		}
-
-        player.sendMessage(message);
-	}
 
     /**
      * Sends a notification regarding the given action, actor and request, to relevant players if they are online

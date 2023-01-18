@@ -66,10 +66,11 @@ public class CmdModreq {
 			return;
 		}
 
+		boolean isMod = (player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin"));
         RequestQuery query = new RequestQuery().creator(player.getUniqueId());
 
-		plugin.getRequestRegistry().get(query, page).thenAcceptAsync(requests -> {
-			Messages.sendList(player, requests, "/mr me %page%");
+		plugin.getRequestRegistry().get(query, page, isMod).thenAcceptAsync(requests -> {
+			player.sendMessage(requests.toComponent(player, "/mr me %page%"));
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
 			e.printStackTrace();

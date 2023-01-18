@@ -83,6 +83,7 @@ public class CmdDone {
             Messages.sendModNotification(NotificationType.CLOSED, player, result, "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
+            e.printStackTrace();
             return null;
         });
     }

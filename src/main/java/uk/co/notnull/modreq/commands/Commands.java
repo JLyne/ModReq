@@ -179,13 +179,14 @@ public class Commands {
 		cmdCheck.checkOpenModreqs(player, page != null ? page : 1);
 	}
 
-	@CommandMethod("mr info <id>")
+	@CommandMethod("mr info <id> [updatesPage]")
     @CommandDescription("View information about a specific modreq")
     private void commandInfo(
             final @NonNull Player player,
-            final @Argument("id") Integer id
+            final @Argument("id") Integer id,
+            final @Argument("updatesPage") Integer page
     ) {
-		cmdCheck.checkSpecialModreq(player, id);
+		cmdCheck.checkSpecialModreq(player, id, page);
 	}
 
 	@CommandMethod("mr search <criteria>")
@@ -240,12 +241,13 @@ public class Commands {
 		cmdDone.doneModReq(player, id, message);
 	}
 
-	@CommandMethod("mr open <id>")
+	@CommandMethod("mr open <id> [message]")
     @CommandDescription("Open the specified modreq")
 	@Confirmation
-    private void commandClose(
+    private void commandReopen(
             final @NonNull Player player,
-            final @Argument("id") Integer id
+            final @Argument("id") Integer id,
+            final @Argument("message") @Greedy String message
     ) {
 		cmdReopen.reopenModReq(player, id);
 	}
@@ -291,16 +293,16 @@ public class Commands {
 		cmdComment.addComment(player, id, false, message);
 	}
 
-	@CommandMethod("mr comment remove <id> <noteid>")
+	@CommandMethod("mr comment remove <id> <commentid>")
     @CommandDescription("Remove the specified comment from the specified modreq")
 	@CommandPermission("modreq.mod")
 	@Confirmation
     private void commandCommentRemove(
             final @NonNull Player player,
             final @Argument("id") Integer id,
-            final @Argument("noteid") Integer noteId
+            final @Argument("commentid") Integer commentId
     ) {
-		cmdComment.removeComment(player, id, noteId);
+		cmdComment.removeComment(player, id, commentId);
 	}
 
 	@ProxiedBy("modreq")

@@ -26,7 +26,6 @@ import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.collections.RequestCollection;
 import uk.co.notnull.modreq.collections.UpdateCollection;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -66,7 +65,7 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Retrieves the request with the given id, if it exists in storage
+	 * Retrieves the request with the given id, if it exists in storage, without private updates
 	 * @param id The id to check
 	 * @return Future completed with the Request if it exists, otherwise null.
 	 *         Future completed exceptionally if a storage error occurs.
@@ -76,7 +75,22 @@ public class RequestRegistry {
 			throw new IllegalArgumentException("ID cannot be less than 1");
 		}
 
-		return makeFuture(() -> plugin.getDataSource().getRequest(id));
+		return makeFuture(() -> plugin.getDataSource().getRequest(id, false));
+	}
+
+	/**
+	 * Retrieves the request with the given id, if it exists in storage
+	 * @param id The id to check
+	 * @param includePrivateUpdates Whether to include updates marked as only visible to staff
+	 * @return Future completed with the Request if it exists, otherwise null.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<Request> get(int id, boolean includePrivateUpdates) {
+		if(id < 1) {
+			throw new IllegalArgumentException("ID cannot be less than 1");
+		}
+
+		return makeFuture(() -> plugin.getDataSource().getRequest(id, includePrivateUpdates));
 	}
 
 	/**
@@ -150,11 +164,12 @@ public class RequestRegistry {
 	/**
 	 * Returns a collection containing all requests which match the given query
 	 * @param query The query to match against
+	 * @param includePrivateUpdates Whether to include updates marked as only visible to staff
 	 * @return Future completed with a collection of results if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getAll(RequestQuery query) {
-		return makeFuture(() -> plugin.getDataSource().getAllRequests(query));
+	public CompletableFuture<RequestCollection> getAll(RequestQuery query, boolean includePrivateUpdates) {
+		return makeFuture(() -> plugin.getDataSource().getAllRequests(query, includePrivateUpdates));
 	}
 
 	/**
@@ -162,11 +177,12 @@ public class RequestRegistry {
 	 * @param query The query to match against
 	 * @param page The page to return. Will return an empty collection with isAfterLastPage() == true,
 	 *                if there are not enough results
+	 * @param includePrivateUpdates Whether to include updates marked as only visible to staff
 	 * @return Future completed with a collection of results if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> get(RequestQuery query, int page) {
-		return makeFuture(() -> plugin.getDataSource().getRequests(query, page));
+	public CompletableFuture<RequestCollection> get(RequestQuery query, int page, boolean includePrivateUpdates) {
+		return makeFuture(() -> plugin.getDataSource().getRequests(query, page, includePrivateUpdates));
 	}
 
 	/**
@@ -204,11 +220,11 @@ public class RequestRegistry {
 
 	/**
 	 * Adds a comment by the given player, to the given request
-	 * @param request The request to add the note to
-	 * @param player The player to create the note for
+	 * @param request The request to add the comment to
+	 * @param player The player to create the comment for
 	 * @param isPublic Whether the comment can be seen by the request creator
 	 * @param comment The comment
-	 * @return Future completed with the created note if successful.
+	 * @return Future completed with the created comment if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
 	public CompletableFuture<Update> addComment(Request request, Player player, boolean isPublic, String comment) {
@@ -216,8 +232,8 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Removes the given note from storage
-	 * @param update The note to remove
+	 * Removes the given comment from storage
+	 * @param update The comment to remove
 	 * @return Future completed a boolean indicating whether the removal was successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
@@ -226,22 +242,27 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Returns a collection containing all closed requests created by the given player, with responses they have not yet seen..
+	 * Returns a collection containing all requests created by the given player, with updates they have not yet seen.
 	 * @param player The player to retrieve the unseen requests for
-	 * @param markSeen If true, the retrieved requests will also be marked as seen in storage.
 	 * @return Future completed with the request count if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<RequestCollection> getUnseen(Player player, boolean markSeen) {
+	public CompletableFuture<RequestCollection> getUnseen(Player player) {
 		return makeFuture(() -> {
 			RequestQuery query = RequestQuery.unseen().creator(player.getUniqueId());
-			RequestCollection requests = plugin.getDataSource().getAllRequests(query);
 
-			if(markSeen) {
-				return plugin.getDataSource().markRequestsAsSeen(requests);
-			}
-
-			return requests;
+			RequestCollection collection = plugin.getDataSource().getAllRequests(query, false);
+			return collection;
 		});
+	}
+
+	/**
+	 * Marks all updates for the given request as seen
+	 * @param request The request to mark as seen
+	 * @return Future completed with the request count if successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<Request> markAsSeen(Request request) {
+		return makeFuture(() -> plugin.getDataSource().markRequestAsSeen(request));
 	}
 }

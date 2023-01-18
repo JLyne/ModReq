@@ -30,23 +30,32 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.Configuration;
+import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.RequestBuilder;
+import uk.co.notnull.modreq.RequestQuery;
+import uk.co.notnull.modreq.RequestStatus;
+import uk.co.notnull.modreq.Update;
+import uk.co.notnull.modreq.UpdateSeenStatus;
+import uk.co.notnull.modreq.UpdateType;
 import uk.co.notnull.modreq.collections.RequestCollection;
 import uk.co.notnull.modreq.collections.RequestCollectionBuilder;
 import uk.co.notnull.modreq.collections.UpdateCollection;
 import uk.co.notnull.modreq.collections.UpdateCollectionBuilder;
 
 import java.io.File;
+
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.DriverManager;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class SqlDataSource implements DataSource {
 	private final ModReq plugin;
@@ -128,7 +137,6 @@ public class SqlDataSource implements DataSource {
 		ResultSet result = statement.executeQuery();
 
 		int version = result.getInt(1);
-		plugin.getLogger().info(String.valueOf(version));
 		result.close();
 		statement.close();
 
@@ -195,13 +203,13 @@ public class SqlDataSource implements DataSource {
 				statement.close();
 
 				statement = connection.prepareStatement(
-						"ALTER TABLE modreq_updates ADD COLUMN seen TINYINT DEFAULT 0 NOT NULL");
+						"ALTER TABLE modreq_updates ADD COLUMN status TINYINT DEFAULT 0 NOT NULL");
 				statement.executeUpdate();
 				statement.close();
 
 				// Add update type (0 being old notes)
 				statement = connection.prepareStatement(
-						"ALTER TABLE modreq_updates ADD COLUMN type INT DEFAULT 0 NOT NULL");
+						"ALTER TABLE modreq_updates ADD COLUMN type TINYINT DEFAULT 0 NOT NULL");
 				statement.executeUpdate();
 				statement.close();
 
@@ -212,15 +220,20 @@ public class SqlDataSource implements DataSource {
 
 				while(modreqs.next()) {
 					statement = connection.prepareStatement(
-						"INSERT INTO modreq_updates (modreq_id,actor,content,type,timestamp,seen) VALUES(?,?,?,?,?,?)");
-					statement.setInt(1, modreqs.getInt(1));
-					statement.setString(2, modreqs.getString(2));
-					statement.setString(3, modreqs.getString(3));
-					statement.setInt(4, 2); // Type
-					statement.setLong(5, modreqs.getLong(4));
-					statement.setBoolean(6, modreqs.getInt(5) == 2); // Seen
+						"INSERT INTO modreq_updates (modreq_id,actor,content,type,timestamp,status) VALUES(?,?,?,?,?,?)");
+					statement.setInt(1, modreqs.getInt("id"));
+					statement.setString(2, modreqs.getString("mod_uuid"));
+					statement.setString(3, modreqs.getString("mod_comment"));
+					statement.setInt(4, UpdateType.CLOSE.ordinal());
+					statement.setLong(5, modreqs.getLong("mod_timestamp"));
+					statement.setBoolean(6, modreqs.getInt("done") == UpdateSeenStatus.SEEN.ordinal()); // Seen
 					statement.executeUpdate();
 				}
+
+				//Remove seen status from modreq table
+				statement = connection.prepareStatement("UPDATE modreq set done=1 WHERE done=2");
+				statement.executeUpdate();
+				statement.close();
 
 				// Remove old response columns
 				statement = connection.prepareStatement("ALTER TABLE modreq DROP COLUMN mod_uuid");
@@ -232,11 +245,6 @@ public class SqlDataSource implements DataSource {
 				statement.close();
 
 				statement = connection.prepareStatement("ALTER TABLE modreq DROP COLUMN mod_timestamp");
-				statement.executeUpdate();
-				statement.close();
-
-				// Mark all old notes as seen
-				statement = connection.prepareStatement("UPDATE modreq_updates SET seen = 1 WHERE type = 0");
 				statement.executeUpdate();
 				statement.close();
 
@@ -272,8 +280,8 @@ public class SqlDataSource implements DataSource {
 		return exists;
 	}
 
-	public RequestCollection getAllRequests(RequestQuery query) throws SQLException {
-		PreparedStatement statement = getQuery(query, null);
+	public RequestCollection getAllRequests(RequestQuery query, boolean includePrivateUpdates) throws SQLException {
+		PreparedStatement statement = getQuery(query, null, includePrivateUpdates);
 		ResultSet results = statement.executeQuery();
 
 		RequestCollection collection = createRequestCollection(results);
@@ -284,7 +292,7 @@ public class SqlDataSource implements DataSource {
 		return collection;
 	}
 
-	public RequestCollection getRequests(RequestQuery query, int page) throws SQLException {
+	public RequestCollection getRequests(RequestQuery query, int page, boolean includePrivateUpdates) throws SQLException {
 		int offset = (page - 1) * cfg.getModreqs_per_page();
 		int count = getRequestCount(query);
 		RequestCollectionBuilder builder = RequestCollection.builder().paginated(offset, count);
@@ -293,7 +301,7 @@ public class SqlDataSource implements DataSource {
 			return builder.build();
 		}
 
-		PreparedStatement statement = getQuery(query, page);
+		PreparedStatement statement = getQuery(query, page, includePrivateUpdates);
 		ResultSet results = statement.executeQuery();
 		RequestCollection collection = populateRequestCollection(builder, results);
 
@@ -320,16 +328,17 @@ public class SqlDataSource implements DataSource {
 		return count;
 	}
 
-	public Request getRequest(int id) throws SQLException {
+	public Request getRequest(int id, boolean includePrivateUpdates) throws SQLException {
 		Connection connection = getConnection();
 
-		PreparedStatement requestStatement = connection.prepareStatement(
-				"SELECT m.*, u.id as update_id, u.type, u.actor, u.timestamp, u.timestamp as update_timestamp, " +
-						"u.content, u.seen FROM modreq m " +
-						"LEFT JOIN (SELECT modreq_id, MAX(id) as latest_update FROM modreq_updates GROUP BY modreq_id) lu " +
-						"ON lu.modreq_id = m.id " +
-						"LEFT JOIN modreq_updates u ON u.id = lu.latest_update WHERE m.id = ?");
-		requestStatement.setInt(1, id);
+		PreparedStatement requestStatement = connection.prepareStatement("""
+			SELECT modreq.*, last_update.* FROM modreq
+			LEFT JOIN (SELECT modreq_id, MAX(id) as id FROM modreq_updates WHERE status <> ? GROUP BY modreq_id ) lu
+			ON lu.modreq_id = modreq.id
+			LEFT JOIN modreq_updates last_update ON last_update.id = lu.id WHERE modreq.id = ?
+		""");
+		requestStatement.setInt(1, includePrivateUpdates ? -1 : 0);
+		requestStatement.setInt(2, id);
 
 		ResultSet requestSet = requestStatement.executeQuery();
 		if(!requestSet.next()) {
@@ -538,18 +547,25 @@ public class SqlDataSource implements DataSource {
 		return statement;
 	}
 
-	private PreparedStatement getQuery(RequestQuery query, @Nullable Integer page) throws SQLException {
+	private PreparedStatement getQuery(RequestQuery query, @Nullable Integer page, boolean includePrivateUpdates) throws SQLException {
 		Connection connection = getConnection();
 
-		String sql = "SELECT m.*, u.id as update_id, u.type, u.actor, u.timestamp, u.timestamp as update_timestamp, " +
-				"u.content, u.seen FROM modreq m " +
-				"LEFT JOIN (SELECT modreq_id, MAX(id) as latest_update FROM modreq_updates GROUP BY modreq_id) lu " +
-				"ON lu.modreq_id = m.id " +
-				"LEFT JOIN modreq_updates u ON u.id = lu.latest_update WHERE ";
+		String sql = """
+			SELECT modreq.*, last_update.* FROM modreq
+			LEFT JOIN (SELECT modreq_id, MAX(id) as id FROM modreq_updates WHERE status <> ? GROUP BY modreq_id ) lu
+			ON lu.modreq_id = modreq.id
+			LEFT JOIN modreq_updates last_update ON last_update.id = lu.id WHERE
+		""";
 		List<Object> parameters = new ArrayList<>();
 
+		if(includePrivateUpdates) {
+			parameters.add(-1); // Any valid status
+		} else {
+			parameters.add(0); // Any status other than private (0)
+		}
+
 		sql += buildWhere(query, parameters);
-		sql += " ORDER BY done ASC, timestamp DESC";
+		sql += " ORDER BY last_update.timestamp DESC";
 
 		if(page != null) {
 			sql += " LIMIT ?,?";
@@ -557,8 +573,6 @@ public class SqlDataSource implements DataSource {
 			parameters.add((page - 1) * cfg.getModreqs_per_page()); //Offset
 			parameters.add(cfg.getModreqs_per_page()); //Limit
 		}
-
-		plugin.getLogger().info(sql);
 
 		PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -628,8 +642,8 @@ public class SqlDataSource implements DataSource {
 		}
 
 		if(query.hasSeenState()) {
-			where.add("seen = ?");
-			parameters.add(query.getSeenState() ? 1 : 0);
+			where.add("status = ?");
+			parameters.add(query.getSeenState() ? 2 : 1);
 		}
 
 		if(query.hasSearch()) {
@@ -646,31 +660,19 @@ public class SqlDataSource implements DataSource {
 		return sql;
 	}
 
-	public RequestCollection markRequestsAsSeen(RequestCollection requests) throws SQLException {
-		if(requests.isEmpty()) {
-			return requests;
-		}
-
+	public Request markRequestAsSeen(@NotNull Request request) throws SQLException {
 		Connection connection = getConnection();
 
-		StringBuilder builder = new StringBuilder("UPDATE modreq SET done='2' WHERE id IN (");
+		PreparedStatement pStatement = connection.prepareStatement(
+				"UPDATE modreq_updates SET status=2 WHERE modreq_id = ? AND status=1");
 
-		builder.append("?,".repeat(requests.size()));
-
-		String sql = builder.deleteCharAt(builder.length() -1).append(")").toString();
-		PreparedStatement pStatement = connection.prepareStatement(sql);
-
-		int i = 1;
-		for(Request request: requests) {
-			pStatement.setInt(i++, request.getId());
-		}
-
+		pStatement.setInt(1, request.getId());
 		pStatement.executeUpdate();
 		pStatement.close();
 		connection.commit();
 
 		//FIXME: There must be a better way
-		List<Request> results = requests.stream().map(request -> Request.builder()
+		return Request.builder()
 				.id(request.getId())
 				.creator(request.getCreator())
 				.message(request.getMessage())
@@ -679,8 +681,8 @@ public class SqlDataSource implements DataSource {
 				.claimedBy(request.getOwner())
 				.elevated(request.isElevated())
 				.lastUpdate(request.getLastUpdate())
-				.build()
-		).collect(Collectors.toList());
+				.build();
+	}
 
 	public UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws SQLException {
 		return getUpdatesForRequest(request, null, includePrivate);
@@ -838,7 +840,7 @@ public class SqlDataSource implements DataSource {
 	private RequestBuilder.BuildStep buildRequest(ResultSet resultSet) throws SQLException {
 		int id = resultSet.getInt(1);
 		World world = Bukkit.getWorld(resultSet.getString("world"));
-		Date createdDate = new Date(resultSet.getLong("timestamp"));
+		Date createdDate = new Date(resultSet.getLong(4));
 		Location location = new Location(world, resultSet.getInt("x"),
 										 resultSet.getInt("y"), resultSet.getInt("z"));
 		RequestStatus status = RequestStatus.values()[resultSet.getInt("done")];
@@ -847,21 +849,21 @@ public class SqlDataSource implements DataSource {
 
 		try {
 			if(!resultSet.getString("claimed").isEmpty()) {
-				owner = UUID.fromString(resultSet.getString(9));
+				owner = UUID.fromString(resultSet.getString("claimed"));
 			}
 		} catch(IllegalArgumentException ignored) {}
 
 		Update lastUpdate = null;
 
-		int updateId = resultSet.getInt("update_id");
-
+		int updateId = resultSet.getInt(12);
 		if(updateId > 0) {
 			UpdateType type = UpdateType.values()[resultSet.getInt("type")];
 			UUID actor = UUID.fromString(resultSet.getString("actor"));
-			Date date = new Date(resultSet.getLong("update_timestamp"));
+			Date date = new Date(resultSet.getLong(16));
+			UpdateSeenStatus updateStatus = UpdateSeenStatus.values()[resultSet.getInt("status")];
 
 			lastUpdate = new Update(updateId, id, type, date, actor,
-									resultSet.getString("content"), resultSet.getBoolean("seen"));
+									resultSet.getString("content"), updateStatus);
 		}
 
 		return Request.builder()
