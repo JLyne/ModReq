@@ -232,7 +232,6 @@ public class Commands {
 
 	@CommandMethod("mr close <id> <message>")
     @CommandDescription("Close the specified modreq")
-	@CommandPermission("modreq.mod")
     private void commandClose(
             final @NonNull Player player,
             final @Argument("id") Integer id,
@@ -243,6 +242,7 @@ public class Commands {
 
 	@CommandMethod("mr open <id> [message]")
     @CommandDescription("Open the specified modreq")
+	@CommandPermission("modreq.mod")
 	@Confirmation
     private void commandReopen(
             final @NonNull Player player,
