@@ -285,7 +285,9 @@ public class Messages {
         }
 
         if(player.getName() != null) {
-            if (player.isOnline()) {
+            if(player.equals(context)) {
+                return Messages.get("general.YOU");
+            } else if (player.isOnline()) {
                 return Messages.get("general.ONLINE-PLAYER","player", player.getName());
             } else {
                 return Messages.get("general.OFFLINE-PLAYER", "player", player.getName());
