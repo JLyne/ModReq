@@ -30,7 +30,11 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 public class Request {
     private final Location location;
@@ -121,20 +125,13 @@ public class Request {
         Map<String, Component> replacements = new HashMap<>();
 
         String status;
-        String username;
         Component location;
 
         if (isMod) {
             if (isClosed()) {
                 status = Messages.getString("general.CLOSED");
             } else if(isClaimed()) {
-                if (owner == null || owner.getName() == null) {
-                    status = Messages.getString("general.UNKNOWN-PLAYER");
-                } else if (owner.isOnline()) {
-                    status = Messages.getString("general.ONLINE-PLAYER", "player", owner.getName());
-                } else {
-                    status = Messages.getString("general.OFFLINE-PLAYER", "player", owner.getName());
-                }
+                status = Messages.getPlayerString(owner, context);
             } else {
                 status = Messages.getString("general.OPEN");
             }
@@ -146,19 +143,7 @@ public class Request {
             status = Messages.getString("general." + (isClosed() ? "CLOSED": "OPEN"));
         }
 
-        if (creator.getName() != null) {
-            if (creator.isOnline()) {
-                username = Messages.getString("general.ONLINE-PLAYER","player", creator.getName());
-            } else {
-                username = Messages.getString("general.OFFLINE-PLAYER", "player", creator.getName());
-            }
-        } else {
-            username = Messages.getString("general.UNKNOWN-PLAYER");
-        }
-
         String world = getLocation().getWorld() != null ? getLocation().getWorld().getName() : Messages.getString("general.UNKNOWN-WORLD");
-
-        //TODO Last update
 
         if(isMod) {
             replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());
@@ -188,7 +173,7 @@ public class Request {
 
         replacements.put("id", Component.text(getId()));
         replacements.put("status", new MineDownParser().parse(status).build());
-        replacements.put("creator", new MineDownParser().parse(username).build());
+        replacements.put("creator", Messages.getPlayer(creator, context));
         replacements.put("date", Component.text(ModReq.getPlugin().getFormat().format(getCreateTime())));
         replacements.put("message", Component.text(getMessage()));
         replacements.put("location", location);
