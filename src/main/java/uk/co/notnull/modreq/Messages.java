@@ -129,10 +129,21 @@ public class Messages {
         setDefaultString("mod.notification.UNELEVATED", "%prefix% [Admin flag has been removed from](gray) %link% [by](gray) %actor% %view%");
         setDefaultString("mod.notification.CLOSED", "%prefix% %link% [has been closed by](gray) %actor% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.REOPENED", "%prefix% %link% [has been re-opened by](gray) %actor% %view%");
-        setDefaultString("mod.notification.TELEPORTED", "%prefix% [Teleported to](gray) %link%");
         setDefaultString("mod.notification.COMMENT-ADDED", "%prefix% %actor% [commented on](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.PRIVATE-COMMENT-ADDED", "%prefix% %actor% [commented privately on](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.COMMENT-REMOVED", "%prefix% %actor% [removed a comment from](gray) %link% %view%\n[Message: %message%](gray)");
+
+        setDefaultString("confirmation.CREATED", "%prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+        setDefaultString("confirmation.CLAIMED", "%prefix% %link% [has been claimed](green) %view%");
+        setDefaultString("confirmation.UNCLAIMED", "%prefix% %link% [has been un-claimed](green) %view%");
+        setDefaultString("confirmation.ELEVATED", "%prefix% %link% [has been flagged for admin attention](green) %view%");
+        setDefaultString("confirmation.UNELEVATED", "%prefix% [Admin flag has been removed from](green) %link% %view%");
+        setDefaultString("confirmation.CLOSED", "%prefix% %link% [has been closed](green) %view%");
+        setDefaultString("confirmation.REOPENED", "%prefix% %link% [has been re-opened](green) %view%");
+        setDefaultString("confirmation.TELEPORTED", "%prefix% [Teleported to](green) %link%");
+        setDefaultString("confirmation.COMMENT-ADDED", "%prefix% [Comment has been added to](green) %link% %view%");
+        setDefaultString("confirmation.PRIVATE-COMMENT-ADDED", "%prefix% [Private comment has been added to](green) %link% %view%");
+        setDefaultString("confirmation.COMMENT-REMOVED", "%prefix% [Comment has been removed from](green) %link% %view%");
 
         setDefaultString("mod.info.HEADER", "[----------](color=aqua format=bold) [#%id%](#07a0ff) - %status% [----------](color=aqua format=bold)");
         setDefaultString("mod.info.REQUEST", "[Created by %creator% on %date% at %location%](#fce469)\n[Message: %message%](gray)");
@@ -357,6 +368,7 @@ public class Messages {
         Component message;
         Component prefix = Messages.get("general.PREFIX");
         Component link = Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId()));
+        Component view = Messages.get("action.VIEW","id", String.valueOf(request.getId()));
 
         String username;
 
@@ -381,17 +393,30 @@ public class Messages {
                     .replace("actor", actor)
                     .replace("prefix", prefix)
                     .replace("link", link)
-                    .replace("view", Messages.get("general.action.VIEW",
-                                                        "id", String.valueOf(request.getId())))
+                    .replace("view", view)
                     .replace(replacements).toComponent();
 
             for(Player p : Bukkit.getOnlinePlayers()) {
-                if(p.hasPermission("modreq.mod")) {
+                if(!p.equals(player) && (p.hasPermission("modreq.mod") || p.hasPermission("modreq.admin"))) {
                     p.sendMessage(message);
                 }
             }
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + modKey);
+        }
+
+        if(player.isOnline()) {
+            String confirmationKey = "confirmation." + action.toString().replace("_", "-");
+
+            message = new MineDown(cfg.getString(confirmationKey))
+                  .placeholderIndicator("%")
+                  .replace("id", String.valueOf(request.getId()))
+                  .replace("prefix", prefix)
+                  .replace("link", link)
+                  .replace("view", view)
+                  .replace(replacements).toComponent();
+
+            ((Player) player).sendMessage(message);
         }
 
         if(action.sendToCreator() && !player.getUniqueId().equals(request.getCreator())) {
@@ -408,8 +433,7 @@ public class Messages {
                     .replace("actor", actor)
                     .replace("prefix", prefix)
                     .replace("link", link)
-                    .replace("view", Messages.get("player.action.VIEW",
-                                                        "id", String.valueOf(request.getId())))
+                    .replace("view", view)
                     .replace(replacements).toComponent();
 
             ((Player) creator).sendMessage(message);

@@ -49,7 +49,7 @@ public class CmdTpid {
 
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
-                    Messages.send(player, new MineDown(Messages.getString("mod.notification.TELEPORTED"))
+                    Messages.send(player, new MineDown(Messages.getString("confirmation.TELEPORTED"))
                             .placeholderIndicator("%")
                             .replace("id", String.valueOf(id))
                             .replace("link", Messages.get("general.REQUEST-LINK",
