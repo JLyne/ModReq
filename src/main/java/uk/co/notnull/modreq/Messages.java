@@ -85,7 +85,7 @@ public class Messages {
         setDefaultString("general.CLOSED", "[CLOSED](red)");
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
         setDefaultString("general.ELEVATED", " [\\[ADMIN\\]](show_text=This ModReq has been flagged for admin attention color=aqua)");
-        setDefaultString("general.UNREAD", " [\\[UNREAD\\]](show_text=This ModReq has activity you have not yet seen color=aqua)");
+        setDefaultString("general.UNREAD", " [\\[UNREAD\\]](run_command=/mr info %id% show_text=This ModReq has activity you have not yet seen color=aqua)");
         setDefaultString("general.DATE-FORMAT", "MMM.dd.yyyy, HH:mm:ss");
         setDefaultString("general.LANGUAGE-TAG", "en-GB");
         setDefaultString("general.ONLINE-PLAYER", "[%player%](suggest_command=/w %player%  show_text=Click to whisper %player% color=green)");

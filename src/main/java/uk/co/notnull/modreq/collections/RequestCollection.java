@@ -111,7 +111,7 @@ public class RequestCollection extends PaginatedCollection<Request> {
 
 			if(request.getCreator().equals(context.getUniqueId()) && request.hasUpdates() &&
 					request.getLastUpdate().getSeenStatus().isUnread()) {
-				status += Messages.getString("general.UNREAD");
+				status += Messages.getString("general.UNREAD", "id", String.valueOf(request.getId()));
 			}
 
 			if(isMod) {
