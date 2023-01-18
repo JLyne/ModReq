@@ -513,8 +513,9 @@ public class SqlDataSource implements DataSource {
 
 		id = rs.getInt(1);
 		pStatement.close();
+		connection.commit();
 
-		//Update
+		//TODO: Add CREATE Update?
 
 		return Request.builder()
 				.id(id)
