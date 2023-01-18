@@ -382,17 +382,11 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public Request closeRequest(Request request, Player mod, String message) throws SQLException {
-		long time = System.currentTimeMillis();
-		int status = request.isCreatorOnline() ? 2 : 1;
 		message = message.trim();
 
 		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',done=?,elevated='0' WHERE id=?");
-		pStatement.setString(1, mod.getUniqueId().toString());
-		pStatement.setString(2, message);
-		pStatement.setLong(3, time);
-		pStatement.setLong(4, status);
-		pStatement.setInt(5, request.getId());
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',done=1,elevated='0' WHERE id=?");
+		pStatement.setInt(1, request.getId());
 		pStatement.executeUpdate();
 		pStatement.close();
 
@@ -413,7 +407,7 @@ public class SqlDataSource implements DataSource {
 
 	public Request reopenRequest(Request request, Player mod) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed=NULL,done=0,elevated=0 WHERE id=?");
+		PreparedStatement pStatement = connection.prepareStatement("UPDATE modreq SET claimed='',done=0,elevated=0 WHERE id=?");
 
 		pStatement.setInt(1, request.getId());
 		int result = pStatement.executeUpdate();
