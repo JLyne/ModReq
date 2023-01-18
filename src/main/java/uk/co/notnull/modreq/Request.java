@@ -206,9 +206,9 @@ public class Request {
 
         if(isMod) {
             actions = actions.append(Messages.get("action.TELEPORT", "id", String.valueOf(id)));
+            actions = actions.append(Component.space());
 
             if (!isClosed()) {
-                actions = actions.append(Component.space());
 
                 if (isClaimedBy(context.getUniqueId())) {
                     actions = actions.append(Messages.get("action.UNCLAIM", "id", String.valueOf(id)));
