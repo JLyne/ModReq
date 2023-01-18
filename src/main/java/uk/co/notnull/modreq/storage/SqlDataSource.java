@@ -365,7 +365,8 @@ public class SqlDataSource implements DataSource {
 			throw new SQLException("Row update failed");
 		}
 
-		Update update = addUpdateToRequest(connection, request, UpdateType.ELEVATE, mod, null);
+		UpdateType type = elevated ? UpdateType.ELEVATE : UpdateType.UNELEVATE;
+		Update update = addUpdateToRequest(connection, request, type, mod, null);
 		connection.commit();
 
 		return Request.builder()
