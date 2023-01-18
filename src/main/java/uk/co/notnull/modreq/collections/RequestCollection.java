@@ -131,7 +131,7 @@ public class RequestCollection extends PaginatedCollection<Request> {
 			}
 
 			replacements.put("id", Component.text(request.getId()));
-			replacements.put("link", Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId())));
+			replacements.put("link", Messages.getRequestLink(request));
 			replacements.put("status", new MineDownParser().parse(status).build());
 			replacements.put("creator", Messages.getPlayer(creator, context));
 			replacements.put("date", Messages.getFormattedDate(request.getCreateTime()));

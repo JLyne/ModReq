@@ -356,10 +356,7 @@ public class Messages {
      */
     public static void send(Player recipient, String key, String ...replacements) {
         if(cfg.getString(key) != null) {
-            recipient.sendMessage(new MineDown(cfg.getString(key))
-                                         .placeholderIndicator("%")
-                                         .replace("prefix", Messages.get("general.PREFIX"))
-                                         .replace(replacements).toComponent());
+            recipient.sendMessage(Messages.get(key, replacements));
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
         }
@@ -398,7 +395,7 @@ public class Messages {
     public static void sendModNotification(NotificationType action, OfflinePlayer player, Request request, String ...replacements) {
         Component message;
         Component prefix = Messages.get("general.PREFIX");
-        Component link = Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId()));
+        Component link = Messages.getRequestLink(request);
         Component view = Messages.get("action.VIEW","id", String.valueOf(request.getId()));
 
         String username;

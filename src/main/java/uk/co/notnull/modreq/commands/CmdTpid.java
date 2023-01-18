@@ -22,12 +22,14 @@
 
 package uk.co.notnull.modreq.commands;
 
-import de.themoep.minedown.adventure.MineDown;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Request;
+
+import java.util.Map;
 
 public class CmdTpid {
     private final ModReq plugin;
@@ -49,12 +51,10 @@ public class CmdTpid {
 
             Bukkit.getScheduler().runTask(plugin, () -> {
                 if(player.teleport(request.getLocation())) {
-                    Messages.send(player, new MineDown(Messages.getString("confirmation.TELEPORTED"))
-                            .placeholderIndicator("%")
-                            .replace("id", String.valueOf(id))
-                            .replace("link", Messages.get("general.REQUEST-LINK",
-                                                          "id", String.valueOf(request.getId())))
-                            .toComponent());
+                    Messages.send(player, "confirmation.TELEPORTED", Map.of(
+                            "id", Component.text(id),
+                            "link", Messages.getRequestLink(request)
+                    ));
                 } else {
                     Messages.send(player, "error.TELEPORT-ERROR");
                 }
