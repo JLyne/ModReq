@@ -788,19 +788,27 @@ public class SqlDataSource implements DataSource {
 
 	private Update addUpdateToRequest(Connection connection, Request request, UpdateType type, Player player, String message) throws SQLException {
 		long time = System.currentTimeMillis();
+		int status = UpdateSeenStatus.NOT_SEEN.ordinal();
+
+		if(!type.isPublic()) {
+			status = UpdateSeenStatus.PRIVATE.ordinal();
+		} else if(request.getCreator().equals(player.getUniqueId())) { //Mark creators own actions as seen immediately
+			status = UpdateSeenStatus.SEEN.ordinal();
+		}
 
 		if(message != null) {
 			message = message.trim();
 		}
 
 		PreparedStatement pStatement = connection.prepareStatement(
-				"INSERT INTO modreq_updates (modreq_id,type,actor,timestamp,content) VALUES (?,?,?,?,?)",
+				"INSERT INTO modreq_updates (modreq_id,type,actor,timestamp,content,status) VALUES (?,?,?,?,?,?)",
 				Statement.RETURN_GENERATED_KEYS);
 		pStatement.setInt(1, request.getId());
 		pStatement.setInt(2, type.ordinal());
 		pStatement.setString(3, player.getUniqueId().toString());
 		pStatement.setLong(4, time);
 		pStatement.setString(5, message);
+		pStatement.setInt(6, status);
 		pStatement.executeUpdate();
 		pStatement.close();
 
