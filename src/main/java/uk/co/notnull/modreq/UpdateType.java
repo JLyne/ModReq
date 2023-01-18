@@ -23,12 +23,12 @@
 package uk.co.notnull.modreq;
 
 public enum UpdateType {
-	CREATE(true, false),
 	PRIVATE_COMMENT(false, true),
 	PUBLIC_COMMENT(true, true),
+	CREATE(true, false),
 	CLOSE(true, false),
 	REOPEN(true, false),
-	ELEVATE(true, false),
+	ELEVATE(false, false),
 	UNELEVATE(false, false),
 	CLAIM(false, false),
 	UNCLAIM(false, false);
