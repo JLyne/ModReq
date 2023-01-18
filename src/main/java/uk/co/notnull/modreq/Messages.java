@@ -107,11 +107,11 @@ public class Messages {
         setDefaultString("confirmation.confirm", "%prefix% [Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
         setDefaultString("confirmation.nothing", "%prefix% [You don't have any pending commands.](red)");
 
-        setDefaultString("player.notification.JOIN", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
+        setDefaultString("player.notification.JOIN-MULTIPLE", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
+        setDefaultString("player.notification.JOIN", "%prefix% [New activity on your ModReq](green) %link% %view%");
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has re-opened your ModReq](green) %link% %view%");
         setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link% %view%\n[Message: %message%](gray)");
-        setDefaultString("player.notification.MULTIPLE-UPDATES", "%prefix% [%count% updates on your ModReq](green) %link% %view%");
 
         setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq  show_text=Create a new ModReq color=gold)");
         setDefaultString("player.list.ITEM", "%link% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469) %view%\n%last_update%[Message: %message%](gray)\n");
@@ -344,6 +344,10 @@ public class Messages {
                 Messages.getString("general.UNKNOWN-DATE");
     }
 
+    public static Component getRequestLink(Request request) {
+        return Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId()));
+    }
+
     /**
      * Send a language string to the specified player
      * @param recipient The player to send the message to
@@ -356,6 +360,20 @@ public class Messages {
                                          .placeholderIndicator("%")
                                          .replace("prefix", Messages.get("general.PREFIX"))
                                          .replace(replacements).toComponent());
+        } else {
+            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+        }
+    }
+
+    /**
+     * Send a language string to the specified player
+     * @param recipient The player to send the message to
+     * @param key The key for the language string to send
+     * @param replacements A list of placeholders and their replacements
+     */
+    public static void send(Player recipient, String key, Map<String, ?> replacements) {
+        if(cfg.getString(key) != null) {
+            recipient.sendMessage(Messages.get(key, replacements));
         } else {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
         }

@@ -22,10 +22,13 @@
 
 package uk.co.notnull.modreq.listener;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
 import uk.co.notnull.modreq.collections.RequestCollection;
+
+import java.util.Map;
 
 public class PlayerJoin {
     private final ModReq plugin;
@@ -42,9 +45,17 @@ public class PlayerJoin {
         plugin.getRequestRegistry().getUnseen(player).thenAcceptAsync((RequestCollection requests) -> {
             if(requests.isEmpty()) {
                 return;
+            } else if(requests.size() == 1) {
+                int id = requests.get(0).getId();
+
+                Messages.send(player, "player.notification.JOIN", Map.of(
+                        "id", Component.text(id),
+                        "link", Messages.getRequestLink(requests.get(0))));
+            } else {
+                Messages.send(player, "player.notification.JOIN-MULTIPLE",
+                              "count", String.valueOf(requests.size()));
             }
 
-            Messages.send(player, "player.notification.JOIN", "count", String.valueOf(requests.size()));
             plugin.playSound(player);
         }).exceptionally(e -> {
             e.printStackTrace();
