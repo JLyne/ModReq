@@ -344,8 +344,20 @@ public class Messages {
                 Messages.getString("general.UNKNOWN-DATE");
     }
 
+    /**
+     * Returns a component containing a clickable request ID
+     * @param request The request
+     */
     public static Component getRequestLink(Request request) {
         return Messages.get("general.REQUEST-LINK", "id", String.valueOf(request.getId()));
+    }
+
+    /**
+     * Returns a component containing a clickable request view button
+     * @param request The request
+     */
+    public static Component getViewButton(Request request) {
+        return Messages.get("action.VIEW", "id", String.valueOf(request.getId()));
     }
 
     /**
@@ -396,7 +408,7 @@ public class Messages {
         Component message;
         Component prefix = Messages.get("general.PREFIX");
         Component link = Messages.getRequestLink(request);
-        Component view = Messages.get("action.VIEW","id", String.valueOf(request.getId()));
+        Component view = Messages.getViewButton(request);
 
         String username;
 

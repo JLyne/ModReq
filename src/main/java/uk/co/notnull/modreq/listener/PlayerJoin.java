@@ -46,11 +46,12 @@ public class PlayerJoin {
             if(requests.isEmpty()) {
                 return;
             } else if(requests.size() == 1) {
-                int id = requests.get(0).getId();
+                Request request = requests.get(0);
 
                 Messages.send(player, "player.notification.JOIN", Map.of(
-                        "id", Component.text(id),
-                        "link", Messages.getRequestLink(requests.get(0))));
+                        "id", Component.text(request.getId()),
+                        "view", Messages.getViewButton(request),
+                        "link", Messages.getRequestLink(request)));
             } else {
                 Messages.send(player, "player.notification.JOIN-MULTIPLE",
                               "count", String.valueOf(requests.size()));

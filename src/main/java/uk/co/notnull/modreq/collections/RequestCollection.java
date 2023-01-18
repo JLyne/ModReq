@@ -136,7 +136,7 @@ public class RequestCollection extends PaginatedCollection<Request> {
 			replacements.put("creator", Messages.getPlayer(creator, context));
 			replacements.put("date", Messages.getFormattedDate(request.getCreateTime()));
 			replacements.put("message", Component.text(request.getMessage()));
-			replacements.put("view", Messages.get("action.VIEW","id", String.valueOf(request.getId())));
+			replacements.put("view", Messages.getViewButton(request));
 
 			if(isMod) {
 				result = result.append(Messages.get("mod.list.ITEM", replacements));
