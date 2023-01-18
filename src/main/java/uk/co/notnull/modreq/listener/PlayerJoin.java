@@ -27,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.collections.RequestCollection;
 
 public class PlayerJoin {
     private final ModReq plugin;

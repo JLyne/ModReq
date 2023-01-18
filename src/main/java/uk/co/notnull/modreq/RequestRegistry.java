@@ -23,6 +23,7 @@
 package uk.co.notnull.modreq;
 
 import org.bukkit.entity.Player;
+import uk.co.notnull.modreq.collections.RequestCollection;
 
 import java.util.List;
 import java.util.concurrent.Callable;

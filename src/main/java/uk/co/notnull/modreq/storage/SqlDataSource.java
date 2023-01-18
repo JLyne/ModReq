@@ -30,6 +30,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.collections.RequestCollection;
+import uk.co.notnull.modreq.collections.RequestCollectionBuilder;
 
 import java.io.File;
 import java.sql.Connection;

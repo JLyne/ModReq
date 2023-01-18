@@ -20,7 +20,9 @@
  *
  */
 
-package uk.co.notnull.modreq;
+package uk.co.notnull.modreq.collections;
+
+import uk.co.notnull.modreq.Request;
 
 import java.util.ArrayList;
 import java.util.List;

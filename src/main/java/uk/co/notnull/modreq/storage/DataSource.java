@@ -24,6 +24,7 @@ package uk.co.notnull.modreq.storage;
 
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.*;
+import uk.co.notnull.modreq.collections.RequestCollection;
 
 import java.sql.Connection;
 import java.sql.SQLException;
