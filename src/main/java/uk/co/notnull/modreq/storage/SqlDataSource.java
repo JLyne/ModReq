@@ -29,9 +29,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
 import uk.co.notnull.modreq.*;
 import uk.co.notnull.modreq.collections.RequestCollection;
 import uk.co.notnull.modreq.collections.RequestCollectionBuilder;
+import uk.co.notnull.modreq.collections.UpdateCollection;
+import uk.co.notnull.modreq.collections.UpdateCollectionBuilder;
 
 import java.io.File;
 import java.sql.Connection;
@@ -332,7 +335,7 @@ public class SqlDataSource implements DataSource {
 		if(!requestSet.next()) {
 			return null;
 		} else {
-			Request request = buildRequest(requestSet).updates(getUpdates(id)).build();
+			Request request = buildRequest(requestSet).build();
 
 			requestSet.close();
 			requestStatement.close();
@@ -356,8 +359,6 @@ public class SqlDataSource implements DataSource {
 		Update update = addUpdateToRequest(connection, request, UpdateType.ELEVATE, mod, null);
 		connection.commit();
 
-		//TODO Add to update list
-
 		return Request.builder()
 				.id(request.getId())
 				.creator(request.getCreator())
@@ -367,7 +368,6 @@ public class SqlDataSource implements DataSource {
 				.claimedBy(request.getOwner())
 				.elevated(elevated)
 				.lastUpdate(update)
-				.updates(request.getUpdates())
 				.build();
 	}
 
@@ -388,7 +388,6 @@ public class SqlDataSource implements DataSource {
 
 		Update update = addUpdateToRequest(connection, request, UpdateType.CLOSE, mod, message);
 		connection.commit();
-		//TODO Add to update list
 
 		return Request.builder()
 				.id(request.getId())
@@ -399,7 +398,6 @@ public class SqlDataSource implements DataSource {
 				.claimedBy(request.getOwner())
 				.elevated(false)
 				.lastUpdate(update)
-				.updates(request.getUpdates())
 				.build();
 	}
 
@@ -417,7 +415,6 @@ public class SqlDataSource implements DataSource {
 
 		Update update = addUpdateToRequest(connection, request, UpdateType.REOPEN, mod, null);
 		connection.commit();
-		//TODO Add to update list
 
 		return Request.builder()
 				.id(request.getId())
@@ -425,7 +422,6 @@ public class SqlDataSource implements DataSource {
 				.message(request.getMessage())
 				.createdAt(request.getCreateTime())
 				.location(request.getLocation())
-				.updates(request.getUpdates())
 				.lastUpdate(update)
 				.build();
 	}
@@ -447,7 +443,6 @@ public class SqlDataSource implements DataSource {
 
 		Update update = addUpdateToRequest(connection, request, UpdateType.CLAIM, player, null);
 		connection.commit();
-		//TODO Add to update list
 
 		return Request.builder()
 				.id(request.getId())
@@ -458,7 +453,6 @@ public class SqlDataSource implements DataSource {
 				.claimedBy(player.getUniqueId())
 				.elevated(request.isElevated())
 				.lastUpdate(update)
-				.updates(request.getUpdates())
 				.build();
 	}
 
@@ -486,7 +480,6 @@ public class SqlDataSource implements DataSource {
 				.location(request.getLocation())
 				.elevated(request.isElevated())
 				.lastUpdate(update)
-				.updates(request.getUpdates())
 				.build();
 	}
 
@@ -686,37 +679,93 @@ public class SqlDataSource implements DataSource {
 				.claimedBy(request.getOwner())
 				.elevated(request.isElevated())
 				.lastUpdate(request.getLastUpdate())
-				.updates(request.getUpdates())
 				.build()
 		).collect(Collectors.toList());
 
-		return requests.toBuilder().requests(results).build();
+	public UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws SQLException {
+		return getUpdatesForRequest(request, null, includePrivate);
 	}
 
-	public List<Update> getUpdatesForRequest(Request request) throws SQLException {
+	public UpdateCollection getUpdatesForRequest(Request request, @Nullable Integer page, boolean includePrivate) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement(
-				"SELECT id,type,actor,timestamp,content,seen FROM modreq_updates WHERE modreq_id=? ORDER BY time DESC");
-		pStatement.setInt(1, request.getId());
-		ResultSet sqlres = pStatement.executeQuery();
+		UpdateCollectionBuilder builder = UpdateCollection.builder();
 
-		List<Update> results = new ArrayList<>();
+		List<Object> parameters = new ArrayList<>();
+		// Sort by newest first, so we don't need to use an offset for the newest activity
+		String sql = "SELECT id,type,actor,timestamp,content,status FROM modreq_updates WHERE modreq_id=? AND status <> ? ORDER BY timestamp ASC LIMIT ?,?";
 
-		while(!sqlres.isAfterLast()) {
-			UUID creator = UUID.fromString(sqlres.getString(2));
-			Date time = new Date(sqlres.getLong(4));
-			UpdateType type = UpdateType.values()[sqlres.getInt(2)];
+		parameters.add(request.getId());
 
-			results.add(new Update(sqlres.getInt(1), request.getId(), type, time, creator,
-								   sqlres.getString(5), sqlres.getBoolean(6)));
-			sqlres.next();
+		if(includePrivate) {
+			parameters.add(-1); // Any valid status
+		} else {
+			parameters.add(0); // Any status other than private (0)
 		}
 
-		sqlres.close();
-		pStatement.close();
+		int count = getUpdateCount(request, includePrivate);
+		int lastPage = (int) Math.ceil((float) count / cfg.getModreqs_per_page());
 
-		return results;
+		if(page == null) {
+			page = lastPage;
+		} else if(page > lastPage) {
+			return builder.build();
+		}
+
+		int offset = (page - 1) * cfg.getModreqs_per_page();
+
+		parameters.add(offset); //Offset
+		parameters.add(cfg.getModreqs_per_page()); //Limit
+		builder.paginated(offset, count);
+
+		PreparedStatement statement = connection.prepareStatement(sql);
+
+		for(int i = 0; i < parameters.size(); i++) {
+			statement.setObject(i + 1, parameters.get(i));
+		}
+
+		ResultSet sqlres = statement.executeQuery();
+		List<Update> updates = new ArrayList<>();
+
+		while(sqlres.next()) {
+			UUID creator = UUID.fromString(sqlres.getString("actor"));
+			Date time = new Date(sqlres.getLong("timestamp"));
+			UpdateType type = UpdateType.values()[sqlres.getInt("type")];
+			UpdateSeenStatus status = UpdateSeenStatus.values()[sqlres.getInt("status")];
+
+			updates.add(new Update(sqlres.getInt("id"), request.getId(), type, time, creator,
+										sqlres.getString("content"), status));
+		}
+
+		builder.updates(updates);
+
+		sqlres.close();
+		statement.close();
+
+		return builder.build();
 	}
+
+	public int getUpdateCount(Request request, boolean includePrivate) throws SQLException {
+		Connection connection = getConnection();
+		PreparedStatement statement = connection.prepareStatement(
+				"SELECT COUNT(*) FROM modreq_updates WHERE modreq_id = ? and status <> ?");
+		statement.setInt(1, request.getId());
+		statement.setInt(2, includePrivate ? -1 : 0);
+
+		ResultSet sqlres = statement.executeQuery();
+
+		if(!sqlres.next()) {
+			sqlres.close();
+			statement.close();
+			throw new SQLException("Invalid response");
+		}
+
+		int count = sqlres.getInt(1);
+		sqlres.close();
+		statement.close();
+
+		return count;
+	}
+
 
 	public Update addCommentToRequest(Request request, Player player, boolean isPublic, String message) throws SQLException {
 		UpdateType type = isPublic ? UpdateType.PUBLIC_COMMENT : UpdateType.PRIVATE_COMMENT;
@@ -771,10 +820,6 @@ public class SqlDataSource implements DataSource {
 		return new Update(id, request.getId(), type, new Date(time), player.getUniqueId(), message);
 	}
 
-	private List<Update> getUpdates(int id) throws SQLException {
-		return getUpdates(List.of(id)).get(id);
-	}
-
 	private int getCount(PreparedStatement statement) throws SQLException {
 		ResultSet sqlres = statement.executeQuery();
 
@@ -788,51 +833,6 @@ public class SqlDataSource implements DataSource {
 		sqlres.close();
 
 		return count;
-	}
-
-	private Map<Integer, List<Update>> getUpdates(List<Integer> ids) throws SQLException {
-		if(ids.isEmpty()) {
-			new HashMap<>();
-		}
-
-		Connection connection = getConnection();
-		StringBuilder builder = new StringBuilder("SELECT id,modreq_id,type,timestamp,actor,content,seen FROM modreq_updates WHERE modreq_id IN (");
-		Map<Integer, List<Update>> results = new HashMap<>();
-
-		for(int id: ids) {
-			results.put(id, new ArrayList<>());
-			builder.append("?,");
-		}
-
-		String sql = builder.deleteCharAt(builder.length() -1).append(")").toString();
-		PreparedStatement pStatement = connection.prepareStatement(sql);
-
-		int i = 1;
-		for(Integer id: ids) {
-			pStatement.setInt(i++, id);
-		}
-
-		ResultSet sqlres = pStatement.executeQuery();
-
-		while(sqlres.next()) {
-			int requestId = sqlres.getInt(2);
-			UUID creator = UUID.fromString(sqlres.getString(5));
-
-			if(!results.containsKey(requestId)) {
-				results.put(requestId, new ArrayList<>());
-			}
-
-			results.get(requestId).add(new Update(
-					sqlres.getInt("id"), requestId,
-					UpdateType.values()[sqlres.getInt("type")],
-					new Date(sqlres.getLong("timestamp")), creator,
-					sqlres.getString("content"), sqlres.getBoolean("seen")));
-		}
-
-		sqlres.close();
-		pStatement.close();
-
-		return results;
 	}
 
 	private RequestBuilder.BuildStep buildRequest(ResultSet resultSet) throws SQLException {
@@ -881,29 +881,13 @@ public class SqlDataSource implements DataSource {
 	}
 
 	private RequestCollection populateRequestCollection(RequestCollectionBuilder collection, ResultSet resultSet) throws SQLException {
-		List<Integer> ids = new ArrayList<>();
-
 		if(resultSet.isAfterLast() || !resultSet.next()) {
 			return collection.build();
 		}
 
-		Map<Integer, RequestBuilder.BuildStep> requests = new HashMap<>();
-
 		while(!resultSet.isAfterLast()) {
-			int id = resultSet.getInt(1);
-			ids.add(id);
-			requests.put(id, buildRequest(resultSet));
+			collection.addRequest(buildRequest(resultSet).build());
 			resultSet.next();
-		}
-
-		Map<Integer, List<Update>> notes = getUpdates(ids);
-
-		for(int id: ids) {
-			if(notes.containsKey(id)) {
-				collection.addRequest(requests.get(id).updates(notes.get(id)).build());
-			} else {
-				collection.addRequest(requests.get(id).build());
-			}
 		}
 
 		return collection.build();

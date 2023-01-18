@@ -24,6 +24,7 @@ package uk.co.notnull.modreq;
 
 import org.bukkit.entity.Player;
 import uk.co.notnull.modreq.collections.RequestCollection;
+import uk.co.notnull.modreq.collections.UpdateCollection;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -179,13 +180,26 @@ public class RequestRegistry {
 	}
 
 	/**
-	 * Retrieves the update history for the given request
+	 * Retrieves the given update history page for the given request
 	 * @param request The request to retrieve the history for
+	 * @param page The page of updates to retrieve. If null is passed the last page will be returned.
+	 * @param includePrivate Whether to include updates marked as only visible to staff
 	 * @return Future completed with a collection of updates if successful.
 	 *         Future completed exceptionally if a storage error occurs.
 	 */
-	public CompletableFuture<List<Update>> getUpdates(Request request) {
-		return makeFuture(() -> plugin.getDataSource().getUpdatesForRequest(request));
+	public CompletableFuture<UpdateCollection> getUpdates(Request request, Integer page, boolean includePrivate) {
+		return makeFuture(() -> plugin.getDataSource().getUpdatesForRequest(request, page, includePrivate));
+	}
+
+	/**
+	 * Retrieves the entire update history for the given request
+	 * @param request The request to retrieve the history for
+	 * @param includePrivate Whether to include updates marked as only visible to staff
+	 * @return Future completed with a collection of updates if successful.
+	 *         Future completed exceptionally if a storage error occurs.
+	 */
+	public CompletableFuture<UpdateCollection> getAllUpdates(Request request, boolean includePrivate) {
+		return makeFuture(() -> plugin.getDataSource().getAllUpdatesForRequest(request, includePrivate));
 	}
 
 	/**

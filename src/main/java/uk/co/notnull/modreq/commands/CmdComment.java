@@ -75,7 +75,7 @@ public class CmdComment {
 				return new CompletableFuture<>();
             }
 
-             return plugin.getRequestRegistry().getUpdates(result);
+             return plugin.getRequestRegistry().getAllUpdates(result, true);
         }).thenComposeAsync((List<Update> updates) -> {
             comment.set(updates.get(commentId));
 

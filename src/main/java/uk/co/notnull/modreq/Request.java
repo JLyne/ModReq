@@ -42,9 +42,8 @@ public class Request {
     private final String message;
     private final UUID owner;
     private final Update lastUpdate;
-    private final List<Update> updates;
 
-    Request(int id, UUID creator, RequestStatus status, String message, Date createTime, Location location, UUID owner, boolean elevated, Update lastUpdate, List<Update> updates) {
+    Request(int id, UUID creator, RequestStatus status, String message, Date createTime, Location location, UUID owner, boolean elevated, Update lastUpdate) {
         Objects.requireNonNull(creator);
         Objects.requireNonNull(message);
         Objects.requireNonNull(createTime);
@@ -58,7 +57,6 @@ public class Request {
         this.lastUpdate = lastUpdate;
         this.elevated = elevated;
         this.location = location;
-        this.updates = updates;
     }
 
     public static RequestBuilder.IDStep builder() {
@@ -98,11 +96,7 @@ public class Request {
     }
 
     public boolean hasUpdates() {
-        return !updates.isEmpty();
-    }
-
-    public List<Update> getUpdates() {
-        return new ArrayList<>(updates);
+        return lastUpdate != null;
     }
 
     public boolean isElevated() { return this.elevated; }
@@ -203,43 +197,12 @@ public class Request {
         replacements.put("y", Component.text(getLocation().getBlockY()));
         replacements.put("z", Component.text(getLocation().getBlockZ()));
 
-        if(isMod) {
-            result = result.append(Messages.get("mod.info.HEADER", replacements));
-            result = result.append(Component.newline());
-            result = result.append(Messages.get("mod.info.REQUEST", replacements));
-        } else {
-            result = result.append(Messages.get("player.info.HEADER", replacements));
-            result = result.append(Component.newline());
-            result = result.append(Messages.get("player.info.REQUEST", replacements));
-        }
+        result = result.append(Messages.get(isMod ? "mod.info.HEADER" : "player.info.HEADER", replacements));
+        result = result.append(Component.newline());
+        result = result.append(Messages.get(isMod ? "mod.info.REQUEST" : "player.info.REQUEST", replacements));
+        result = result.append(Component.newline());
 
-        if(isMod) {
-            for(int i = 0; i < updates.size(); i++) {
-                Update update = updates.get(i);
-                OfflinePlayer noteCreator = Bukkit.getOfflinePlayer(update.getCreator());
-                String creatorName;
-
-                if (noteCreator.getName() != null) {
-                    creatorName = noteCreator.getName();
-                } else {
-                    creatorName = Messages.getString("general.UNKNOWN-PLAYER");
-                }
-
-                result = result.append(Component.newline());
-                result = result.append(Messages.get("mod.info.NOTE",
-                                                    "id", String.valueOf(i + 1),
-                                                    "creator", creatorName,
-                                                    "message", update.getMessage()));
-            }
-
-            result = result.append(Component.newline());
-            result = result.append(getActions(context));
-            result = result.append(Component.newline());
-            result = result.append(Messages.get("mod.info.FOOTER", replacements));
-        } else {
-            result = result.append(Component.newline());
-            result = result.append(Messages.get("player.info.FOOTER", replacements));
-        }
+        result = result.append(getActions(context));
 
         return result;
     }

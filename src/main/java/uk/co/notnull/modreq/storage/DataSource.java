@@ -49,5 +49,6 @@ public interface DataSource {
 	RequestCollection markRequestsAsSeen(RequestCollection ids) throws Exception;
 	Update addCommentToRequest(Request request, Player player, boolean isPublic, String content) throws Exception;
 	boolean removeComment(Update update) throws Exception;
-	List<Update> getUpdatesForRequest(Request request) throws Exception;
+	UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws Exception;
+	UpdateCollection getUpdatesForRequest(Request request, @Nullable Integer page, boolean includePrivate) throws Exception;
 }

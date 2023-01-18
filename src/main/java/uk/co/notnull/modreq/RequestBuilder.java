@@ -130,7 +130,7 @@ public class RequestBuilder {
 		}
 
 		public Request build() {
-			return new Request(id, creator, status, message, createTime, location, owner, elevated, lastUpdate, updates);
+			return new Request(id, creator, status, message, createTime, location, owner, elevated, lastUpdate);
 		}
 	}
 }
