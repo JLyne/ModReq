@@ -92,7 +92,8 @@ public class CmdCheck implements Listener {
 				return;
 			}
 
-			Component message = request.get().toComponent(player).append(Component.newline());
+			Component message = Component.newline()
+					.append(request.get().toComponent(player).append(Component.newline()));
 
 			if(!updates.isEmpty()) {
 				message = message.append(Component.newline()) //???

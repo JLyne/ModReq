@@ -445,6 +445,7 @@ public class Messages {
             ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + modKey);
         }
 
+        // Send confirmation to acting player
         if(player.isOnline()) {
             String confirmationKey = "confirmation." + action.toString().replace("_", "-");
 
@@ -459,11 +460,13 @@ public class Messages {
             ((Player) player).sendMessage(message);
         }
 
+        // Send notification to creator if they should be notified, are online, and are not the player who performed
+        // the action
         if(action.sendToCreator() && !player.getUniqueId().equals(request.getCreator())) {
             OfflinePlayer creator = Bukkit.getOfflinePlayer(request.getCreator());
             String playerKey = "player.notification." + action.toString().replace("_", "-");
 
-            if(!creator.isOnline() || cfg.getString(modKey) == null) {
+            if(!creator.isOnline() || cfg.getString(playerKey) == null) {
                 return;
             }
 
