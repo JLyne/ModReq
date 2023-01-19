@@ -81,7 +81,7 @@ public class Messages {
         setDefaultString("error.NO-PERMISSION", "%prefix% [You do not have permission to do this.](red)");
         setDefaultString("error.REOPEN-INSTEAD", "%prefix% [You cannot comment on closed ModReqs. Would you like to reopen the ModReq instead?](red)\n[\\[Reopen\\]](run_command=/mr open %id% %message% show_text=Reopen this ModReq color=gold)");
 
-        setDefaultString("general.PREFIX", "[ModReq](color=red) [//](white)");
+        setDefaultString("general.PREFIX", "[ModReq >](color=red format=bold)");
         setDefaultString("general.OPEN", "[OPEN](green)");
         setDefaultString("general.CLOSED", "[CLOSED](red)");
         setDefaultString("general.CLAIMED", "[CLAIMED \\(%player%\\)](gold)");
