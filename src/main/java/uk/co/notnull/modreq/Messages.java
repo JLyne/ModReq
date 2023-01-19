@@ -74,8 +74,9 @@ public class Messages {
         setDefaultString("error.TELEPORT-ERROR", "%prefix% [An error has occurred while teleporting, please contact an administrator.](red)");
         setDefaultString("error.TELEPORT-UNLOADED", "%prefix% [The world this ModReq was created in is not loaded.](red)");
         setDefaultString("error.PAGE-ERROR", "%prefix% [Page %page% does not exist](red)");
-        setDefaultString("error.COMMENT-DOES-NOT-EXIST", "%prefix% [This comment id does not exist.](red)");
+        setDefaultString("error.COMMENT-DOES-NOT-EXIST", "%prefix% [This comment does not exist.](red)");
         setDefaultString("error.COMMENT-OTHER", "%prefix% [You did not create this comment.](red)");
+        setDefaultString("error.NOT-A-COMMENT", "%prefix% [You may only delete comments, not other activity.](red)");
         setDefaultString("error.MAX-OPEN-MODREQS", "%prefix% [You cannot open more than](red) [%max%](dark_red) [ModReq(s) at the same time.](red)");
         setDefaultString("error.NO-PREVIOUS-SEARCH", "%prefix% [You have no previous search.](red) [\\[Start new Search\\]](suggest_command=/mr search  show_text=Start a new search color=gold)");
         setDefaultString("error.NO-PERMISSION", "%prefix% [You do not have permission to do this.](red)");

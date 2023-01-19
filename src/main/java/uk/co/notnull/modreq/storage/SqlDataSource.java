@@ -669,16 +669,20 @@ public class SqlDataSource implements DataSource {
 	}
 
 	public UpdateCollection getAllUpdatesForRequest(Request request, boolean includePrivate) throws SQLException {
-		return getUpdatesForRequest(request, null, includePrivate);
+		return getUpdates(request, false, null, includePrivate);
 	}
 
 	public UpdateCollection getUpdatesForRequest(Request request, @Nullable Integer page, boolean includePrivate) throws SQLException {
+		return getUpdates(request, true, page, includePrivate);
+	}
+
+	private UpdateCollection getUpdates(Request request, boolean paginated, @Nullable Integer page, boolean includePrivate) throws SQLException {
 		Connection connection = getConnection();
 		UpdateCollectionBuilder builder = UpdateCollection.builder();
 
 		List<Object> parameters = new ArrayList<>();
 		// Sort by newest first, so we don't need to use an offset for the newest activity
-		String sql = "SELECT id,type,actor,timestamp,content,status FROM modreq_updates WHERE modreq_id=? AND status <> ? ORDER BY timestamp ASC LIMIT ?,?";
+		String sql = "SELECT id,type,actor,timestamp,content,status FROM modreq_updates WHERE modreq_id=? AND status <> ? ORDER BY timestamp ASC ";
 
 		parameters.add(request.getId());
 
@@ -691,19 +695,23 @@ public class SqlDataSource implements DataSource {
 		int count = getUpdateCount(request, includePrivate);
 		int lastPage = (int) Math.ceil((float) count / cfg.getModreqs_per_page());
 
-		if(page == null) {
-			page = lastPage;
+		if(paginated) {
+			sql += "LIMIT ?,?";
+
+			if(page == null) {
+				page = lastPage;
+			}
+
+			if(page > lastPage) {
+				return builder.build();
+			}
+
+			int offset = (page - 1) * cfg.getModreqs_per_page();
+			builder.paginated(offset, count);
+
+			parameters.add(offset); //Offset
+			parameters.add(cfg.getModreqs_per_page()); //Limit
 		}
-
-		int offset = (page - 1) * cfg.getModreqs_per_page();
-		builder.paginated(offset, count);
-
-		if(page > lastPage) {
-			return builder.build();
-		}
-
-		parameters.add(offset); //Offset
-		parameters.add(cfg.getModreqs_per_page()); //Limit
 
 		PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -767,9 +775,11 @@ public class SqlDataSource implements DataSource {
 
 	public boolean removeComment(Update update) throws SQLException {
 		Connection connection = getConnection();
-		PreparedStatement pStatement = connection.prepareStatement("DELETE FROM modreq_updates WHERE id=?");
+		PreparedStatement pStatement = connection.prepareStatement("DELETE FROM modreq_updates WHERE id=? AND type IN(?,?)");
 
 		pStatement.setInt(1, update.getId());
+		pStatement.setInt(2, UpdateType.PUBLIC_COMMENT.ordinal());
+		pStatement.setInt(3, UpdateType.PRIVATE_COMMENT.ordinal());
 		int result = pStatement.executeUpdate();
 		pStatement.close();
 		connection.commit();

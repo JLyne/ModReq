@@ -84,16 +84,23 @@ public class CmdComment {
 
              return plugin.getRequestRegistry().getAllUpdates(result, true);
         }).thenComposeAsync((List<Update> updates) -> {
-            comment.set(updates.get(commentId));
-
-            if(comment.get() == null) {
+            if(commentId < 1 || commentId > updates.size()) {
                 Messages.send(player, "error.COMMENT-DOES-NOT-EXIST");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
 
+            comment.set(updates.get(commentId - 1));
+
             if(!comment.get().getCreator().equals(player.getUniqueId()) && !plugin.isAdmin(player)) {
                 Messages.send(player, "error.COMMENT-OTHER");
+                shortcut.complete(null);
+				return new CompletableFuture<>();
+            }
+
+            if(!comment.get().getType().equals(UpdateType.PUBLIC_COMMENT)
+                    && !comment.get().getType().equals(UpdateType.PRIVATE_COMMENT)) {
+                Messages.send(player, "error.NOT-A-COMMENT");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
             }
@@ -104,6 +111,7 @@ public class CmdComment {
                                          "message", comment.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
+            e.printStackTrace();
             return null;
         });
     }
