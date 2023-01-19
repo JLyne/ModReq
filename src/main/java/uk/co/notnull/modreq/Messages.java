@@ -144,7 +144,10 @@ public class Messages {
         setDefaultString("mod.notification.PRIVATE-COMMENT-ADDED", "%prefix% %actor% [commented privately on](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.COMMENT-REMOVED", "%prefix% %actor% [removed a comment from](gray) %link% %view%\n[Message: %message%](gray)");
 
-        setDefaultString("confirmation.CREATED", "%prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%");
+        setDefaultString("confirmation.CREATED", """
+        %prefix% [Your ModReq (%link%) has been created and sent to staff members. Please be patient.](green) %view%
+        [Have more information to add?](#fce469) %comment%
+        [No longer require support?](#fce469) %close%""");
         setDefaultString("confirmation.CLAIMED", "%prefix% %link% [has been claimed](green) %view%");
         setDefaultString("confirmation.UNCLAIMED", "%prefix% %link% [has been un-claimed](green) %view%");
         setDefaultString("confirmation.ELEVATED", "%prefix% %link% [has been flagged for admin attention](green) %view%");
@@ -410,6 +413,8 @@ public class Messages {
         Component prefix = Messages.get("general.PREFIX");
         Component link = Messages.getRequestLink(request);
         Component view = Messages.getViewButton(request);
+        Component comment = Messages.get("action.COMMENT", "id", String.valueOf(request.getId()));
+        Component close = Messages.get("action.CLOSE", "id", String.valueOf(request.getId()));
 
         String username;
 
@@ -435,6 +440,8 @@ public class Messages {
                     .replace("prefix", prefix)
                     .replace("link", link)
                     .replace("view", view)
+                    .replace("comment", comment)
+                    .replace("close", close)
                     .replace(replacements).toComponent();
 
             for(Player p : Bukkit.getOnlinePlayers()) {
@@ -451,12 +458,14 @@ public class Messages {
             String confirmationKey = "confirmation." + action.toString().replace("_", "-");
 
             message = new MineDown(cfg.getString(confirmationKey))
-                  .placeholderIndicator("%")
-                  .replace("id", String.valueOf(request.getId()))
-                  .replace("prefix", prefix)
-                  .replace("link", link)
-                  .replace("view", view)
-                  .replace(replacements).toComponent();
+                    .placeholderIndicator("%")
+                    .replace("id", String.valueOf(request.getId()))
+                    .replace("prefix", prefix)
+                    .replace("link", link)
+                    .replace("view", view)
+                    .replace("comment", comment)
+                    .replace("close", close)
+                    .replace(replacements).toComponent();
 
             ((Player) player).sendMessage(message);
         }
