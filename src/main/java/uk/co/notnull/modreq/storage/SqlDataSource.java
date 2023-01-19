@@ -226,7 +226,7 @@ public class SqlDataSource implements DataSource {
 					statement.setString(3, modreqs.getString("mod_comment"));
 					statement.setInt(4, UpdateType.CLOSE.ordinal());
 					statement.setLong(5, modreqs.getLong("mod_timestamp"));
-					statement.setBoolean(6, modreqs.getInt("done") == UpdateSeenStatus.SEEN.ordinal()); // Seen
+					statement.setInt(6, modreqs.getInt("done")); // Seen
 					statement.executeUpdate();
 				}
 
