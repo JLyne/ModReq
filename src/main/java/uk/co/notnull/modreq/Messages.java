@@ -105,7 +105,8 @@ public class Messages {
         setDefaultString("pagination.activity.NEXT", "[\\[Newer Activity >\\]](run_command=%command% show_text=View more recent activity on this ModReq color=gray)");
         setDefaultString("pagination.activity.DISABLED", "                     ");
 
-        setDefaultString("confirmation.confirm", "%prefix% [Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
+        setDefaultString("confirmation.reopen", "%prefix% [Please confirm you wish to reopen the modreq.\nWe request you only do this if you still require support.](#fce469)\n[\\[Confirm\\]](run_command=/mr confirm show_text=Confirm the ModReq should be reopened color=gold)");
+        setDefaultString("confirmation.generic", "%prefix% [Confirmation required](red) [\\[Confirm\\]](run_command=/mr confirm show_text=Click to confirm the command you just entered color=gold)");
         setDefaultString("confirmation.nothing", "%prefix% [You don't have any pending commands.](red)");
 
         setDefaultString("player.notification.JOIN-MULTIPLE", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");

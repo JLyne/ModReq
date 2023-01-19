@@ -112,13 +112,24 @@ public class Commands {
         //
         // Create the confirmation manager. This allows us to require certain commands to be
         // confirmed before they can be executed
-        //
-        this.confirmationManager = new CommandConfirmationManager<>(
-                /* Timeout */ 30L,
-                /* Timeout unit */ TimeUnit.SECONDS,
-                /* Action when confirmation is required */ context -> Messages.send((Player) context.getCommandContext().getSender(), "confirmation.confirm"),
-                /* Action when no confirmation is pending */ sender -> Messages.send((Player) sender, "confirmation.nothing")
-        );
+		//
+		this.confirmationManager = new CommandConfirmationManager<>(
+				/* Timeout */ 30L,
+				/* Timeout unit */ TimeUnit.SECONDS,
+				/* Action when confirmation is required */ context -> {
+					String argument = context.getCommand().getArguments().get(1).getName();
+
+					if(argument.equals("open") && !plugin.isMod(context.getCommandContext().getSender())) {
+						Messages.send((Player) context.getCommandContext().getSender(), "confirmation.reopen");
+					} else {
+						Messages.send((Player) context.getCommandContext().getSender(), "confirmation.generic");
+					}
+
+
+		},
+				/* Action when no confirmation is pending */
+							  sender -> Messages.send((Player) sender, "confirmation.nothing")
+		);
         //
         // Register the confirmation processor. This will enable confirmations for commands that require it
         //
