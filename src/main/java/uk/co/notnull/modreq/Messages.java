@@ -109,9 +109,9 @@ public class Messages {
 
         setDefaultString("player.notification.JOIN-MULTIPLE", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
         setDefaultString("player.notification.JOIN", "%prefix% [New activity on your ModReq](green) %link% %view%");
-        setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link% %view%\n[Message: %message%](gray)");
-        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has re-opened your ModReq](green) %link% %view%\n[Message: %message%](gray)");
-        setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link% %view%\n[Message: %message%](gray)");
+        setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link%\n[Message: %message%](gray)\n%view%");
+        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has re-opened your ModReq](green) %link%\n[Message: %message%](gray)\n%view%");
+        setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link%\n[Message: %message%](gray)\n%view%");
 
         setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq  show_text=Create a new ModReq color=gold)");
         setDefaultString("player.list.ITEM", "%link% [\\[](#fce469)%status%[\\]](#fce469) [%date%](#fce469) %view%\n%last_update%[Message: %message%](gray)\n");
