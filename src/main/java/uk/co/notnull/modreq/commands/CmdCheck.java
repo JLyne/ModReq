@@ -68,6 +68,11 @@ public class CmdCheck implements Listener {
 	}
 
 	public void checkSpecialModreq(final Player player, final int id, final Integer page) {
+		if(page != null && page < 1) {
+			Messages.send(player, "error.NUMBER-ERROR", "id", String.valueOf(page));
+			return;
+		}
+
 		CompletableFuture<Void> shortcut = new CompletableFuture<>();
         AtomicReference<Request> request = new AtomicReference<>();
 		boolean isMod = (player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin"));

@@ -693,15 +693,17 @@ public class SqlDataSource implements DataSource {
 
 		if(page == null) {
 			page = lastPage;
-		} else if(page > lastPage) {
-			return builder.build();
 		}
 
 		int offset = (page - 1) * cfg.getModreqs_per_page();
+		builder.paginated(offset, count);
+
+		if(page > lastPage) {
+			return builder.build();
+		}
 
 		parameters.add(offset); //Offset
 		parameters.add(cfg.getModreqs_per_page()); //Limit
-		builder.paginated(offset, count);
 
 		PreparedStatement statement = connection.prepareStatement(sql);
 
