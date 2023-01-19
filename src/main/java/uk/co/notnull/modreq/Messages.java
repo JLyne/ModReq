@@ -111,7 +111,7 @@ public class Messages {
         setDefaultString("player.notification.JOIN-MULTIPLE", "%prefix% [New activity on](green) [%count%](#07a0ff) [of your ModReq(s)](green) [\\[View all\\]](run_command=/mr me show_text=List all ModReqs you have created color=gold)");
         setDefaultString("player.notification.JOIN", "%prefix% [New activity on your ModReq](green) %link% %view%");
         setDefaultString("player.notification.CLOSED", "%prefix% %actor% [has closed your ModReq](green) %link%\n[Message: %message%](gray)\n%view%");
-        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has re-opened your ModReq](green) %link%\n[Message: %message%](gray)\n%view%");
+        setDefaultString("player.notification.REOPENED", "%prefix% %actor% [has reopened your ModReq](green) %link%\n[Message: %message%](gray)\n%view%");
         setDefaultString("player.notification.COMMENT-ADDED", "%prefix% %actor% [commented on your ModReq](gray) %link%\n[Message: %message%](gray)\n%view%");
 
         setDefaultString("player.list.HEADER", "%prefix% Your ModReqs [\\[Create\\]](suggest_command=/modreq  show_text=Create a new ModReq color=gold)");
@@ -139,7 +139,7 @@ public class Messages {
         setDefaultString("mod.notification.ELEVATED", "%prefix% %link% [has been flagged for admin attention by](gray) %actor% %view%");
         setDefaultString("mod.notification.UNELEVATED", "%prefix% [Admin flag has been removed from](gray) %link% [by](gray) %actor% %view%");
         setDefaultString("mod.notification.CLOSED", "%prefix% %link% [has been closed by](gray) %actor% %view%\n[Message: %message%](gray)");
-        setDefaultString("mod.notification.REOPENED", "%prefix% %link% [has been re-opened by](gray) %actor% %view%\n[Message: %message%](gray)");
+        setDefaultString("mod.notification.REOPENED", "%prefix% %link% [has been reopened by](gray) %actor% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.COMMENT-ADDED", "%prefix% %actor% [commented on](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.PRIVATE-COMMENT-ADDED", "%prefix% %actor% [commented privately on](gray) %link% %view%\n[Message: %message%](gray)");
         setDefaultString("mod.notification.COMMENT-REMOVED", "%prefix% %actor% [removed a comment from](gray) %link% %view%\n[Message: %message%](gray)");
@@ -150,7 +150,7 @@ public class Messages {
         setDefaultString("confirmation.ELEVATED", "%prefix% %link% [has been flagged for admin attention](green) %view%");
         setDefaultString("confirmation.UNELEVATED", "%prefix% [Admin flag has been removed from](green) %link% %view%");
         setDefaultString("confirmation.CLOSED", "%prefix% %link% [has been closed](green) %view%");
-        setDefaultString("confirmation.REOPENED", "%prefix% %link% [has been re-opened](green) %view%");
+        setDefaultString("confirmation.REOPENED", "%prefix% %link% [has been reopened](green) %view%");
         setDefaultString("confirmation.TELEPORTED", "%prefix% [Teleported to](green) %link%");
         setDefaultString("confirmation.COMMENT-ADDED", "%prefix% [Comment has been added to](green) %link% %view%");
         setDefaultString("confirmation.PRIVATE-COMMENT-ADDED", "%prefix% [Private comment has been added to](green) %link% %view%");
@@ -182,7 +182,7 @@ public class Messages {
 
         setDefaultString("action.VIEW","[\\[View\\]](run_command=/mr info %id% show_text=Show the details of this ModReq color=gold)");
         setDefaultString("action.CLOSE","[\\[Close\\]](suggest_command=/mr close %id%  show_text=Close this ModReq color=red)");
-        setDefaultString("action.OPEN","[\\[Re-open\\]](suggest_command=/mr open %id%  show_text=Re-open this ModReq color=red)");
+        setDefaultString("action.OPEN","[\\[Reopen\\]](suggest_command=/mr open %id%  show_text=Re-open this ModReq color=red)");
         setDefaultString("action.TELEPORT","[\\[Teleport\\]](run_command=/mr tp %id% show_text=Teleport to where this ModReq was created color=gold)");
         setDefaultString("action.CLAIM","[\\[Claim\\]](run_command=/mr claim %id% show_text=Claim this ModReq to indicate you are working on it color=gold)");
         setDefaultString("action.UNCLAIM","[\\[Un-claim\\]](run_command=/mr unclaim %id% show_text=Un-claim this ModReq to allow other staff to work on it color=gold)");
