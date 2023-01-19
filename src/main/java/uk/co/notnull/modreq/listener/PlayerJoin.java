@@ -70,7 +70,7 @@ public class PlayerJoin {
                     return;
                 }
 
-                Messages.send(player, "mod.JOIN", "count", String.valueOf(count));
+                Messages.send(player, "mod.notification.JOIN", "count", String.valueOf(count));
                 plugin.playSound(player);
             }).exceptionally(e -> {
                 e.printStackTrace();
