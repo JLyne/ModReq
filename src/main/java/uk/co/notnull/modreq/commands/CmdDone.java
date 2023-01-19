@@ -47,9 +47,7 @@ public class CmdDone {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 shortcut.complete(null);
 				return new CompletableFuture<>();
-            }
-
-            if(request.isClosed()) {
+            } else if(request.isClosed()) {
                 Messages.send(player, "error.ALREADY-CLOSED");
                 shortcut.complete(null);
 				return new CompletableFuture<>();

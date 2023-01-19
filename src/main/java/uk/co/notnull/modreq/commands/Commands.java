@@ -242,7 +242,6 @@ public class Commands {
 
 	@CommandMethod("mr open <id> <message>")
     @CommandDescription("Open the specified modreq")
-	@CommandPermission("modreq.mod")
 	@Confirmation
     private void commandReopen(
             final @NonNull Player player,

@@ -193,13 +193,13 @@ public class Request {
         Component actions = Component.newline();
         boolean isMod = context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
 
-        if (isClosed() && isMod) {
+        if(isClosed()) {
             actions = actions.append(Messages.get("action.OPEN", "id", String.valueOf(id)));
-            actions = actions.append(Component.space());
-        } else if(!isClosed()) {
+        } else {
             actions = actions.append(Messages.get("action.CLOSE", "id", String.valueOf(id)));
-            actions = actions.append(Component.space());
         }
+
+        actions = actions.append(Component.space());
 
         if(isMod) {
             actions = actions.append(Messages.get("action.TELEPORT", "id", String.valueOf(id)));

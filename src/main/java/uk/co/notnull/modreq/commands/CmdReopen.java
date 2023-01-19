@@ -41,25 +41,29 @@ public class CmdReopen {
 
     public void reopenModReq(final Player player, final int id, final String message) {
         CompletableFuture<Void> shortcut = new CompletableFuture<>();
-        AtomicReference<Request> request = new AtomicReference<>();
 
-        plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
-            request.set(result);
-
-            if(result != null && result.isClosed()) {
-                return plugin.getRequestRegistry().reopen(result, player, message);
-            }
-
-            if(result == null) {
+        plugin.getRequestRegistry().get(id).thenComposeAsync((Request request) -> {
+            if(request == null) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
-            } else {
+                shortcut.complete(null);
+                return new CompletableFuture<>();
+            } else if(!request.isClosed()) {
                 Messages.send(player,"error.NOT-CLOSED");
+                shortcut.complete(null);
+                return new CompletableFuture<>();
             }
 
-            shortcut.complete(null);
-            return new CompletableFuture<>();
+            if(player.getUniqueId().equals(request.getCreator())) {
+                return plugin.getRequestRegistry().reopen(request, player, message);
+            } else if(!player.hasPermission("modreq.mod")) {
+                Messages.send(player, "error.NO-PERMISSION");
+                shortcut.complete(null);
+                return new CompletableFuture<>();
+            }
+
+            return plugin.getRequestRegistry().reopen(request, player, message);
         }).thenAcceptAsync((Request result) -> {
-            Messages.sendModNotification(NotificationType.REOPENED, player, request.get(),
+            Messages.sendModNotification(NotificationType.REOPENED, player, result,
                                          "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
