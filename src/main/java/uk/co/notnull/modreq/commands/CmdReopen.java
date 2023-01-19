@@ -55,7 +55,7 @@ public class CmdReopen {
 
             if(player.getUniqueId().equals(request.getCreator())) {
                 return plugin.getRequestRegistry().reopen(request, player, message);
-            } else if(!player.hasPermission("modreq.mod")) {
+            } else if(!plugin.isMod(player)) {
                 Messages.send(player, "error.NO-PERMISSION");
                 shortcut.complete(null);
                 return new CompletableFuture<>();

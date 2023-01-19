@@ -32,8 +32,10 @@ import java.util.Locale;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import uk.co.notnull.modreq.commands.Commands;
 import uk.co.notnull.modreq.listener.PlayerListener;
 import uk.co.notnull.modreq.storage.DataSource;
@@ -134,9 +136,17 @@ public final class ModReq extends JavaPlugin {
 
     public void playModSound() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("modreq.mod")) {
+            if (plugin.isMod(player)) {
                 this.playSound(player);
             }
         }
+    }
+
+    public boolean isMod(@NotNull CommandSender player) {
+        return player.hasPermission("modreq.mod");
+    }
+
+    public boolean isAdmin(@NotNull CommandSender player) {
+        return player.hasPermission("modreq.admin");
     }
 }

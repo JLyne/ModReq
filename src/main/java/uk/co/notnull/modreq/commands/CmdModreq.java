@@ -66,7 +66,7 @@ public class CmdModreq {
 			return;
 		}
 
-		boolean isMod = (player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin"));
+		boolean isMod = plugin.isMod(player);
         RequestQuery query = new RequestQuery().creator(player.getUniqueId());
 
 		plugin.getRequestRegistry().get(query, page, isMod).thenAcceptAsync(requests -> {

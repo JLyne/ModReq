@@ -64,7 +64,7 @@ public class PlayerJoin {
             return null;
         });
 
-        if(player.hasPermission("modreq.mod") || player.hasPermission("modreq.admin")) {
+        if(plugin.isMod(player)) {
             plugin.getRequestRegistry().getCount(RequestQuery.open()).thenAcceptAsync((Integer count) -> {
                 if(count == 0) {
                     return;

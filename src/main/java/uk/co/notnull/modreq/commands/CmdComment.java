@@ -92,7 +92,7 @@ public class CmdComment {
 				return new CompletableFuture<>();
             }
 
-            if(!comment.get().getCreator().equals(player.getUniqueId()) && !player.hasPermission("modreq.admin")) {
+            if(!comment.get().getCreator().equals(player.getUniqueId()) && !plugin.isAdmin(player)) {
                 Messages.send(player, "error.COMMENT-OTHER");
                 shortcut.complete(null);
 				return new CompletableFuture<>();

@@ -445,7 +445,7 @@ public class Messages {
                     .replace(replacements).toComponent();
 
             for(Player p : Bukkit.getOnlinePlayers()) {
-                if(!p.equals(player) && (p.hasPermission("modreq.mod") || p.hasPermission("modreq.admin"))) {
+                if(!p.equals(player) && ModReq.getPlugin().isMod(p)) {
                     p.sendMessage(message);
                 }
             }

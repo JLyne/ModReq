@@ -55,13 +55,13 @@ public class CmdDone {
 
             if(player.getUniqueId().equals(request.getCreator())) {
                 return plugin.getRequestRegistry().close(request, player, message);
-            } else if(!player.hasPermission("modreq.mod")) {
+            } else if(!plugin.isMod(player)) {
                 Messages.send(player, "error.NO-PERMISSION");
                 shortcut.complete(null);
                 return new CompletableFuture<>();
             }
 
-            boolean canClaimOther = player.hasPermission("modreq.admin")
+            boolean canClaimOther = plugin.isAdmin(player)
                     || player.hasPermission("modreq.mod.overrideclaimed");
 
             if(request.isClaimed() && !request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {

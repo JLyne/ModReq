@@ -54,8 +54,7 @@ public class CmdClaim {
 				return new CompletableFuture<>();
             }
 
-            boolean canClaimOther = player.hasPermission("modreq.admin")
-                    || player.hasPermission("modreq.mod.overrideclaimed");
+            boolean canClaimOther = plugin.isAdmin(player) || player.hasPermission("modreq.mod.overrideclaimed");
 
             if(claim) {
                 if(request.isClaimed() && !canClaimOther) {
