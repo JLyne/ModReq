@@ -224,8 +224,10 @@ public class Request {
             }
         }
 
-        actions = actions.append(Messages.get("action.COMMENT", "id", String.valueOf(id)));
-        actions = actions.append(Component.space());
+        if(isMod || !isClosed()) {
+            actions = actions.append(Messages.get("action.COMMENT", "id", String.valueOf(id)));
+            actions = actions.append(Component.space());
+        }
 
         if(isMod) {
             actions = actions.append(Messages.get("action.PRIVATE_COMMENT", "id", String.valueOf(id)));

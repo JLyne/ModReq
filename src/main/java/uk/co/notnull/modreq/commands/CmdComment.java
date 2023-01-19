@@ -50,6 +50,13 @@ public class CmdComment {
 				return new CompletableFuture<>();
             }
 
+            if(result.isClosed() && result.getCreator().equals(player.getUniqueId())) {
+                Messages.send(player, "error.REOPEN-INSTEAD", "id", String.valueOf(id),
+                              "message", message);
+                shortcut.complete(null);
+				return new CompletableFuture<>();
+            }
+
             return plugin.getRequestRegistry().addComment(result, player, isPublic, message);
         }).thenAccept((Update update) -> {
             Messages.sendModNotification(
