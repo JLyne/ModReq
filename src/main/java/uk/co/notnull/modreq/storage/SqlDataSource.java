@@ -561,7 +561,7 @@ public class SqlDataSource implements DataSource {
 		}
 
 		sql += buildWhere(query, parameters);
-		sql += " ORDER BY last_update.timestamp DESC";
+		sql += " ORDER BY last_update.timestamp DESC, modreq.timestamp DESC";
 
 		if(page != null) {
 			sql += " LIMIT ?,?";
