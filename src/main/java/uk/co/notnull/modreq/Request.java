@@ -185,14 +185,11 @@ public class Request {
         result = result.append(Messages.get(isMod ? "mod.info.HEADER" : "player.info.HEADER", replacements));
         result = result.append(Component.newline());
         result = result.append(Messages.get(isMod ? "mod.info.REQUEST" : "player.info.REQUEST", replacements));
-        result = result.append(Component.newline());
-
-        result = result.append(getActions(context));
 
         return result;
     }
 
-    private Component getActions(@NotNull Player context) {
+    public Component getActions(@NotNull Player context) {
         Component actions = Component.newline();
         boolean isMod = context.hasPermission("modreq.mod") || context.hasPermission("modreq.admin");
 
@@ -209,7 +206,6 @@ public class Request {
             actions = actions.append(Component.space());
 
             if (!isClosed()) {
-
                 if (isClaimedBy(context.getUniqueId())) {
                     actions = actions.append(Messages.get("action.UNCLAIM", "id", String.valueOf(id)));
                     actions = actions.append(Component.space());

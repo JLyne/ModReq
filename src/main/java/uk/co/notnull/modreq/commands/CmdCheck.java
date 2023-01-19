@@ -101,10 +101,13 @@ public class CmdCheck implements Listener {
 					.append(request.get().toComponent(player).append(Component.newline()));
 
 			if(!updates.isEmpty()) {
-				message = message.append(Component.newline()) //???
+				message = message.append(Component.newline())
 						.append(updates.toComponent(player, "/mr info " + request.get().getId() + " %page%"))
 						.append(Component.newline());
 			}
+
+        	message = message.append(request.get().getActions(player));
+			message = message.append(Component.newline());
 
 			Messages.send(player, message);
 		}).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
