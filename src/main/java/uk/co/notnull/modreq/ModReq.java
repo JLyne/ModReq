@@ -34,6 +34,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import uk.co.notnull.modreq.commands.Commands;
@@ -148,5 +149,12 @@ public final class ModReq extends JavaPlugin {
 
     public boolean isAdmin(@NotNull CommandSender player) {
         return player.hasPermission("modreq.admin");
+    }
+
+    public boolean isVanished(Player player) {
+        for (MetadataValue meta : player.getMetadata("vanished")) {
+            if (meta.asBoolean()) return true;
+        }
+            return false;
     }
 }
