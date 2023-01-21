@@ -57,7 +57,7 @@ public class CmdElevate {
             }
         }).thenAcceptAsync((Request result) -> {
             NotificationType type = result.isElevated() ? NotificationType.ELEVATED : NotificationType.UNELEVATED;
-            Messages.sendModNotification(type, player, result);
+            Messages.sendNotification(type, player, result);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");

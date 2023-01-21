@@ -410,7 +410,7 @@ public class Messages {
      * @param request The request that was acted on
      * @param replacements A list of placeholders and their replacements
      */
-    public static void sendModNotification(NotificationType action, OfflinePlayer player, Request request, String ...replacements) {
+    public static void sendNotification(NotificationType action, OfflinePlayer player, Request request, String ...replacements) {
         Component message;
         Component prefix = Messages.get("general.PREFIX");
         Component link = Messages.getRequestLink(request);

@@ -80,9 +80,9 @@ public class CmdClaim {
             }
         }).thenAcceptAsync((Request result) -> {
             if(result.isClaimed()) {
-                Messages.sendModNotification(NotificationType.CLAIMED, player, result);
+                Messages.sendNotification(NotificationType.CLAIMED, player, result);
             } else {
-                Messages.sendModNotification(NotificationType.UNCLAIMED, player, result);
+                Messages.sendNotification(NotificationType.UNCLAIMED, player, result);
             }
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");

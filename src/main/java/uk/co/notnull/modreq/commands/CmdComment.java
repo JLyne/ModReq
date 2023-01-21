@@ -59,7 +59,7 @@ public class CmdComment {
 
             return plugin.getRequestRegistry().addComment(result, player, isPublic, message);
         }).thenAccept((Update update) -> {
-            Messages.sendModNotification(
+            Messages.sendNotification(
                     isPublic ? NotificationType.COMMENT_ADDED : NotificationType.PRIVATE_COMMENT_ADDED, player,
                     request.get(), "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
@@ -107,8 +107,8 @@ public class CmdComment {
 
             return plugin.getRequestRegistry().removeComment(comment.get());
         }).thenAcceptAsync((Boolean result) -> {
-            Messages.sendModNotification(NotificationType.COMMENT_REMOVED, player, request.get(),
-                                         "message", comment.get().getMessage());
+            Messages.sendNotification(NotificationType.COMMENT_REMOVED, player, request.get(),
+                                      "message", comment.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             e.printStackTrace();

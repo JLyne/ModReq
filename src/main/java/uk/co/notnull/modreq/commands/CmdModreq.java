@@ -52,10 +52,11 @@ public class CmdModreq {
 
             return plugin.getRequestRegistry().create(player, message);
         }).thenAcceptAsync((Request request) -> {
-            Messages.sendModNotification(NotificationType.CREATED, player, request);
+            Messages.sendNotification(NotificationType.CREATED, player, request);
             Util.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
+			e.printStackTrace();
             return null;
         });
     }

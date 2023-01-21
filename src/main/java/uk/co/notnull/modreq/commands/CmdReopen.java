@@ -63,8 +63,8 @@ public class CmdReopen {
 
             return plugin.getRequestRegistry().reopen(request, player, message);
         }).thenAcceptAsync((Request result) -> {
-            Messages.sendModNotification(NotificationType.REOPENED, player, result,
-                                         "message", message);
+            Messages.sendNotification(NotificationType.REOPENED, player, result,
+									  "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");
