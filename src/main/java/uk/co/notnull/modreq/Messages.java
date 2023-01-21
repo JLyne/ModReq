@@ -417,20 +417,7 @@ public class Messages {
         Component view = Messages.getViewButton(request);
         Component comment = Messages.get("action.COMMENT", "id", String.valueOf(request.getId()));
         Component close = Messages.get("action.CLOSE", "id", String.valueOf(request.getId()));
-
-        String username;
-
-        if(player.getName() != null) {
-            if (player.isOnline()) {
-                username = Messages.getString("general.ONLINE-PLAYER","player", player.getName());
-            } else {
-                username = Messages.getString("general.OFFLINE-PLAYER", "player", player.getName());
-            }
-        } else {
-            username = Messages.getString("general.UNKNOWN-PLAYER");
-        }
-
-        Component actor = new MineDownParser().parse(username).build();
+        Component actor = getPlayer(player);
 
         String modKey = "mod.notification." + action.toString().replace("_", "-");
 
