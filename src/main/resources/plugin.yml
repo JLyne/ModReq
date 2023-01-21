@@ -4,3 +4,6 @@ main: uk.co.notnull.modreq.ModReq
 author: Jim (NotKatuen)
 api-version: 1.17
 description: File moderator requests.
+softdepend:
+  - SuperVanish
+  - PremiumVanish

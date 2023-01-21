@@ -293,7 +293,7 @@ public class Messages {
         if(player.getName() != null) {
             if(player.equals(context)) {
                 return Messages.get("general.YOU");
-            } else if (player.isOnline() && !Util.isVanished((Player) player)) {
+            } else if (player.isOnline() && Util.canSee((Player) context, (Player) player)) {
                 return Messages.get("general.ONLINE-PLAYER","player", player.getName());
             } else {
                 return Messages.get("general.OFFLINE-PLAYER", "player", player.getName());
@@ -321,7 +321,7 @@ public class Messages {
         if(player != null && player.getName() != null) {
             if(player.equals(context)) {
                 return Messages.getString("general.YOU");
-            } else if (player.isOnline() && !Util.isVanished((Player) player)) {
+            } else if (player.isOnline() && Util.canSee((Player) context, (Player) player)) {
                 return Messages.getString("general.ONLINE-PLAYER","player", player.getName());
             } else {
                 return Messages.getString("general.OFFLINE-PLAYER", "player", player.getName());
@@ -472,7 +472,7 @@ public class Messages {
             message = new MineDown(cfg.getString(playerKey))
                     .placeholderIndicator("%")
                     .replace("id", String.valueOf(request.getId()))
-                    .replace("actor", actor)
+                    .replace("actor", getPlayer(player, creator))
                     .replace("prefix", prefix)
                     .replace("link", link)
                     .replace("view", view)

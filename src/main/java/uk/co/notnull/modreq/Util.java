@@ -22,12 +22,14 @@
 
 package uk.co.notnull.modreq;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Util {
 	public static void playSound(Player player) {
@@ -65,10 +67,22 @@ public class Util {
         return player.hasPermission("modreq.admin");
     }
 
-    public static boolean isVanished(Player player) {
-        for (MetadataValue meta : player.getMetadata("vanished")) {
-            if (meta.asBoolean()) return true;
+    public static boolean canSee(@Nullable Player viewer, Player target) {
+        if(viewer == null) {
+            return true;
         }
-            return false;
+
+        if(Bukkit.getServer().getPluginManager().isPluginEnabled("SuperVanish")
+                    || Bukkit.getServer().getPluginManager().isPluginEnabled("PremiumVanish")) {
+            return VanishAPI.canSee(viewer, target);
+        }
+
+        for (MetadataValue meta : target.getMetadata("vanished")) {
+            if (meta.asBoolean()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
