@@ -23,7 +23,6 @@
 package uk.co.notnull.modreq.commands;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.bukkit.entity.Player;
@@ -31,6 +30,7 @@ import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.Util;
 
 public class CmdReopen {
     private final ModReq plugin;
@@ -55,7 +55,7 @@ public class CmdReopen {
 
             if(player.getUniqueId().equals(request.getCreator())) {
                 return plugin.getRequestRegistry().reopen(request, player, message);
-            } else if(!plugin.isMod(player)) {
+            } else if(!Util.isMod(player)) {
                 Messages.send(player, "error.NO-PERMISSION");
                 shortcut.complete(null);
                 return new CompletableFuture<>();

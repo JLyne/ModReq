@@ -293,7 +293,7 @@ public class Messages {
         if(player.getName() != null) {
             if(player.equals(context)) {
                 return Messages.get("general.YOU");
-            } else if (player.isOnline() && !ModReq.getPlugin().isVanished((Player) player)) {
+            } else if (player.isOnline() && !Util.isVanished((Player) player)) {
                 return Messages.get("general.ONLINE-PLAYER","player", player.getName());
             } else {
                 return Messages.get("general.OFFLINE-PLAYER", "player", player.getName());
@@ -321,7 +321,7 @@ public class Messages {
         if(player != null && player.getName() != null) {
             if(player.equals(context)) {
                 return Messages.getString("general.YOU");
-            } else if (player.isOnline() && !ModReq.getPlugin().isVanished((Player) player)) {
+            } else if (player.isOnline() && !Util.isVanished((Player) player)) {
                 return Messages.getString("general.ONLINE-PLAYER","player", player.getName());
             } else {
                 return Messages.getString("general.OFFLINE-PLAYER", "player", player.getName());
@@ -434,7 +434,7 @@ public class Messages {
                     .replace(replacements).toComponent();
 
             for(Player p : Bukkit.getOnlinePlayers()) {
-                if(!p.equals(player) && ModReq.getPlugin().isMod(p)) {
+                if(!p.equals(player) && Util.isMod(p)) {
                     p.sendMessage(message);
                 }
             }

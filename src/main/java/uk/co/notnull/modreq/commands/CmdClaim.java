@@ -30,6 +30,7 @@ import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.Util;
 
 public class CmdClaim {
     private final ModReq plugin;
@@ -54,7 +55,7 @@ public class CmdClaim {
 				return new CompletableFuture<>();
             }
 
-            boolean canClaimOther = plugin.isAdmin(player) || player.hasPermission("modreq.mod.overrideclaimed");
+            boolean canClaimOther = Util.isAdmin(player) || player.hasPermission("modreq.mod.overrideclaimed");
 
             if(claim) {
                 if(request.isClaimed() && !canClaimOther) {

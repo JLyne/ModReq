@@ -53,7 +53,7 @@ public class CmdModreq {
             return plugin.getRequestRegistry().create(player, message);
         }).thenAcceptAsync((Request request) -> {
             Messages.sendModNotification(NotificationType.CREATED, player, request);
-            plugin.playModSound();
+            Util.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
@@ -66,7 +66,7 @@ public class CmdModreq {
 			return;
 		}
 
-		boolean isMod = plugin.isMod(player);
+		boolean isMod = Util.isMod(player);
         RequestQuery query = new RequestQuery().creator(player.getUniqueId());
 
 		plugin.getRequestRegistry().get(query, page, isMod).thenAcceptAsync(requests -> {

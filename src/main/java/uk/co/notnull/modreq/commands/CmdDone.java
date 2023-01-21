@@ -31,6 +31,7 @@ import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.NotificationType;
 import uk.co.notnull.modreq.Request;
+import uk.co.notnull.modreq.Util;
 
 public class CmdDone {
     private final ModReq plugin;
@@ -55,13 +56,13 @@ public class CmdDone {
 
             if(player.getUniqueId().equals(request.getCreator())) {
                 return plugin.getRequestRegistry().close(request, player, message);
-            } else if(!plugin.isMod(player)) {
+            } else if(!Util.isMod(player)) {
                 Messages.send(player, "error.NO-PERMISSION");
                 shortcut.complete(null);
                 return new CompletableFuture<>();
             }
 
-            boolean canClaimOther = plugin.isAdmin(player)
+            boolean canClaimOther = Util.isAdmin(player)
                     || player.hasPermission("modreq.mod.overrideclaimed");
 
             if(request.isClaimed() && !request.isClaimedBy(player.getUniqueId()) && !canClaimOther) {
@@ -75,7 +76,7 @@ public class CmdDone {
             Player creator = Bukkit.getPlayer(result.getCreator());
 
             if(creator != null) {
-                plugin.playSound(creator);
+                Util.playSound(creator);
             }
 
             Messages.sendModNotification(NotificationType.CLOSED, player, result, "message", message);

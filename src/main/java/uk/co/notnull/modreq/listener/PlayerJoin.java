@@ -57,21 +57,21 @@ public class PlayerJoin {
                               "count", String.valueOf(requests.size()));
             }
 
-            plugin.playSound(player);
+            Util.playSound(player);
         }).exceptionally(e -> {
             e.printStackTrace();
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
 
-        if(plugin.isMod(player)) {
+        if(Util.isMod(player)) {
             plugin.getRequestRegistry().getCount(RequestQuery.open()).thenAcceptAsync((Integer count) -> {
                 if(count == 0) {
                     return;
                 }
 
                 Messages.send(player, "mod.notification.JOIN", "count", String.valueOf(count));
-                plugin.playSound(player);
+                Util.playSound(player);
             }).exceptionally(e -> {
                 e.printStackTrace();
                 Messages.send(player, "error.DATABASE-ERROR");

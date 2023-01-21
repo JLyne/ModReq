@@ -75,7 +75,7 @@ public class CmdCheck implements Listener {
 
 		CompletableFuture<Void> shortcut = new CompletableFuture<>();
         AtomicReference<Request> request = new AtomicReference<>();
-		boolean isMod = plugin.isMod(player);
+		boolean isMod = Util.isMod(player);
 
 		plugin.getRequestRegistry().get(id, isMod).thenComposeAsync((Request result) -> {
             if(result == null || (!isMod && !result.getCreator().equals(player.getUniqueId()))) {

@@ -28,9 +28,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import uk.co.notnull.modreq.Messages;
-import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Update;
 import uk.co.notnull.modreq.UpdateType;
+import uk.co.notnull.modreq.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ public class UpdateCollection extends PaginatedCollection<Update>  {
 
 		Component result = Component.empty();
 		Component pagination = getPagination(context, paginationCommand);
-		boolean isMod = ModReq.getPlugin().isMod(context);
+		boolean isMod = Util.isMod(context);
 
 		result = result.append(Messages.get(isMod ? "mod.activity.HEADER" : "player.activity.HEADER", Map.of(
 				"count", Component.text(getTotal()),
@@ -108,7 +108,7 @@ public class UpdateCollection extends PaginatedCollection<Update>  {
 
 		Component nextButton;
 		Component prevButton;
-		boolean isMod = ModReq.getPlugin().isMod(context);
+		boolean isMod = Util.isMod(context);
 
 		if (isLastPage()) {
 			nextButton = Messages.get("pagination.activity.DISABLED");

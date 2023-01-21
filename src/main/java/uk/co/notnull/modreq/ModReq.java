@@ -115,46 +115,4 @@ public final class ModReq extends JavaPlugin {
             }
         });
     }
-
-    public void playSound(Player player) {
-        Sound sound = null;
-
-        try {
-            sound = Sound.valueOf("BLOCK_NOTE_HARP");
-        } catch (Exception var6) {
-            try {
-                sound = Sound.valueOf("BLOCK_NOTE_BLOCK_HARP");
-            } catch (Exception ignored) { }
-        }
-
-        if (sound != null) {
-            player.playSound(player.getLocation(), sound, 1.0F, 1.0F);
-        } else {
-            getPlugin().getLogger().warning("Cannot find sound...");
-        }
-
-    }
-
-    public void playModSound() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (plugin.isMod(player)) {
-                this.playSound(player);
-            }
-        }
-    }
-
-    public boolean isMod(@NotNull CommandSender player) {
-        return player.hasPermission("modreq.mod");
-    }
-
-    public boolean isAdmin(@NotNull CommandSender player) {
-        return player.hasPermission("modreq.admin");
-    }
-
-    public boolean isVanished(Player player) {
-        for (MetadataValue meta : player.getMetadata("vanished")) {
-            if (meta.asBoolean()) return true;
-        }
-            return false;
-    }
 }

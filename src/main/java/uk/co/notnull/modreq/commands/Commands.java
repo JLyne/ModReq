@@ -47,6 +47,7 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
+import uk.co.notnull.modreq.Util;
 
 public class Commands {
 	private PaperCommandManager<CommandSender> paperCommandManager;
@@ -119,7 +120,7 @@ public class Commands {
 				/* Action when confirmation is required */ context -> {
 					String argument = context.getCommand().getArguments().get(1).getName();
 
-					if(argument.equals("open") && !plugin.isMod(context.getCommandContext().getSender())) {
+					if(argument.equals("open") && !Util.isMod(context.getCommandContext().getSender())) {
 						Messages.send((Player) context.getCommandContext().getSender(), "confirmation.reopen");
 					} else {
 						Messages.send((Player) context.getCommandContext().getSender(), "confirmation.generic");

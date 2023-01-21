@@ -62,7 +62,7 @@ public class RequestCollection extends PaginatedCollection<Request> {
 	@Override
 	public Component toComponent(@NotNull Player context, String paginationCommand) {
 		Component result = Component.empty();
-		boolean isMod = ModReq.getPlugin().isMod(context);
+		boolean isMod = Util.isMod(context);
 
         if(getTotal() == 0 && getPage() == 1) {
 			return Messages.get(isMod ? "mod.list.NO-RESULTS" : "player.list.NO-RESULTS");

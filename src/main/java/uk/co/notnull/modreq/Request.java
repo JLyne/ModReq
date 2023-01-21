@@ -117,7 +117,7 @@ public class Request {
     }
 
     public Component toComponent(@NotNull Player context) {
-        boolean isMod = ModReq.getPlugin().isMod(context);
+        boolean isMod = Util.isMod(context);
         Component result = Component.empty();
 
         OfflinePlayer creator = Bukkit.getOfflinePlayer(getCreator());
@@ -191,7 +191,7 @@ public class Request {
 
     public Component getActions(@NotNull Player context) {
         Component actions = Component.newline();
-        boolean isMod = ModReq.getPlugin().isMod(context);
+        boolean isMod = Util.isMod(context);
 
         if(isClosed()) {
             actions = actions.append(Messages.get("action.OPEN", "id", String.valueOf(id)));

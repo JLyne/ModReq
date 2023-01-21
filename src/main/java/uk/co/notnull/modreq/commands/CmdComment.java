@@ -92,7 +92,7 @@ public class CmdComment {
 
             comment.set(updates.get(commentId - 1));
 
-            if(!comment.get().getCreator().equals(player.getUniqueId()) && !plugin.isAdmin(player)) {
+            if(!comment.get().getCreator().equals(player.getUniqueId()) && !Util.isAdmin(player)) {
                 Messages.send(player, "error.COMMENT-OTHER");
                 shortcut.complete(null);
 				return new CompletableFuture<>();
