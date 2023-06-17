@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="ModReq">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/old/ModReq.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
