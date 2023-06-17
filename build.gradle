@@ -23,13 +23,14 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
-    id 'maven-publish'
 }
 
 repositories {
     mavenLocal()
+    mavenCentral()
+
     maven {
         url = uri('https://repo.papermc.io/repository/maven-public/')
     }
@@ -43,23 +44,19 @@ repositories {
     }
 
     maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
-
-    maven {
         url = uri('https://jitpack.io')
     }
 }
 
 dependencies {
-    implementation 'de.themoep:minedown-adventure:1.7.2-SNAPSHOT'
-    implementation 'cloud.commandframework:cloud-paper:1.8.0'
-    implementation 'cloud.commandframework:cloud-minecraft-extras:1.8.0'
-    implementation 'cloud.commandframework:cloud-annotations:1.8.0'
+    implementation 'de.themoep:minedown-adventure:1.7.1-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-paper:1.8.3'
+    implementation 'cloud.commandframework:cloud-minecraft-extras:1.8.3'
+    implementation 'cloud.commandframework:cloud-annotations:1.8.3'
     implementation 'com.zaxxer:HikariCP:5.0.1'
     
-    compileOnly 'io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT'
-    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.6-4'
+    compileOnly 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
+    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.16'
 }
 
 group = 'uk.co.notnull'
@@ -98,12 +95,3 @@ tasks {
         dependsOn(shadowJar)
     }
 }
-
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
-    }
-}
-
