@@ -49,14 +49,14 @@ repositories {
 }
 
 dependencies {
-    implementation 'de.themoep:minedown-adventure:1.7.1-SNAPSHOT'
-    implementation 'cloud.commandframework:cloud-paper:1.8.3'
-    implementation 'cloud.commandframework:cloud-minecraft-extras:1.8.3'
-    implementation 'cloud.commandframework:cloud-annotations:1.8.3'
-    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'de.themoep:minedown-adventure:1.7.3-SNAPSHOT'
+    implementation 'cloud.commandframework:cloud-paper:1.8.4'
+    implementation 'cloud.commandframework:cloud-minecraft-extras:1.8.4'
+    implementation 'cloud.commandframework:cloud-annotations:1.8.4'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
     
     compileOnly 'io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT'
-    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.16'
+    compileOnly 'com.github.LeonMangler:SuperVanish:6.2.19'
 }
 
 group = 'uk.co.notnull'
