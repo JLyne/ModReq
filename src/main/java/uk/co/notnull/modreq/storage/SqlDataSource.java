@@ -495,7 +495,16 @@ public class SqlDataSource implements DataSource {
 
 		message = message.trim();
 
-		PreparedStatement pStatement = connection.prepareStatement("INSERT INTO modreq (uuid,request,timestamp,world,x,y,z) VALUES (?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+		String sql = "INSERT INTO modreq (uuid,request,timestamp,world,x,y,z) VALUES (?,?,?,?,?,?,?)";
+		PreparedStatement pStatement;
+		ResultSet rs;
+
+		if(cfg.isMySQL()) {
+			pStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		} else {
+			pStatement = connection.prepareStatement(sql + " RETURNING rowid");
+		}
+
 		pStatement.setString(1, player.getUniqueId().toString());
 		pStatement.setString(2, message);
 		pStatement.setLong(3, time);
@@ -503,15 +512,20 @@ public class SqlDataSource implements DataSource {
 		pStatement.setInt(5, location.getBlockX());
 		pStatement.setInt(6, location.getBlockY());
 		pStatement.setInt(7, location.getBlockZ());
-		pStatement.executeUpdate();
 
-		ResultSet rs = pStatement.getGeneratedKeys();
-
+		if(cfg.isMySQL()) {
+			pStatement.executeUpdate();
+			rs = pStatement.getGeneratedKeys();
+		} else {
+			rs = pStatement.executeQuery();
+		}
 		if(!rs.next()) {
+			pStatement.close();
 			throw new SQLException("No row id returned?");
 		}
 
 		id = rs.getInt(1);
+		rs.close();
 		pStatement.close();
 		connection.commit();
 
@@ -801,21 +815,31 @@ public class SqlDataSource implements DataSource {
 			message = message.trim();
 		}
 
-		PreparedStatement pStatement = connection.prepareStatement(
-				"INSERT INTO modreq_updates (modreq_id,type,actor,timestamp,content,status) VALUES (?,?,?,?,?,?)",
-				Statement.RETURN_GENERATED_KEYS);
+		String sql = "INSERT INTO modreq_updates (modreq_id,type,actor,timestamp,content,status) VALUES (?,?,?,?,?,?)";
+		PreparedStatement pStatement;
+		ResultSet rs;
+
+		if(cfg.isMySQL()) {
+			pStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+		} else {
+			pStatement = connection.prepareStatement(sql + " RETURNING rowid");
+		}
+
 		pStatement.setInt(1, request.getId());
 		pStatement.setInt(2, type.ordinal());
 		pStatement.setString(3, player.getUniqueId().toString());
 		pStatement.setLong(4, time);
 		pStatement.setString(5, message);
 		pStatement.setInt(6, status);
-		pStatement.executeUpdate();
-		pStatement.close();
 
-		ResultSet rs = pStatement.getGeneratedKeys();
-
+		if(cfg.isMySQL()) {
+			pStatement.executeUpdate();
+			rs = pStatement.getGeneratedKeys();
+		} else {
+			rs = pStatement.executeQuery();
+		}
 		if(!rs.next()) {
+			pStatement.close();
 			throw new SQLException("No row id returned?");
 		}
 
@@ -898,4 +922,8 @@ public class SqlDataSource implements DataSource {
 
 		return collection.build();
 	}
+
+	private boolean hasReturningKeys() {
+        return !cfg.isMySQL();
+    }
 }
