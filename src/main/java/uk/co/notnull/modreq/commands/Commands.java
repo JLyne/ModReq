@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -49,7 +48,7 @@ import uk.co.notnull.modreq.Messages;
 import uk.co.notnull.modreq.ModReq;
 import uk.co.notnull.modreq.Util;
 
-public class Commands {
+public final class Commands {
 	private PaperCommandManager<CommandSender> paperCommandManager;
     private CommandConfirmationManager<CommandSender> confirmationManager;
     private AnnotationParser<CommandSender> annotationParser;
@@ -350,9 +349,9 @@ public class Commands {
 		ModReq.getPlugin().reloadConfiguration();
 
 		if(ModReq.getPlugin().getConfiguration().isMySQL()) {
-			player.sendMessage(ChatColor.WHITE + "Config and language file reloaded (database: MySQL).");
+			player.sendMessage(Component.text("Config and language file reloaded (database: MySQL)."));
 		} else {
-			player.sendMessage(ChatColor.WHITE + "Config and language file reloaded (database: SQLite).");
+			player.sendMessage(Component.text("Config and language file reloaded (database: SQLite)."));
 		}
 	}
 }

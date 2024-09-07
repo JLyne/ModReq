@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-public class CmdCheck implements Listener {
+public final class CmdCheck implements Listener {
 	private final ModReq plugin;
 
 	final Map<Player, String> lastSearch = new ConcurrentHashMap<>();
