@@ -101,9 +101,9 @@ public class Commands {
         //
         // Register Brigadier mappings
         //
-        if (paperCommandManager.hasCapability(CloudBukkitCapabilities.BRIGADIER)) {
-            paperCommandManager.registerBrigadier();
-        }
+//        if (paperCommandManager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+//            paperCommandManager.registerBrigadier();
+//        }
         //
         // Register asynchronous completions
         //
