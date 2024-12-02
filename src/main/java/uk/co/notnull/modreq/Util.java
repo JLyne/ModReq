@@ -36,10 +36,10 @@ public class Util {
         Sound sound = null;
 
         try {
-            sound = Sound.valueOf("BLOCK_NOTE_HARP");
+            sound = Sound.BLOCK_NOTE_BLOCK_HARP;
         } catch (Exception var6) {
             try {
-                sound = Sound.valueOf("BLOCK_NOTE_BLOCK_HARP");
+                sound = Sound.BLOCK_NOTE_BLOCK_HARP;
             } catch (Exception ignored) { }
         }
 
