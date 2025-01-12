@@ -1,9 +1,0 @@
-name: ModReq
-version: @project.version@
-main: uk.co.notnull.modreq.ModReq
-author: Jim (AnEnragedPigeon)
-api-version: '1.21.4'
-description: File moderator requests.
-softdepend:
-  - SuperVanish
-  - PremiumVanish
