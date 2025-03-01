@@ -1,5 +1,5 @@
 [versions]
-pluginYmlPaperVersion = "0.6.0"
+pluginYmlPaperVersion = "0.7.1"
 paperApiVersion = "1.21.4-R0.1-SNAPSHOT"
 minedownAdventure = "1.7.3-SNAPSHOT"
 cloud = "1.8.4"
@@ -16,4 +16,4 @@ hikari = { group = "com.zaxxer", name = "HikariCP", version.ref = "hikari" }
 superVanishApi = { group = "com.github.LeonMangler", name = "SuperVanish", version.ref = "superVanishApi" }
 
 [plugins]
-pluginYmlPaper = { id = "net.minecrell.plugin-yml.paper", version.ref = "pluginYmlPaperVersion" }
+pluginYmlPaper = { id = "de.eldoria.plugin-yml.paper", version.ref = "pluginYmlPaperVersion" }
