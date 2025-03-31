@@ -1,6 +1,6 @@
 [versions]
 pluginYmlPaperVersion = "0.7.1"
-paperApiVersion = "1.21.4-R0.1-SNAPSHOT"
+paperApiVersion = "1.21.5-R0.1-SNAPSHOT"
 minedownAdventure = "1.7.3-SNAPSHOT"
 cloud = "1.8.4"
 hikari = "5.1.0"
