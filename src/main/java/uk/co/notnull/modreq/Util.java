@@ -22,12 +22,10 @@
 
 package uk.co.notnull.modreq;
 
-import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,17 +70,6 @@ public class Util {
             return true;
         }
 
-        if(Bukkit.getServer().getPluginManager().isPluginEnabled("SuperVanish")
-                    || Bukkit.getServer().getPluginManager().isPluginEnabled("PremiumVanish")) {
-            return VanishAPI.canSee(viewer, target);
-        }
-
-        for (MetadataValue meta : target.getMetadata("vanished")) {
-            if (meta.asBoolean()) {
-                return false;
-            }
-        }
-
-        return true;
+        return viewer.canSee(target);
     }
 }

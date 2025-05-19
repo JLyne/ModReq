@@ -54,8 +54,7 @@ repositories {
 }
 
 dependencies {
-	compileOnly(libs.paperApi)
-    compileOnly(libs.superVanishApi)
+    compileOnly(libs.paperApi)
 
     paperLibrary(libs.minedownAdventure)
     paperLibrary(libs.cloudPaper)
@@ -71,17 +70,6 @@ paper {
     apiVersion = libs.versions.paperApiVersion.get().replace(Regex("\\-R\\d.\\d-SNAPSHOT"), "")
     authors = listOf("Jim (AnEnragedPigeon)")
     description = "File moderator requests."
-
-    serverDependencies {
-        register("SuperVanish") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        register("PremiumVanish") {
-            required = false
-            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-    }
 }
 
 tasks {
