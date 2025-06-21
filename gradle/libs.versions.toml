@@ -1,9 +1,9 @@
 [versions]
 pluginYmlPaperVersion = "0.7.1"
 paperApiVersion = "1.21.6-R0.1-SNAPSHOT"
-minedownAdventure = "1.7.3-SNAPSHOT"
+minedownAdventure = "1.7.4-SNAPSHOT"
 cloud = "1.8.4"
-hikari = "5.1.0"
+hikari = "6.3.0"
 
 [libraries]
 paperApi = { group = "io.papermc.paper", name = "paper-api", version.ref = "paperApiVersion" }
