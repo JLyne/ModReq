@@ -45,7 +45,6 @@ repositories {
     maven {
         url = uri("https://repo.minebench.de/")
     }
-    mavenCentral()
 	mavenLocal()
 }
 
