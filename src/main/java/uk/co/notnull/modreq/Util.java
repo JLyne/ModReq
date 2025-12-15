@@ -58,7 +58,7 @@ public class Util {
     }
 
     public static boolean isMod(@NotNull CommandSender player) {
-        return player.hasPermission("modreq.mod");
+        return isAdmin(player) || player.hasPermission("modreq.mod");
     }
 
     public static boolean isAdmin(@NotNull CommandSender player) {
