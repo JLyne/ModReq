@@ -25,9 +25,7 @@ package uk.co.notnull.modreq;
 import org.bukkit.Location;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 public class RequestBuilder {

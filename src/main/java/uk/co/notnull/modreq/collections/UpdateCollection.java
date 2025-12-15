@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("serial")
 public class UpdateCollection extends PaginatedCollection<Update>  {
 	UpdateCollection(List<Update> updates) {
 		super(updates);

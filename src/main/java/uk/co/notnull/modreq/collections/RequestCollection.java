@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("serial")
 public class RequestCollection extends PaginatedCollection<Request> {
 	RequestCollection(List<Request> requests) {
 		super(requests);
