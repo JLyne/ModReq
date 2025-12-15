@@ -44,7 +44,7 @@ public class CmdComment {
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
             request.set(result);
 
-            if(result == null) {
+            if(result == null || (!Util.isMod(player) && !result.getCreator().equals(player.getUniqueId()))) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 shortcut.complete(null);
 				return new CompletableFuture<>();
@@ -76,7 +76,7 @@ public class CmdComment {
         plugin.getRequestRegistry().get(id).thenComposeAsync((Request result) -> {
             request.set(result);
 
-            if(result == null) {
+            if(result == null || (!Util.isMod(player) && !result.getCreator().equals(player.getUniqueId()))) {
                 Messages.send(player, "error.ID-ERROR", "id", String.valueOf(id));
                 shortcut.complete(null);
 				return new CompletableFuture<>();
