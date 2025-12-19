@@ -46,7 +46,7 @@ public class PlayerJoin {
             if(requests.isEmpty()) {
                 return;
             } else if(requests.size() == 1) {
-                Request request = requests.get(0);
+                Request request = requests.getFirst();
 
                 Messages.send(player, "player.notification.JOIN", Map.of(
                         "id", Component.text(request.getId()),

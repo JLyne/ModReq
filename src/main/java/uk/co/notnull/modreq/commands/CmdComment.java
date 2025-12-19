@@ -106,7 +106,7 @@ public class CmdComment {
             }
 
             return plugin.getRequestRegistry().removeComment(comment.get());
-        }).thenAcceptAsync((Boolean result) -> {
+        }).thenAcceptAsync(_ -> {
             Messages.sendNotification(NotificationType.COMMENT_REMOVED, player, request.get(),
                                       "message", comment.get().getMessage());
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
