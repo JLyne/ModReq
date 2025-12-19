@@ -66,7 +66,7 @@ public class CmdReopen {
             Messages.sendNotification(NotificationType.REOPENED, player, result,
 									  "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
-            e.printStackTrace();
+            plugin.getSLF4JLogger().error("Database error", e);
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });

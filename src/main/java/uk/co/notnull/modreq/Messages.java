@@ -225,7 +225,7 @@ public class Messages {
                     .replace("prefix", new MineDownParser().parse(cfg.getString("general.PREFIX", "")).build())
                     .replace(replacements).toComponent();
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", key);
             return Component.empty();
         }
     }
@@ -246,7 +246,7 @@ public class Messages {
                     .replace("prefix", new MineDownParser().parse(cfg.getString("general.PREFIX", "")).build())
                     .replace(replacements).toComponent();
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", key);
             return Component.empty();
         }
     }
@@ -266,7 +266,7 @@ public class Messages {
                     .replace("prefix", cfg.getString("general.PREFIX", ""))
                     .replace(replacements).replaceIn(cfg.getString(key));
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", key);
             return "";
         }
     }
@@ -376,7 +376,7 @@ public class Messages {
         if(cfg.getString(key) != null) {
             recipient.sendMessage(Messages.get(key, replacements));
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", key);
         }
     }
 
@@ -390,7 +390,7 @@ public class Messages {
         if(cfg.getString(key) != null) {
             recipient.sendMessage(Messages.get(key, replacements));
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + key);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", key);
         }
     }
 
@@ -439,7 +439,7 @@ public class Messages {
                 }
             }
         } else {
-            ModReq.getPlugin().getLogger().warning("Error: Cannot find language string. " + modKey);
+			ModReq.getPlugin().getSLF4JLogger().warn("Error: Cannot find language string. {}", modKey);
         }
 
         // Send confirmation to acting player

@@ -67,8 +67,6 @@ public final class ModReq extends JavaPlugin {
         if(this.dataSource != null) {
             this.dataSource.destroy();
         }
-
-        this.getLogger().info("Plugin disabled.");
     }
 
     public static ModReq getPlugin() {

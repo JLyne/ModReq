@@ -59,7 +59,7 @@ public class PlayerJoin {
 
             Util.playSound(player);
         }).exceptionally(e -> {
-            e.printStackTrace();
+            plugin.getSLF4JLogger().error("Database error", e);
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
@@ -73,7 +73,7 @@ public class PlayerJoin {
                 Messages.send(player, "mod.notification.JOIN", "count", String.valueOf(count));
                 Util.playSound(player);
             }).exceptionally(e -> {
-                e.printStackTrace();
+                plugin.getSLF4JLogger().error("Database error", e);
                 Messages.send(player, "error.DATABASE-ERROR");
                 return null;
             });

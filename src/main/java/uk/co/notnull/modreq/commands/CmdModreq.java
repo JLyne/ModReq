@@ -56,7 +56,7 @@ public class CmdModreq {
             Util.playModSound();
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
-			e.printStackTrace();
+			plugin.getSLF4JLogger().error("Database error", e);
             return null;
         });
     }
@@ -74,7 +74,7 @@ public class CmdModreq {
 			player.sendMessage(requests.toComponent(player, "/mr me %page%"));
 		}).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
-			e.printStackTrace();
+			plugin.getSLF4JLogger().error("Database error", e);
 			return null;
 		});
     }

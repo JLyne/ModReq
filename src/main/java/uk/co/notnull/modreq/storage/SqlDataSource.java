@@ -126,7 +126,7 @@ public class SqlDataSource implements DataSource {
 
 			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			plugin.getSLF4JLogger().error("Database error", e);
 			return false;
 		}
 	}
@@ -161,7 +161,7 @@ public class SqlDataSource implements DataSource {
 	private void migrateToVersion(Connection connection, int version) throws SQLException {
 		PreparedStatement statement;
 
-		plugin.getLogger().info("Migrating DB to version " + version);
+		plugin.getSLF4JLogger().info("Migrating DB to version {}", version);
 
 		switch (version) {
 			case 1 -> {

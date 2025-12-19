@@ -82,7 +82,7 @@ public class CmdDone {
             Messages.sendNotification(NotificationType.CLOSED, player, result, "message", message);
         }).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
             Messages.send(player, "error.DATABASE-ERROR");
-            e.printStackTrace();
+            plugin.getSLF4JLogger().error("Database error", e);
             return null;
         });
     }

@@ -62,7 +62,7 @@ public final class CmdCheck implements Listener {
 					player.sendMessage(requests.toComponent(player, "/mr list %page%"));
 				}).exceptionally((e) -> {
 					Messages.send(player, "error.DATABASE-ERROR");
-					e.printStackTrace();
+					plugin.getSLF4JLogger().error("Database error", e);
 					return null;
 				});
 	}
@@ -112,7 +112,7 @@ public final class CmdCheck implements Listener {
 			Messages.send(player, message);
 		}).applyToEither(shortcut, Function.identity()).exceptionally((e) -> {
 			Messages.send(player, "error.DATABASE-ERROR");
-			e.printStackTrace();
+			plugin.getSLF4JLogger().error("Database error", e);
 			return null;
 		});
 	}
@@ -143,7 +143,7 @@ public final class CmdCheck implements Listener {
 					player.sendMessage(requests.toComponent(player, "/mr searchpage %page%"));
 				}).exceptionally((e) -> {
 					Messages.send(player, "error.DATABASE-ERROR");
-					e.printStackTrace();
+					plugin.getSLF4JLogger().error("Database error", e);
 					return null;
 				});
 	}

@@ -59,7 +59,7 @@ public class CmdElevate {
             NotificationType type = result.isElevated() ? NotificationType.ELEVATED : NotificationType.UNELEVATED;
             Messages.sendNotification(type, player, result);
         }).applyToEither(shortcut, Function.identity()).exceptionally(e -> {
-            e.printStackTrace();
+            plugin.getSLF4JLogger().error("Database error", e);
             Messages.send(player, "error.DATABASE-ERROR");
             return null;
         });
