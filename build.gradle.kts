@@ -62,7 +62,7 @@ paper {
     main = "uk.co.notnull.modreq.ModReq"
     loader = "uk.co.notnull.modreq.ModReqLoader"
     generateLibrariesJson = true
-    apiVersion = libs.versions.paperApiVersion.get().replace(Regex("\\-R\\d.\\d-SNAPSHOT"), "")
+    apiVersion = libs.versions.paperApiVersion.get().replace(".build.+", "")
     authors = listOf("Jim (AnEnragedPigeon)")
     description = "File moderator requests."
 }
