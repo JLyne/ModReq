@@ -143,7 +143,7 @@ public class Request {
             status = Messages.getString("general." + (isClosed() ? "CLOSED": "OPEN"));
         }
 
-        String world = getLocation().getWorld() != null ? getLocation().getWorld().getName() : Messages.getString("general.UNKNOWN-WORLD");
+        String world = getLocation().getWorld() != null ? getLocation().getWorld().key().asString() : Messages.getString("general.UNKNOWN-WORLD");
 
         if(isMod) {
             replacements.put("elevated", isElevated() ? Messages.get("general.ELEVATED") : Component.empty());

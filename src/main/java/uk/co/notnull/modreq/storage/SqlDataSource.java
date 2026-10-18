@@ -26,6 +26,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -508,7 +509,7 @@ public class SqlDataSource implements DataSource {
 		pStatement.setString(1, player.getUniqueId().toString());
 		pStatement.setString(2, message);
 		pStatement.setLong(3, time);
-		pStatement.setString(4, location.getWorld().getName());
+		pStatement.setString(4, location.getWorld().key().asString());
 		pStatement.setInt(5, location.getBlockX());
 		pStatement.setInt(6, location.getBlockY());
 		pStatement.setInt(7, location.getBlockZ());
@@ -867,7 +868,7 @@ public class SqlDataSource implements DataSource {
 
 	private RequestBuilder.BuildStep buildRequest(ResultSet resultSet) throws SQLException {
 		int id = resultSet.getInt(1);
-		World world = Bukkit.getWorld(resultSet.getString("world"));
+		World world = Bukkit.getWorld(NamespacedKey.fromString(resultSet.getString("world")));
 		Date createdDate = new Date(resultSet.getLong(4));
 		Location location = new Location(world, resultSet.getInt("x"),
 										 resultSet.getInt("y"), resultSet.getInt("z"));
